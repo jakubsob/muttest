@@ -26,3 +26,4 @@ Imports:
     treesitter.r,
     withr
 Config/testthat/edition: 3
+URL: https://jakubsob.github.io/muttest/
