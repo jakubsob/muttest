@@ -97,14 +97,14 @@
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#' tests/testthat/test_calculate.R</span></span>
 <span><span class="fu">test_that</span><span class="op">(</span><span class="st">"calculate always returns 0"</span>, <span class="op">{</span></span>
-<span>  <span class="co"># ❌ This test doesn't kill "+" -&gt; "-" operator mutant: (2 - 2) * 0 = 0</span></span>
-<span>  <span class="co"># ✅ This test kills "*" -&gt; "/" operator mutant: (2 + 2) / 0 = Inf</span></span>
+<span>  <span class="co"># 🟢 This test doesn't kill "+" -&gt; "-" operator mutant: (2 - 2) * 0 = 0</span></span>
+<span>  <span class="co"># ❌ This test kills "*" -&gt; "/" operator mutant: (2 + 2) / 0 = Inf</span></span>
 <span>  <span class="fu">expect_equal</span><span class="op">(</span><span class="fu">calculate</span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">test_that</span><span class="op">(</span><span class="st">"calculate returns a numeric"</span>, <span class="op">{</span></span>
-<span>  <span class="co"># ❌ This test doesn't kill "+" -&gt; "-", (2 - 2) * 0 = 0, is numeric</span></span>
-<span>  <span class="co"># ❌ This test doesn't kill "*" -&gt; "/", (2 + 2) / 0 = Inf, is numeric</span></span>
+<span>  <span class="co"># 🟢 This test doesn't kill "+" -&gt; "-", (2 - 2) * 0 = 0, is numeric</span></span>
+<span>  <span class="co"># 🟢 This test doesn't kill "*" -&gt; "/", (2 + 2) / 0 = Inf, is numeric</span></span>
 <span>  <span class="fu">expect_true</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">is.numeric</a></span><span class="op">(</span><span class="fu">calculate</span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <p>We have killed 1 mutant out of 2, so the mutation score is 50%.</p>
