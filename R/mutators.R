@@ -19,6 +19,10 @@ info_oneline <- function(x) {
   sprintf("Mutator: %s -> %s", x$from, x$to)
 }
 
+#' Operator mutator
+#' @param from The operator to be replaced.
+#' @param to The operator to replace with.
+#' @export
 operator <- function(from, to) {
   Mutator$new(
     from = from,

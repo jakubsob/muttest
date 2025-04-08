@@ -1,3 +1,10 @@
+#' Run a mutation test
+#'
+#' @param path Path to the test directory.
+#' @param source_path Path to the source code directory.
+#' @param mutators A list of mutators to use.
+#' @param env The environment to use for testing.
+#'
 #' @importFrom fs dir_copy dir_delete dir_ls
 #' @importFrom withr with_dir defer
 #' @importFrom purrr map iwalk
@@ -5,6 +12,7 @@
 #' @importFrom dplyr select mutate bind_rows all_of
 #' @importFrom testthat test_dir SilentReporter
 #' @importFrom cli cli_inform
+#' @export
 test <- function(
   path,
   source_path = "R",
