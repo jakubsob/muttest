@@ -4,9 +4,10 @@
 #' @param source_path Path to the source code directory.
 #' @param mutators A list of mutators to use.
 #' @param env The environment to use for testing.
+#' @param reporter Reporter to use for mutation testing results.
 #'
-#' @importFrom fs dir_copy dir_delete dir_ls
-#' @importFrom withr with_dir defer
+#' @importFrom fs dir_copy dir_delete dir_ls file_copy path_rel
+#' @importFrom withr with_dir defer local_tempdir
 #' @importFrom purrr map iwalk
 #' @importFrom tibble as_tibble tibble
 #' @importFrom dplyr select mutate bind_rows all_of
@@ -17,7 +18,8 @@ test <- function(
   path,
   source_path = "R",
   mutators = list(operator("+", "-"), operator("*", "/")),
-  env = new.env()
+  env = new.env(),
+  reporter = default_reporter()
 ) {
   plan <- tibble::tibble()
 
@@ -48,80 +50,68 @@ test <- function(
   }
 
   if (nrow(plan) == 0) {
-    cli_inform(c(
-      "i" = "No mutations were generated. Check your mutators and source files."
-    ))
     return(1.0)
   }
 
-  cli_inform(c("i" = "Generated {nrow(plan)} mutations to test"))
+  temp_dir <- withr::local_tempdir()
+  original_dir <- getwd()
 
-  results <- purrr::map(seq_len(nrow(plan)), function(i) {
-    row <- plan[i, ]
-    mutator <- row$mutator[[1]]
-    file_path <- row$file_path
-    mutated_code <- row$mutated_code[[1]]
+  dirs_to_copy <- list.dirs(original_dir, recursive = FALSE, full.names = FALSE)
+  dirs_to_copy <- dirs_to_copy[!grepl("^\\.|tmp|temp", dirs_to_copy)]
 
-    new_path <- paste0("___", source_path, "___")
-    dir_copy(source_path, new_path, overwrite = TRUE)
-    defer({
-      dir_delete(source_path)
-      dir_copy(new_path, source_path, overwrite = TRUE)
-      dir_delete(new_path)
-    })
+  for (dir in dirs_to_copy) {
+    if (dir.exists(file.path(original_dir, dir))) {
+      fs::dir_copy(
+        file.path(original_dir, dir),
+        file.path(temp_dir, dir),
+        overwrite = TRUE
+      )
+    }
+  }
 
-    cli_inform(c(
-      "i" = "Testing mutation in {file_path} using {mutator$from} -> {mutator$to}"
-    ))
-    writeLines(mutated_code, file_path)
+  reporter$start_reporter(plan, temp_dir)
+  withr::with_dir(temp_dir, {
+    results <- purrr::map(seq_len(nrow(plan)), function(i) {
+      row <- plan[i, ]
+      mutator <- row$mutator[[1]]
+      file_path <- row$file_path
+      original_code <- row$original_code[[1]]
+      mutated_code <- row$mutated_code[[1]]
 
-    test_results <- test_dir(
-      path,
-      env = env,
-      stop_on_failure = FALSE,
-      reporter = SilentReporter$new()
-    )
+      reporter$start_file(file_path)
+      reporter$start_mutator(mutator)
 
-    test_results_tibble <- as_tibble(test_results)
-    killed <- any(test_results_tibble$failed > 0)
+      reporter$update(force = TRUE)
 
-    tibble::tibble(
-      file_path = file_path,
-      mutator = list(mutator),
-      test_results = list(test_results_tibble),
-      killed = killed
-    )
-  }) |>
-    dplyr::bind_rows()
+      temp_file_path <- file.path(temp_dir, file_path)
+      withr::defer(writeLines(original_code, temp_file_path))
+      writeLines(mutated_code, temp_file_path)
 
-  total_mutants <- nrow(results)
-  killed_mutants <- sum(results$killed)
-  survived_mutants <- total_mutants - killed_mutants
-  score <- killed_mutants / total_mutants
+      test_results <- test_dir(
+        path,
+        env = env,
+        stop_on_failure = FALSE,
+        reporter = reporter$test_reporter
+      )
 
-  cli::cli_rule(cli::style_bold("Results"))
-  cli_text(
-    "[ ",
-    if (killed_mutants > 0) {
-      col_green("KILLED ")
-    } else {
-      "KILLED "
-    },
-    killed_mutants,
-    " | ",
-    if (survived_mutants > 0) {
-      col_red("SURVIVED ")
-    } else {
-      "SURVIVED "
-    },
-    survived_mutants,
-    " | ",
-    paste0("TOTAL ", total_mutants),
-    " | ",
-    col_green("SCORE: "),
-    sprintf("%.1f%%", score * 100),
-    " ]"
-  )
+      test_results_tibble <- as_tibble(test_results)
+      killed <- any(test_results_tibble$failed > 0)
 
-  score
+      reporter$add_result(file_path, mutator, test_results_tibble, killed)
+
+      reporter$end_mutator()
+      reporter$end_file()
+
+      tibble::tibble(
+        file_path = file_path,
+        mutator = list(mutator),
+        test_results = list(test_results_tibble),
+        killed = killed
+      )
+    }) |>
+      dplyr::bind_rows()
+  })
+
+  reporter$end_reporter()
+  sum(results$killed) / nrow(results)
 }

@@ -9,6 +9,11 @@ test_that("multiple_files", {
     expect_equal(test("tests/testthat"), 0.333, tolerance = 0.01)
   })
 })
+test_that("no_mutations", {
+  withr::with_dir(system.file("examples/no_mutations/", package = "muttest"), {
+    expect_equal(test("tests/testthat", mutators = list(operator("/", "*"))), 1)
+  })
+})
 
 test_that("box", {
   testthat::skip_if(testthat::is_checking())

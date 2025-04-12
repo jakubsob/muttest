@@ -20,6 +20,7 @@ Imports:
     dplyr,
     fs,
     purrr,
+    R6,
     testthat,
     tibble,
     treesitter,

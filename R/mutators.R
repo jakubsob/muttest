@@ -8,16 +8,14 @@ Mutator <- R6::R6Class(
       self$to <- to
       self$query <- query
     },
+    # nocov start
     print = function() {
       cat(sprintf("Mutator: %s -> %s\n", self$from, self$to))
       cat(sprintf("Query: %s\n", self$query))
     }
+    # nocov end
   )
 )
-
-info_oneline <- function(x) {
-  sprintf("Mutator: %s -> %s", x$from, x$to)
-}
 
 #' Operator mutator
 #' @param from The operator to be replaced.

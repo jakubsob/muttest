@@ -8,7 +8,8 @@ test(
   path,
   source_path = "R",
   mutators = list(operator("+", "-"), operator("*", "/")),
-  env = new.env()
+  env = new.env(),
+  reporter = default_reporter()
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ test(
 \item{mutators}{A list of mutators to use.}
 
 \item{env}{The environment to use for testing.}
+
+\item{reporter}{Reporter to use for mutation testing results.}
 }
 \description{
 Run a mutation test
