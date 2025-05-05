@@ -10,7 +10,8 @@ test(
   source_path = "R",
   env = new.env(),
   reporter = default_reporter(),
-  plan = test_plan(fs::dir_ls(source_path, recurse = TRUE, regexp = "*.[rR]$"), mutators)
+  plan = test_plan(fs::dir_ls(source_path, recurse = TRUE, regexp = "*.[rR]$"), mutators),
+  test_strategy = default_test_strategy()
 )
 }
 \arguments{
@@ -25,6 +26,9 @@ test(
 \item{reporter}{Reporter to use for mutation testing results.}
 
 \item{plan}{A data frame with the test plan. See [test_plan()].}
+
+\item{test_strategy}{Strategy for running tests: "full" (all tests) or "file" (tests matching source file name).
+Can also be a RunStrategy object. See [create_run_strategy()].}
 }
 \description{
 Run a mutation test

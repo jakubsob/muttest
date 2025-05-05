@@ -6,6 +6,8 @@
 #' @param env The environment to use for testing.
 #' @param reporter Reporter to use for mutation testing results.
 #' @param plan A data frame with the test plan. See [test_plan()].
+#' @param test_strategy Strategy for running tests: "full" (all tests) or "file" (tests matching source file name).
+#'   Can also be a RunStrategy object. See [create_run_strategy()].
 #'
 #' @export
 test <- function(
@@ -17,7 +19,8 @@ test <- function(
   plan = test_plan(
     fs::dir_ls(source_path, recurse = TRUE, regexp = "*.[rR]$"),
     mutators
-  )
+  ),
+  test_strategy = default_test_strategy()
 ) {
   checkmate::assert_directory_exists(path)
   checkmate::assert_directory_exists(source_path)
@@ -32,6 +35,7 @@ test <- function(
     ),
     combine = "and"
   )
+  checkmate::assert_class(test_strategy, "TestStrategy", null.ok = TRUE)
 
   if (nrow(plan) == 0) {
     return(invisible(1.0))
@@ -75,10 +79,12 @@ test <- function(
         withr::defer(writeLines(original_code, temp_file_path))
         writeLines(mutated_code, temp_file_path)
 
-        test_results <- test_dir(
-          path,
+        # Use the run method of R6 strategy object
+        test_results <- test_strategy$execute(
+          path = path,
+          file_path = file_path,
+          mutated_code = mutated_code,
           env = env,
-          stop_on_failure = FALSE,
           reporter = reporter$test_reporter
         )
 
