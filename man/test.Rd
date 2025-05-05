@@ -6,22 +6,25 @@
 \usage{
 test(
   path,
+  mutators,
   source_path = "R",
-  mutators = list(operator("+", "-"), operator("*", "/")),
   env = new.env(),
-  reporter = default_reporter()
+  reporter = default_reporter(),
+  plan = test_plan(fs::dir_ls(source_path, recurse = TRUE, regexp = "*.[rR]$"), mutators)
 )
 }
 \arguments{
 \item{path}{Path to the test directory.}
 
-\item{source_path}{Path to the source code directory.}
-
 \item{mutators}{A list of mutators to use.}
+
+\item{source_path}{Path to the source code directory.}
 
 \item{env}{The environment to use for testing.}
 
 \item{reporter}{Reporter to use for mutation testing results.}
+
+\item{plan}{A data frame with the test plan. See [test_plan()].}
 }
 \description{
 Run a mutation test
