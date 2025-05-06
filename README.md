@@ -1,23 +1,35 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
 # muttest <img src="man/figures/logo.png" align="right" alt="" width="120" />
 
 <!-- badges: start -->
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![CRAN status](https://www.r-pkg.org/badges/version/muttest)](https://CRAN.R-project.org/package=muttest)
+
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/muttest)](https://CRAN.R-project.org/package=muttest)
 [![R-CMD-check](https://github.com/jakubsob/muttest/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jakubsob/muttest/actions/workflows/R-CMD-check.yaml)
-[![Codecov test coverage](https://codecov.io/gh/jakubsob/muttest/graph/badge.svg)](https://app.codecov.io/gh/jakubsob/muttest)
+[![Codecov test
+coverage](https://codecov.io/gh/jakubsob/muttest/graph/badge.svg)](https://app.codecov.io/gh/jakubsob/muttest)
 <!-- badges: end -->
 
-> 🚧 **This package is in development and not yet ready for production use.** 🚧
+> 🚧 **This package is in development and not yet ready for production
+> use.** 🚧
 
-Mutation testing frameworks work by intentionally introducing small changes (called mutations) into your code to check whether your tests can detect them.
+Mutation testing frameworks work by intentionally introducing small
+changes (called mutations) into your code to check whether your tests
+can detect them.
 
-The goal is to evaluate how effective your test suite is — if your tests fail when the code is altered, that’s a good sign. If they don’t, your tests might be missing something important.
+The goal is to evaluate how effective your test suite is — if your tests
+fail when the code is altered, that’s a good sign. If they don’t, your
+tests might be missing something important.
 
 # Example
 
 Given our codebase is:
 
-```r
+``` r
 #' R/calculate.R
 calculate <- function(x, y) {
   (x + y) * 0
@@ -26,55 +38,52 @@ calculate <- function(x, y) {
 
 And our tests are:
 
-```r
+``` r
 #' tests/testthat/test_calculate.R
-test_that("calculate always returns 0", {
-  expect_equal(calculate(2, 2), 0)
-})
-
 test_that("calculate returns a numeric", {
-  expect_true(is.numeric(calculate(2, 2)))
+  expect_true(is.numeric(calculate(2, 2))) # ❌ This assertion doesn't kill mutants
+})
+
+test_that("calculate always returns 0", {
+  expect_equal(calculate(2, 2), 0) # ✅ This assertion only kills "*" -> "/" mutant
 })
 ```
 
-When running `muttest::test()` we'll get a report of the mutation score:
-```r
-muttest::test(
-  path = "tests/testthat",
-  source_path = "R",
-  mutators = list(operator("+", "-"), operator("*", "/"))
+When running `muttest::test()` we’ll get a report of the mutation score:
+
+``` r
+plan <- muttest::test_plan(
+  source_files = "R/calculate.R",
+  mutators = list(
+    muttest::operator("+", "-"),
+    muttest::operator("*", "/")
+  )
 )
-#> ── Mutation Testing ──────────────────────────────────────────────────────────────────────
-#> Using temporary directory: /var/folders/vk/yrfnlfbs4dq06zwj3rqg5h0m0000gn/T//RtmpIpw4bv/file108173bf72d17
-#> Starting mutation testing with:
-#>   - 2 total mutations
-#>   - 1 files to mutate
-#>   - 2 unique mutation operators
-#>
-#>    |  K    S    T   | File
-#> x  |  0    1    1   | calculate.R     1 "+" -> "-"
-#> ✔  |  1    1    2   | calculate.R     2 "*" -> "/"
-#>
-#> ── Mutation Distribution ─────────────────────────────────────────────────────────────────
-#> calculate.R: 1 killed / 1 survived / 2 total (50.0%)
-#>
-#>
-#> ── Mutation Testing Results ──────────────────────────────────────────────────────────────
-#> [ KILLED 1 | SURVIVED 1 | TOTAL 2 | SCORE: 50.0% ]
+
+muttest::test("tests/testthat", plan)
+#> ℹ Mutation Testing
+#>   |   K |   S |   E |   T |   % | Mutator  | File
+#> x |   0 |   1 |   0 |   1 |   0 | + → -    | calculate.R
+#> ✔ |   1 |   1 |   0 |   2 |  50 | * → /    | calculate.R
+#> ── Mutation Testing Results ────────────────────────────────────────────────────
+#> [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
 ```
 
-The mutation score is: $\text{Mutation Score} = \frac{\text{Killed Mutants}}{\text{Total Mutants}} \times 100\%$, where a Mutant is defined as variant of the original code that is used to test the robustness of the test suite.
+The mutation score is:
+$\text{Mutation Score} = \frac{\text{Killed Mutants}}{\text{Total Mutants}} \times 100\%$,
+where a Mutant is defined as variant of the original code that is used
+to test the robustness of the test suite.
 
 In the example there were 2 mutants of the code:
 
-```r
+``` r
 #' R/calculate.R
 calculate <- function(x, y) {
   (x - y) * 0 # mutant 1: "+" -> "-"
 }
 ```
 
-```r
+``` r
 #' R/calculate.R
 calculate <- function(x, y) {
   (x + y) / 0 # mutant 2: "*" -> "/"
@@ -83,11 +92,14 @@ calculate <- function(x, y) {
 
 Tests are run against both variants of the code.
 
-The first test run against the first mutant will pass, because the result is still 0. The second test run against the second mutant will fail, because the result is Inf.
+The first test run against the first mutant will pass, because the
+result is still 0. The second test run against the second mutant will
+fail, because the result is Inf.
 
-The second test will pass against both mutants, because the result is still numeric.
+The second test will pass against both mutants, because the result is
+still numeric.
 
-```r
+``` r
 #' tests/testthat/test_calculate.R
 test_that("calculate always returns 0", {
   # 🟢 This test doesn't kill "+" -> "-" operator mutant: (2 - 2) * 0 = 0
