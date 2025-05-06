@@ -34,7 +34,7 @@ Other TestStrategy:
 \subsection{Method \code{execute()}}{
 Execute the test strategy
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FileTestStrategy$execute(path, file_path, mutated_code, env, reporter)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{FileTestStrategy$execute(path, mutated_file, mutated_code, env, reporter)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -42,7 +42,7 @@ Execute the test strategy
 \describe{
 \item{\code{path}}{The path to the test directory}
 
-\item{\code{file_path}}{The path to the file being tested}
+\item{\code{mutated_file}}{The path to the file being tested}
 
 \item{\code{mutated_code}}{The mutated code}
 

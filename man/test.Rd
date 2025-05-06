@@ -6,29 +6,28 @@
 \usage{
 test(
   path,
-  mutators,
-  source_path = "R",
-  env = new.env(),
+  plan,
   reporter = default_reporter(),
-  plan = test_plan(fs::dir_ls(source_path, recurse = TRUE, regexp = "*.[rR]$"), mutators),
-  test_strategy = default_test_strategy()
+  test_strategy = default_test_strategy(),
+  source_loader = default_source_loader(),
+  project_copy_stragtegy = default_project_copy_strategy()
 )
 }
 \arguments{
 \item{path}{Path to the test directory.}
 
-\item{mutators}{A list of mutators to use.}
-
-\item{source_path}{Path to the source code directory.}
-
-\item{env}{The environment to use for testing.}
+\item{plan}{A data frame with the test plan. See [test_plan()].}
 
 \item{reporter}{Reporter to use for mutation testing results.}
 
-\item{plan}{A data frame with the test plan. See [test_plan()].}
+\item{test_strategy}{Strategy for running tests.}
 
-\item{test_strategy}{Strategy for running tests: "full" (all tests) or "file" (tests matching source file name).
-Can also be a RunStrategy object. See [create_run_strategy()].}
+\item{source_loader}{Function to load source files.}
+
+\item{project_copy_stragtegy}{Strategy for copying the project.}
+}
+\value{
+A numeric value representing the mutation score.
 }
 \description{
 Run a mutation test
