@@ -4,266 +4,316 @@
 #' It provides real-time feedback on which mutations are being tested
 #' and whether they were killed by tests.
 #'
-#' @field frames Spinner animation frames for dynamic display
-#' @field dynamic Whether dynamic output is supported in the current terminal
 #' @field start_time Time when testing started (for duration calculation)
 #' @field min_time Minimum test duration to display timing information
-#' @field last_update Time of the last progress update
-#' @field update_interval How often to update the spinner (in seconds)
-#' @field frame_index Current frame index in the spinner animation
-#' @field mutations_by_file List tracking mutation statistics by file
-#' @field table_header_printed Whether the table header has been printed
-#' @field current_mutation_index List tracking current mutation index by file
-#' @field col_status_width Width for status column
-#' @field col_killed_width Width for killed mutations column
-#' @field col_survived_width Width for survived mutations column
-#' @field col_total_width Width for total mutations column
-#' @field col_file_width Width for file name column
-#' @field col_sep Column separator string
+#' @field col_config List of column configuration for report formatting
 #'
 #' @importFrom R6 R6Class
 #' @importFrom cli col_green col_red col_yellow col_grey symbol
 #' @export
 #' @family reporters
-MutationProgressReporter <- R6::R6Class("MutationProgressReporter",
+MutationProgressReporter <- R6::R6Class(
+  classname = "MutationProgressReporter",
   inherit = MutationReporter,
   public = list(
-    # For dynamic display
-    frames = NULL,
-    dynamic = FALSE,
     start_time = NULL,
     min_time = 1,
-    last_update = NULL,
-    update_interval = 0.1,
-    frame_index = 0,
+    col_config = list(
+      "status" = list(
+        padding_left = 0,
+        padding_right = 1,
+        width = 2
+      ),
+      "k" = list(
+        padding_left = 1,
+        padding_right = 1,
+        width = 5,
+        type = "number"
+      ),
+      "s" = list(
+        padding_left = 1,
+        padding_right = 1,
+        width = 5,
+        type = "number"
+      ),
+      "e" = list(
+        padding_left = 1,
+        padding_right = 1,
+        width = 5,
+        type = "number"
+      ),
+      "t" = list(
+        padding_left = 1,
+        padding_right = 1,
+        width = 5,
+        type = "number"
+      ),
+      "score" = list(
+        padding_left = 1,
+        padding_right = 1,
+        width = 5,
+        type = "number"
+      ),
+      "mutator" = list(
+        padding_left = 1,
+        padding_right = 1,
+        width = 10
+      ),
+      "file" = list(
+        padding_left = 1,
+        padding_right = 1
+      )
+    ),
 
-    # Track mutations by file
-    mutations_by_file = list(),
+    #' @description Format a column with specified padding and width
+    #' @param text Text to format
+    #' @param col_name Column name to use configuration from
+    #' @param colorize Optional function to color the text
+    format_column = function(text, col_name, colorize = NULL) {
+      config <- self$col_config[[col_name]]
 
-    # For tabular output
-    table_header_printed = FALSE,
-    current_mutation_index = list(),
+      # Get actual visible length of text
+      text_len <- nchar(text)
 
-    # Column width configuration
-    col_status_width = 3,
-    col_killed_width = 5,
-    col_survived_width = 5,
-    col_total_width = 5,
-    col_file_width = 20,
-    col_sep = " | ",
+      # If width is specified, calculate available text space after padding
+      if (!is.null(config$width) && config$width > 0) {
+        padding_size <- (config$padding_left %||% 0) +
+          (config$padding_right %||% 0)
+        text_max_width <- config$width - padding_size
+        if (text_len > text_max_width && text_max_width > 0) {
+          # Truncate if text is too long for the available space
+          text <- substring(text, 1, text_max_width)
+          text_len <- text_max_width
+        }
+      } else if (!is.null(config$max_width) && config$max_width > 0) {
+        # Otherwise, use the existing max_width logic if provided
+        text <- substring(text, 1, config$max_width)
+        text_len <- min(text_len, config$max_width)
+      }
+
+      # Calculate left padding
+      left_pad <- ""
+      if (!is.null(config$padding_left) && config$padding_left > 0) {
+        left_pad <- strrep(" ", config$padding_left)
+      }
+
+      # Calculate right padding
+      right_pad <- ""
+      if (!is.null(config$padding_right) && config$padding_right > 0) {
+        right_pad <- strrep(" ", config$padding_right)
+      }
+
+      # Handle fixed width columns
+      if (!is.null(config$width) && config$width > 0) {
+        # Calculate current total width
+        total_width <- text_len + nchar(left_pad) + nchar(right_pad)
+        if (total_width < config$width) {
+          # For number columns, add extra spaces to left padding for right alignment
+          if (!is.null(config$type) && config$type == "number") {
+            left_pad <- paste0(
+              left_pad,
+              strrep(" ", config$width - total_width)
+            )
+          } else {
+            # Otherwise add to right padding (left alignment)
+            right_pad <- paste0(
+              right_pad,
+              strrep(" ", config$width - total_width)
+            )
+          }
+        }
+      } else if (!is.null(config$max_width) && config$max_width > 0) {
+        # Handle max_width padding (existing behavior)
+        total_current_width <- text_len + nchar(left_pad) + nchar(right_pad)
+        if (total_current_width < config$max_width) {
+          # Add extra spaces to reach max width
+          right_pad <- paste0(
+            right_pad,
+            strrep(" ", config$max_width - total_current_width)
+          )
+        }
+      }
+
+      # Apply color formatting after padding calculation but before concatenation
+      if (!is.null(colorize) && is.function(colorize)) {
+        text <- colorize(text)
+      }
+
+      paste0(left_pad, text, right_pad)
+    },
+
+    #' @description Format the header of the report
+    fmt_h = function() {
+      paste0(
+        " ",
+        " |",
+        self$format_column("K", "k", cli::col_green),
+        "|",
+        self$format_column("S", "s", cli::col_red),
+        "|",
+        self$format_column("E", "e", cli::col_yellow),
+        "|",
+        self$format_column("T", "t"),
+        "|",
+        self$format_column("  %", "score"),
+        "|",
+        self$format_column("Mutator", "mutator"),
+        "|",
+        self$format_column("File", "file")
+      )
+    },
+
+    #' @description Format a row of the report
+    #' @param status Status symbol (e.g., tick or cross)
+    #' @param k Number of killed mutations
+    #' @param s Number of survived mutations
+    #' @param e Number of errors
+    #' @param t Total number of mutations
+    #' @param score Score percentage
+    #' @param mutator The mutator used
+    #' @param file The file being tested
+    #' @return Formatted row string
+    fmt_r = function(status, k, s, e, t, score, mutator, file) {
+      paste0(
+        status,
+        " |",
+        self$format_column(as.character(k), "k"),
+        "|",
+        self$format_column(as.character(s), "s"),
+        "|",
+        self$format_column(as.character(e), "e"),
+        "|",
+        self$format_column(as.character(t), "t"),
+        "|",
+        self$format_column(score, "score"),
+        "|",
+        self$format_column(as.character(mutator), "mutator"),
+        "|",
+        self$format_column(file, "file")
+      )
+    },
 
     #' @description Initialize a new progress reporter
     #' @param test_reporter Reporter to use for testthat::test_dir
     #' @param min_time Minimum time to show elapsed time (default: 1s)
-    #' @param update_interval How often to update the display (default: 0.1s)
     #' @param file Output destination (default: stdout)
-    initialize = function(test_reporter = "silent",
-                          min_time = 1,
-                          update_interval = 0.1,
-                          file = stdout()) {
+    initialize = function(
+      test_reporter = "silent",
+      min_time = 1,
+      file = stdout()
+    ) {
       super$initialize(test_reporter, file)
 
       self$min_time <- min_time
-      self$update_interval <- update_interval
-      self$mutations_by_file <- list()
-      self$current_mutation_index <- list()
-      self$table_header_printed <- FALSE
-
-      self$frames <- cli::get_spinner()$frames
-      self$dynamic <- cli::is_dynamic_tty()
+      self$results <- list()
     },
 
     #' @description Start reporter
     #' @param plan The complete mutation plan
-    #' @param temp_dir Path to the temporary directory for testing
-    start_reporter = function(plan = NULL, temp_dir = NULL) {
-      super$start_reporter(plan, temp_dir)
+    start_reporter = function(plan = NULL) {
+      super$start_reporter(plan)
       self$start_time <- proc.time()
-      self$mutations_by_file <- list()
-      self$current_mutation_index <- list()
-      self$table_header_printed <- FALSE
-      self$rule("Mutation Testing", line = 1)
-
-      self$cat_line("Using temporary directory: ", self$temp_dir)
-
-      total_mutations <- nrow(self$plan)
-      unique_files <- length(unique(self$plan$file_path))
-      unique_mutators <- length(unique(sapply(self$plan$mutator, function(m) paste(m$from, "->", m$to))))
-
-      self$cat_line("Starting mutation testing with:")
-      self$cat_line("  - ", total_mutations, " total mutations")
-      self$cat_line("  - ", unique_files, " files to mutate")
-      self$cat_line("  - ", unique_mutators, " unique mutation operators")
-
-      self$cat_line()
-    },
-
-    #' @description Start testing a file
-    #' @param file_path Path to the file being mutated
-    start_file = function(file_path) {
-      super$start_file(file_path)
-
-      # Initialize mutation tracking for this file
-      if (is.null(self$mutations_by_file[[file_path]])) {
-        self$mutations_by_file[[file_path]] <- list(
-          total = 0,
-          killed = 0,
-          survived = 0
-        )
-
-        # Reset mutation index counter for this file
-        self$current_mutation_index[[file_path]] <- 0
-      }
-
-      # Print table header if this is the first file or mutation
-      if (!self$table_header_printed) {
-        # Format header with colored K and S
-        self$cat_line(
-          "   |  ",
-          col_green("K"), "    ",
-          col_red("S"), "    T   | File"
-        )
-        self$table_header_printed <- TRUE
-      }
-    },
-
-    #' @description Start testing with a specific mutator
-    #' @param mutator The mutator being applied
-    start_mutator = function(mutator) {
-      super$start_mutator(mutator)
-      # We don't need to print anything here, will show in add_result
+      self$results <- list()
+      self$cat_line(paste(cli::symbol$info, "Mutation Testing"))
+      self$cat_line(self$fmt_h())
     },
 
     #' @description Add a mutation test result
     #' @param file_path Path to the file that was mutated
     #' @param mutator The mutator that was applied
-    #' @param test_results Results from the test execution
     #' @param killed Whether the mutation was killed by tests
-    add_result = function(file_path, mutator, test_results, killed) {
-      super$add_result(file_path, mutator, test_results, killed)
+    #' @param survived Number of survived mutations
+    #' @param errors Number of errors encountered
+    add_result = function(
+      file_path,
+      mutator,
+      killed,
+      survived,
+      errors
+    ) {
+      super$add_result(file_path, mutator, killed, survived, errors)
 
-      self$mutations_by_file[[file_path]]$total <- self$mutations_by_file[[file_path]]$total + 1
-      if (killed) {
-        self$mutations_by_file[[file_path]]$killed <- self$mutations_by_file[[file_path]]$killed + 1
+      status_symbol <- if (killed) {
+        cli::col_green(cli::symbol$tick)
       } else {
-        self$mutations_by_file[[file_path]]$survived <- self$mutations_by_file[[file_path]]$survived + 1
+        cli::col_red("x")
       }
 
-      # Increment mutation index for this file
-      self$current_mutation_index[[file_path]] <- self$current_mutation_index[[file_path]] + 1
-      mutation_idx <- self$current_mutation_index[[file_path]]
-
-      # Format table values with proper spacing
-      status_symbol <- if (killed) col_green(cli::symbol$tick) else col_red("x")
-      k <- sprintf("%3d", self$mutations_by_file[[file_path]]$killed)
-      s <- sprintf("%3d", self$mutations_by_file[[file_path]]$survived)
-      t <- sprintf("%3d", self$mutations_by_file[[file_path]]$total)
-
+      k <- self$results[[file_path]]$killed
+      s <- self$results[[file_path]]$survived
+      t <- self$results[[file_path]]$total
+      e <- self$results[[file_path]]$errors
       file_name <- basename(file_path)
-      file_name <- sprintf("%-15s", substring(file_name, 1, 15))
+      score <- floor(self$current_score * 100)
 
-      mutation_desc <- sprintf("%d \"%s\" -> \"%s\"",
-                              mutation_idx,
-                              mutator$from,
-                              mutator$to)
-
-      # Use carriage return to overwrite the spinner line
-      # nocov start
-      if (self$dynamic) {
-        # Clear line completely and write the result
-        self$cat_tight("\r\033[K")
-      }
-      # nocov end
-
-      # Format table row to match the requested example exactly
-      self$cat_line(
-        status_symbol, "  |",
-        k, "  ", s, "  ", t, "   | ",
-        file_name, " ",
-        mutation_desc
-      )
+      # Format and print the row using our formatting function
+      self$cat_line(self$fmt_r(
+        status_symbol,
+        k,
+        s,
+        e,
+        t,
+        score,
+        info_oneline(mutator),
+        file_name
+      ))
     },
 
     #' @description Update status spinner (for long-running operations)
     #' @param force Force update even if interval hasn't elapsed
     update = function(force = FALSE) {
-      now <- proc.time()[[3]]
-      if (force || is.null(self$last_update) ||
-          now - self$last_update > self$update_interval) {
-
-        self$last_update <- now
-
-        # nocov start
-        if (self$dynamic) {
-          self$frame_index <- (self$frame_index %% length(self$frames)) + 1
-          frame <- self$frames[self$frame_index]
-
-          # Show temporary spinner that will be completely replaced by add_result
-          # Use a clear format that matches the add_result output structure
-          self$cat_tight(
-            "\r", frame, "  |               |                       | Running mutation..."
-          )
-        }
-        # nocov end
-      }
     },
 
     #' @description End testing current file
     end_file = function() {
-      # We don't need to print anything here since the tabular format shows file progress
       super$end_file()
     },
 
     #' @description Carriage return if dynamic, newline otherwise
     # nocov start
     cr = function() {
-      if (self$dynamic) {
-        "\r"
-      } else {
-        "\n"
-      }
     },
     # nocov end
 
     #' @description End reporter with detailed summary
     end_reporter = function() {
-      # Clear any progress display
-      # nocov start
-      if (self$dynamic) {
-        self$cat_tight(self$cr(), strrep(" ", self$width))
-      }
-      # nocov end
-
       self$cat_line()
 
-      # End time statistics
-      # nocov start
       time <- proc.time() - self$start_time
       if (time[[3]] > self$min_time) {
-        self$cat_line(cli::col_cyan(paste0("Duration: ", sprintf("%.2f s", time[[3]]))))
-        self$cat_line()
+        self$cat_line(cli::col_cyan(paste0(
+          "Duration: ",
+          sprintf("%.2f s", time[[3]])
+        )))
       }
-      # nocov end
 
-      # Show mutation distribution by file
-      if (self$total_mutations > 0) {
-        self$rule("Mutation Distribution", line = 1)
+      results <- dplyr::bind_rows(self$results)
+      k <- sum(results$killed)
+      s <- sum(results$survived)
+      t <- sum(results$total)
+      e <- sum(results$errors)
+      score <- self$current_score
+      self$cat_line()
+      cli::cli_rule(cli::style_bold("Mutation Testing Results"))
+      self$cat_line(
+        "[ ",
+        cli::col_green("KILLED "),
+        k,
+        " | ",
+        cli::col_red("SURVIVED "),
+        s,
+        " | ",
+        cli::col_yellow("ERRORS "),
+        e,
+        " | ",
+        "TOTAL ",
+        t,
+        " | ",
+        cli::style_bold(cli::col_green(sprintf("SCORE %.1f%%", score * 100))),
+        " ]"
+      )
 
-        # Display stats for each file
-        for (file_path in names(self$mutations_by_file)) {
-          stats <- self$mutations_by_file[[file_path]]
-          file_score <- if (stats$total > 0) stats$killed / stats$total else 1.0
-
-          self$cat_line(
-            basename(file_path), ": ",
-            col_green(paste0(stats$killed, " killed")), " / ",
-            col_red(paste0(stats$survived, " survived")), " / ",
-            stats$total, " total (", sprintf("%.1f%%", file_score * 100), ")"
-          )
-        }
-
-        self$cat_line()
-      }
+      self$cat_line()
 
       super$end_reporter()
     }

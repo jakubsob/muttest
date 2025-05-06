@@ -22,6 +22,7 @@ Imports:
     fs,
     purrr,
     R6,
+    rlang,
     testthat,
     tibble,
     treesitter,

@@ -33,3 +33,7 @@ operator <- function(from, to) {
     )', from)
   )
 }
+
+info_oneline <- function(m) {
+  paste(m$from, cli::symbol$arrow_right, m$to)
+}

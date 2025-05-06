@@ -9,6 +9,7 @@
 #' @return A numeric value representing the mutation score.
 #'
 #' @export
+#' @importFrom rlang .data
 test <- function(
   path,
   plan,
@@ -38,9 +39,10 @@ test <- function(
   reporter$start_reporter(plan)
 
   results <- plan |>
+    dplyr::arrange(.data$file_path, .data$mutator) |>
     dplyr::rowwise() |>
     dplyr::group_split() |>
-    purrr::map(\(row) {
+    purrr::walk(\(row) {
       mutator <- row$mutator[[1]]
       file_path <- row$file_path
       original_code <- row$original_code[[1]]
@@ -73,23 +75,23 @@ test <- function(
       })
 
       test_results_tibble <- tibble::as_tibble(test_results)
-      killed <- any(test_results_tibble$failed > 0)
+      killed <- as.numeric(sum(test_results_tibble$failed) > 0)
+      survived <- as.numeric(sum(test_results_tibble$failed) == 0)
+      errors <- sum(test_results_tibble$error)
 
-      reporter$add_result(file_path, mutator, test_results_tibble, killed)
+      reporter$add_result(
+        file_path,
+        mutator,
+        killed,
+        survived,
+        errors
+      )
       reporter$end_mutator()
       reporter$end_file()
-
-      tibble::tibble(
-        file_path = file_path,
-        mutator = list(mutator),
-        test_results = list(test_results_tibble),
-        killed = killed
-      )
-    }) |>
-    dplyr::bind_rows()
+    })
 
   reporter$end_reporter()
-  invisible(sum(results$killed) / nrow(results))
+  invisible(reporter$get_score())
 }
 
 #' Create a test plan for mutation testing

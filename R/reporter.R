@@ -11,17 +11,17 @@
 #' @field crayon Whether colored output is supported
 #' @field rstudio Whether running in RStudio
 #' @field hyperlinks Whether terminal hyperlinks are supported
-#' @field total_mutations Total number of mutation tests executed
-#' @field killed_mutations Number of mutations killed by tests
-#' @field survived_mutations Number of mutations that survived tests
 #' @field current_file Path of the file currently being mutated
 #' @field current_mutator Mutator currently being applied
 #' @field plan Complete mutation plan for the test run
-#' @field temp_dir Path to the temporary directory for testing
+#' @field results List of mutation test results, indexed by file path
+#' @field current_score Current score of the mutation tests
 #'
 #' @export
 #' @family reporters
-MutationReporter <- R6::R6Class("MutationReporter",
+#' @importFrom rlang `%||%`
+MutationReporter <- R6::R6Class(
+  classname = "MutationReporter",
   public = list(
     # Define test reporter that will be used for running tests
     test_reporter = NULL,
@@ -36,18 +36,15 @@ MutationReporter <- R6::R6Class("MutationReporter",
     rstudio = TRUE,
     hyperlinks = TRUE,
 
-    # Counters for tracking mutation results
-    total_mutations = 0,
-    killed_mutations = 0,
-    survived_mutations = 0,
-
     # Current state
     current_file = NULL,
     current_mutator = NULL,
 
-    # Mutation plan and temp directory
     plan = NULL,
-    temp_dir = NULL,
+
+    # Track mutations by file
+    results = NULL,
+    current_score = NA_real_,
 
     #' @description Initialize a new reporter
     #' @param test_reporter Reporter to use for the testthat::test_dir function
@@ -67,18 +64,23 @@ MutationReporter <- R6::R6Class("MutationReporter",
     #' @description Start reporter
     #' @param plan The complete mutation plan
     #' @param temp_dir Path to the temporary directory for testing
-    start_reporter = function(plan = NULL, temp_dir = NULL) {
-      self$total_mutations <- 0
-      self$killed_mutations <- 0
-      self$survived_mutations <- 0
+    start_reporter = function(plan = NULL) {
       self$plan <- plan
-      self$temp_dir <- temp_dir
+      self$results <- list()
+      self$current_score <- NA_real_
     },
 
     #' @description Start testing a file
     #' @param file_path Path to the file being mutated
     start_file = function(file_path) {
       self$current_file <- file_path
+      self$results[[file_path]] <- self$results[[file_path]] %||%
+        list(
+          total = 0,
+          killed = 0,
+          survived = 0,
+          errors = 0
+        )
     },
 
     #' @description Start testing with a specific mutator
@@ -90,15 +92,27 @@ MutationReporter <- R6::R6Class("MutationReporter",
     #' @description Add a mutation test result
     #' @param file_path Path to the file that was mutated
     #' @param mutator The mutator that was applied
-    #' @param test_results Results from the test execution
     #' @param killed Whether the mutation was killed by tests
-    add_result = function(file_path, mutator, test_results, killed) {
-      self$total_mutations <- self$total_mutations + 1
-      if (killed) {
-        self$killed_mutations <- self$killed_mutations + 1
-      } else {
-        self$survived_mutations <- self$survived_mutations + 1
-      }
+    #' @param survived Number of survived mutations
+    #' @param errors Number of errors encountered
+    add_result = function(
+      file_path,
+      mutator,
+      killed,
+      survived,
+      errors
+    ) {
+      self$results[[file_path]]$total <- self$results[[file_path]]$total + 1
+      self$results[[file_path]]$killed <- self$results[[file_path]]$killed +
+        killed
+      self$results[[file_path]]$survived <- self$results[[file_path]]$survived +
+        survived
+      self$results[[file_path]]$errors <- self$results[[file_path]]$errors +
+        errors
+      killed_counts <- purrr::map(self$results, "killed")
+      total_counts <- purrr::map(self$results, "total")
+      self$current_score <- sum(as.numeric(killed_counts)) /
+        sum(as.numeric(total_counts))
     },
 
     #' @description End testing with current mutator
@@ -113,25 +127,11 @@ MutationReporter <- R6::R6Class("MutationReporter",
 
     #' @description End reporter and show summary
     end_reporter = function() {
-      score <- self$killed_mutations / self$total_mutations
-      self$cat_line()
-      cli::cli_rule(cli::style_bold("Mutation Testing Results"))
-      self$cat_line(
-        "[ ",
-        cli::col_green("KILLED "),
-        self$killed_mutations,
-        " | ",
-        cli::col_red("SURVIVED "),
-        self$survived_mutations,
-        " | ",
-        paste0("TOTAL ", self$total_mutations),
-        " | ",
-        cli::col_green("SCORE: "),
-        sprintf("%.1f%%", score * 100),
-        " ]"
-      )
+    },
 
-      self$cat_line()
+    #' @description Get the current score
+    get_score = function() {
+      self$current_score
     },
 
     #' @description Print a message to the output

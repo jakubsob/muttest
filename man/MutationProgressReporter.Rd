@@ -24,47 +24,22 @@ Other reporters:
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{frames}}{Spinner animation frames for dynamic display}
-
-\item{\code{dynamic}}{Whether dynamic output is supported in the current terminal}
-
 \item{\code{start_time}}{Time when testing started (for duration calculation)}
 
 \item{\code{min_time}}{Minimum test duration to display timing information}
 
-\item{\code{last_update}}{Time of the last progress update}
-
-\item{\code{update_interval}}{How often to update the spinner (in seconds)}
-
-\item{\code{frame_index}}{Current frame index in the spinner animation}
-
-\item{\code{mutations_by_file}}{List tracking mutation statistics by file}
-
-\item{\code{table_header_printed}}{Whether the table header has been printed}
-
-\item{\code{current_mutation_index}}{List tracking current mutation index by file}
-
-\item{\code{col_status_width}}{Width for status column}
-
-\item{\code{col_killed_width}}{Width for killed mutations column}
-
-\item{\code{col_survived_width}}{Width for survived mutations column}
-
-\item{\code{col_total_width}}{Width for total mutations column}
-
-\item{\code{col_file_width}}{Width for file name column}
-
-\item{\code{col_sep}}{Column separator string}
+\item{\code{col_config}}{List of column configuration for report formatting}
 }
 \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-MutationProgressReporter-format_column}{\code{MutationProgressReporter$format_column()}}
+\item \href{#method-MutationProgressReporter-fmt_h}{\code{MutationProgressReporter$fmt_h()}}
+\item \href{#method-MutationProgressReporter-fmt_r}{\code{MutationProgressReporter$fmt_r()}}
 \item \href{#method-MutationProgressReporter-new}{\code{MutationProgressReporter$new()}}
 \item \href{#method-MutationProgressReporter-start_reporter}{\code{MutationProgressReporter$start_reporter()}}
-\item \href{#method-MutationProgressReporter-start_file}{\code{MutationProgressReporter$start_file()}}
-\item \href{#method-MutationProgressReporter-start_mutator}{\code{MutationProgressReporter$start_mutator()}}
 \item \href{#method-MutationProgressReporter-add_result}{\code{MutationProgressReporter$add_result()}}
 \item \href{#method-MutationProgressReporter-update}{\code{MutationProgressReporter$update()}}
 \item \href{#method-MutationProgressReporter-end_file}{\code{MutationProgressReporter$end_file()}}
@@ -74,15 +49,83 @@ Other reporters:
 }
 }
 \if{html}{\out{
-<details open><summary>Inherited methods</summary>
+<details><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="muttest" data-topic="MutationReporter" data-id="cat_line"><a href='../../muttest/html/MutationReporter.html#method-MutationReporter-cat_line'><code>muttest::MutationReporter$cat_line()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="muttest" data-topic="MutationReporter" data-id="cat_tight"><a href='../../muttest/html/MutationReporter.html#method-MutationReporter-cat_tight'><code>muttest::MutationReporter$cat_tight()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="muttest" data-topic="MutationReporter" data-id="end_mutator"><a href='../../muttest/html/MutationReporter.html#method-MutationReporter-end_mutator'><code>muttest::MutationReporter$end_mutator()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="muttest" data-topic="MutationReporter" data-id="get_score"><a href='../../muttest/html/MutationReporter.html#method-MutationReporter-get_score'><code>muttest::MutationReporter$get_score()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="muttest" data-topic="MutationReporter" data-id="rule"><a href='../../muttest/html/MutationReporter.html#method-MutationReporter-rule'><code>muttest::MutationReporter$rule()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="muttest" data-topic="MutationReporter" data-id="start_file"><a href='../../muttest/html/MutationReporter.html#method-MutationReporter-start_file'><code>muttest::MutationReporter$start_file()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="muttest" data-topic="MutationReporter" data-id="start_mutator"><a href='../../muttest/html/MutationReporter.html#method-MutationReporter-start_mutator'><code>muttest::MutationReporter$start_mutator()</code></a></span></li>
 </ul>
 </details>
 }}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MutationProgressReporter-format_column"></a>}}
+\if{latex}{\out{\hypertarget{method-MutationProgressReporter-format_column}{}}}
+\subsection{Method \code{format_column()}}{
+Format a column with specified padding and width
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MutationProgressReporter$format_column(text, col_name, colorize = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{text}}{Text to format}
+
+\item{\code{col_name}}{Column name to use configuration from}
+
+\item{\code{colorize}}{Optional function to color the text}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MutationProgressReporter-fmt_h"></a>}}
+\if{latex}{\out{\hypertarget{method-MutationProgressReporter-fmt_h}{}}}
+\subsection{Method \code{fmt_h()}}{
+Format the header of the report
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MutationProgressReporter$fmt_h()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MutationProgressReporter-fmt_r"></a>}}
+\if{latex}{\out{\hypertarget{method-MutationProgressReporter-fmt_r}{}}}
+\subsection{Method \code{fmt_r()}}{
+Format a row of the report
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MutationProgressReporter$fmt_r(status, k, s, e, t, score, mutator, file)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{status}}{Status symbol (e.g., tick or cross)}
+
+\item{\code{k}}{Number of killed mutations}
+
+\item{\code{s}}{Number of survived mutations}
+
+\item{\code{e}}{Number of errors}
+
+\item{\code{t}}{Total number of mutations}
+
+\item{\code{score}}{Score percentage}
+
+\item{\code{mutator}}{The mutator used}
+
+\item{\code{file}}{The file being tested}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Formatted row string
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MutationProgressReporter-new"></a>}}
 \if{latex}{\out{\hypertarget{method-MutationProgressReporter-new}{}}}
@@ -92,7 +135,6 @@ Initialize a new progress reporter
 \if{html}{\out{<div class="r">}}\preformatted{MutationProgressReporter$new(
   test_reporter = "silent",
   min_time = 1,
-  update_interval = 0.1,
   file = stdout()
 )}\if{html}{\out{</div>}}
 }
@@ -103,8 +145,6 @@ Initialize a new progress reporter
 \item{\code{test_reporter}}{Reporter to use for testthat::test_dir}
 
 \item{\code{min_time}}{Minimum time to show elapsed time (default: 1s)}
-
-\item{\code{update_interval}}{How often to update the display (default: 0.1s)}
 
 \item{\code{file}}{Output destination (default: stdout)}
 }
@@ -117,49 +157,13 @@ Initialize a new progress reporter
 \subsection{Method \code{start_reporter()}}{
 Start reporter
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MutationProgressReporter$start_reporter(plan = NULL, temp_dir = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MutationProgressReporter$start_reporter(plan = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{plan}}{The complete mutation plan}
-
-\item{\code{temp_dir}}{Path to the temporary directory for testing}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MutationProgressReporter-start_file"></a>}}
-\if{latex}{\out{\hypertarget{method-MutationProgressReporter-start_file}{}}}
-\subsection{Method \code{start_file()}}{
-Start testing a file
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MutationProgressReporter$start_file(file_path)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{file_path}}{Path to the file being mutated}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MutationProgressReporter-start_mutator"></a>}}
-\if{latex}{\out{\hypertarget{method-MutationProgressReporter-start_mutator}{}}}
-\subsection{Method \code{start_mutator()}}{
-Start testing with a specific mutator
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MutationProgressReporter$start_mutator(mutator)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{mutator}}{The mutator being applied}
 }
 \if{html}{\out{</div>}}
 }
@@ -170,7 +174,13 @@ Start testing with a specific mutator
 \subsection{Method \code{add_result()}}{
 Add a mutation test result
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MutationProgressReporter$add_result(file_path, mutator, test_results, killed)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MutationProgressReporter$add_result(
+  file_path,
+  mutator,
+  killed,
+  survived,
+  errors
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -180,9 +190,11 @@ Add a mutation test result
 
 \item{\code{mutator}}{The mutator that was applied}
 
-\item{\code{test_results}}{Results from the test execution}
-
 \item{\code{killed}}{Whether the mutation was killed by tests}
+
+\item{\code{survived}}{Number of survived mutations}
+
+\item{\code{errors}}{Number of errors encountered}
 }
 \if{html}{\out{</div>}}
 }

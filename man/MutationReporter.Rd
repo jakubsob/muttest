@@ -35,19 +35,15 @@ Other reporters:
 
 \item{\code{hyperlinks}}{Whether terminal hyperlinks are supported}
 
-\item{\code{total_mutations}}{Total number of mutation tests executed}
-
-\item{\code{killed_mutations}}{Number of mutations killed by tests}
-
-\item{\code{survived_mutations}}{Number of mutations that survived tests}
-
 \item{\code{current_file}}{Path of the file currently being mutated}
 
 \item{\code{current_mutator}}{Mutator currently being applied}
 
 \item{\code{plan}}{Complete mutation plan for the test run}
 
-\item{\code{temp_dir}}{Path to the temporary directory for testing}
+\item{\code{results}}{List of mutation test results, indexed by file path}
+
+\item{\code{current_score}}{Current score of the mutation tests}
 }
 \if{html}{\out{</div>}}
 }
@@ -62,6 +58,7 @@ Other reporters:
 \item \href{#method-MutationReporter-end_mutator}{\code{MutationReporter$end_mutator()}}
 \item \href{#method-MutationReporter-end_file}{\code{MutationReporter$end_file()}}
 \item \href{#method-MutationReporter-end_reporter}{\code{MutationReporter$end_reporter()}}
+\item \href{#method-MutationReporter-get_score}{\code{MutationReporter$get_score()}}
 \item \href{#method-MutationReporter-cat_tight}{\code{MutationReporter$cat_tight()}}
 \item \href{#method-MutationReporter-cat_line}{\code{MutationReporter$cat_line()}}
 \item \href{#method-MutationReporter-rule}{\code{MutationReporter$rule()}}
@@ -93,7 +90,7 @@ Initialize a new reporter
 \subsection{Method \code{start_reporter()}}{
 Start reporter
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MutationReporter$start_reporter(plan = NULL, temp_dir = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MutationReporter$start_reporter(plan = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -146,7 +143,7 @@ Start testing with a specific mutator
 \subsection{Method \code{add_result()}}{
 Add a mutation test result
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MutationReporter$add_result(file_path, mutator, test_results, killed)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MutationReporter$add_result(file_path, mutator, killed, survived, errors)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -156,9 +153,11 @@ Add a mutation test result
 
 \item{\code{mutator}}{The mutator that was applied}
 
-\item{\code{test_results}}{Results from the test execution}
-
 \item{\code{killed}}{Whether the mutation was killed by tests}
+
+\item{\code{survived}}{Number of survived mutations}
+
+\item{\code{errors}}{Number of errors encountered}
 }
 \if{html}{\out{</div>}}
 }
@@ -190,6 +189,16 @@ End testing current file
 End reporter and show summary
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MutationReporter$end_reporter()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MutationReporter-get_score"></a>}}
+\if{latex}{\out{\hypertarget{method-MutationReporter-get_score}{}}}
+\subsection{Method \code{get_score()}}{
+Get the current score
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MutationReporter$get_score()}\if{html}{\out{</div>}}
 }
 
 }
