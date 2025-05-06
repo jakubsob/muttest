@@ -1,3 +1,6 @@
+#' @import testthat
+NULL
+
 #' Base TestStrategy class
 #'
 #' @md
@@ -8,13 +11,13 @@ TestStrategy <- R6::R6Class(
   public = list(
     #' @description Execute the test strategy
     #' @param path The path to the test directory
-    #' @param file_path The path to the file being tested
+    #' @param mutated_file The path to the file being tested
     #' @param mutated_code The mutated code
     #' @param env The environment to run the tests in
     #' @param reporter The reporter to use for test results
     #' @return The test result
-    execute = function(path, file_path, mutated_code, env, reporter) {
-      stop("Method not implemented for base Test class")
+    execute = function(path, mutated_file, mutated_code, env, reporter) {
+      stop("Not implemented")
     }
   )
 )
@@ -31,12 +34,12 @@ FullTestStrategy <- R6::R6Class(
   public = list(
     #' @description Execute the test strategy
     #' @param path The path to the test directory
-    #' @param file_path The path to the file being tested
+    #' @param mutated_file The path to the file being tested
     #' @param mutated_code The mutated code
     #' @param env The environment to run the tests in
     #' @param reporter The reporter to use for test results
     #' @return The test results
-    execute = function(path, file_path, mutated_code, env, reporter) {
+    execute = function(path, mutated_file, mutated_code, env, reporter) {
       testthat::test_dir(
         path,
         env = env,
@@ -59,15 +62,15 @@ FileTestStrategy <- R6::R6Class(
   public = list(
     #' @description Execute the test strategy
     #' @param path The path to the test directory
-    #' @param file_path The path to the file being tested
+    #' @param mutated_file The path to the file being tested
     #' @param mutated_code The mutated code
     #' @param env The environment to run the tests in
     #' @param reporter The reporter to use for test results
     #' @return The test results
-    execute = function(path, file_path, mutated_code, env, reporter) {
-      file_name <- tools::file_path_sans_ext(basename(file_path))
+    execute = function(path, mutated_file, mutated_code, env, reporter) {
+      file_name <- tools::file_path_sans_ext(basename(mutated_file))
       if (!any(grepl(file_name, list.files(path)))) {
-        file_name <- NULL
+        return(.empty_test_result())
       }
       testthat::test_dir(
         path,
@@ -89,4 +92,11 @@ FileTestStrategy <- R6::R6Class(
 #' @family TestStrategy
 default_test_strategy <- function(...) {
   FileTestStrategy$new(...)
+}
+
+.empty_test_result <- function() {
+  structure(
+    list(),
+    class = c("testthat_results")
+  )
 }
