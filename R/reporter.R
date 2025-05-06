@@ -19,8 +19,6 @@
 #' @field plan Complete mutation plan for the test run
 #' @field temp_dir Path to the temporary directory for testing
 #'
-#' @importFrom R6 R6Class
-#' @importFrom cli cli_inform cli_text col_cyan col_red col_green col_yellow
 #' @export
 #' @family reporters
 MutationReporter <- R6::R6Class("MutationReporter",
@@ -120,15 +118,15 @@ MutationReporter <- R6::R6Class("MutationReporter",
       cli::cli_rule(cli::style_bold("Mutation Testing Results"))
       self$cat_line(
         "[ ",
-        col_green("KILLED "),
+        cli::col_green("KILLED "),
         self$killed_mutations,
         " | ",
-        col_red("SURVIVED "),
+        cli::col_red("SURVIVED "),
         self$survived_mutations,
         " | ",
         paste0("TOTAL ", self$total_mutations),
         " | ",
-        col_green("SCORE: "),
+        cli::col_green("SCORE: "),
         sprintf("%.1f%%", score * 100),
         " ]"
       )

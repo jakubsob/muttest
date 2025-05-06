@@ -240,7 +240,7 @@ MutationProgressReporter <- R6::R6Class("MutationProgressReporter",
       # nocov start
       time <- proc.time() - self$start_time
       if (time[[3]] > self$min_time) {
-        self$cat_line(col_cyan(paste0("Duration: ", sprintf("%.2f s", time[[3]]))))
+        self$cat_line(cli::col_cyan(paste0("Duration: ", sprintf("%.2f s", time[[3]]))))
         self$cat_line()
       }
       # nocov end
