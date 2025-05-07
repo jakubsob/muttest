@@ -11,8 +11,8 @@
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Mutation Testing">
-<meta name="description" content="Mutation testing for R. Run your tests agains mutated code to learn the quality of your assertions.">
-<meta property="og:description" content="Mutation testing for R. Run your tests agains mutated code to learn the quality of your assertions.">
+<meta name="description" content="Mutation testing for R. Run your tests against mutated code to learn the quality of your assertions.">
+<meta property="og:description" content="Mutation testing for R. Run your tests against mutated code to learn the quality of your assertions.">
 <meta property="og:image" content="https://jakubsob.github.io/muttest/logo.png">
 </head>
 <body>
@@ -70,37 +70,30 @@
 <p>And our tests are:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#' tests/testthat/test_calculate.R</span></span>
-<span><span class="fu">test_that</span><span class="op">(</span><span class="st">"calculate always returns 0"</span>, <span class="op">{</span></span>
-<span>  <span class="fu">expect_equal</span><span class="op">(</span><span class="fu">calculate</span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="fu">test_that</span><span class="op">(</span><span class="st">"calculate returns a numeric"</span>, <span class="op">{</span></span>
+<span>  <span class="fu">expect_true</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">is.numeric</a></span><span class="op">(</span><span class="fu">calculate</span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="co"># ❌ This assertion doesn't kill mutants</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">test_that</span><span class="op">(</span><span class="st">"calculate returns a numeric"</span>, <span class="op">{</span></span>
-<span>  <span class="fu">expect_true</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">is.numeric</a></span><span class="op">(</span><span class="fu">calculate</span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">test_that</span><span class="op">(</span><span class="st">"calculate always returns 0"</span>, <span class="op">{</span></span>
+<span>  <span class="fu">expect_equal</span><span class="op">(</span><span class="fu">calculate</span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fl">0</span><span class="op">)</span> <span class="co"># ✅ This assertion only kills "*" -&gt; "/" mutant</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <p>When running <code><a href="reference/test.html">muttest::test()</a></code> we’ll get a report of the mutation score:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">muttest</span><span class="fu">::</span><span class="fu"><a href="reference/test.html">test</a></span><span class="op">(</span></span>
-<span>  path <span class="op">=</span> <span class="st">"tests/testthat"</span>,</span>
-<span>  source_path <span class="op">=</span> <span class="st">"R"</span>,</span>
-<span>  mutators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="reference/operator.html">operator</a></span><span class="op">(</span><span class="st">"+"</span>, <span class="st">"-"</span><span class="op">)</span>, <span class="fu"><a href="reference/operator.html">operator</a></span><span class="op">(</span><span class="st">"*"</span>, <span class="st">"/"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu">muttest</span><span class="fu">::</span><span class="fu"><a href="reference/test_plan.html">test_plan</a></span><span class="op">(</span></span>
+<span>  source_files <span class="op">=</span> <span class="st">"R/calculate.R"</span>,</span>
+<span>  mutators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="fu">muttest</span><span class="fu">::</span><span class="fu"><a href="reference/operator.html">operator</a></span><span class="op">(</span><span class="st">"+"</span>, <span class="st">"-"</span><span class="op">)</span>,</span>
+<span>    <span class="fu">muttest</span><span class="fu">::</span><span class="fu"><a href="reference/operator.html">operator</a></span><span class="op">(</span><span class="st">"*"</span>, <span class="st">"/"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; ── Mutation Testing ──────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; Using temporary directory: /var/folders/vk/yrfnlfbs4dq06zwj3rqg5h0m0000gn/T//RtmpIpw4bv/file108173bf72d17</span></span>
-<span><span class="co">#&gt; Starting mutation testing with:</span></span>
-<span><span class="co">#&gt;   - 2 total mutations</span></span>
-<span><span class="co">#&gt;   - 1 files to mutate</span></span>
-<span><span class="co">#&gt;   - 2 unique mutation operators</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt;    |  K    S    T   | File</span></span>
-<span><span class="co">#&gt; x  |  0    1    1   | calculate.R     1 "+" -&gt; "-"</span></span>
-<span><span class="co">#&gt; ✔  |  1    1    2   | calculate.R     2 "*" -&gt; "/"</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt; ── Mutation Distribution ─────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; calculate.R: 1 killed / 1 survived / 2 total (50.0%)</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt;</span></span>
-<span><span class="co">#&gt; ── Mutation Testing Results ──────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; [ KILLED 1 | SURVIVED 1 | TOTAL 2 | SCORE: 50.0% ]</span></span></code></pre></div>
+<span></span>
+<span><span class="fu">muttest</span><span class="fu">::</span><span class="fu"><a href="reference/test.html">test</a></span><span class="op">(</span><span class="st">"tests/testthat"</span>, <span class="va">plan</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ℹ Mutation Testing</span></span>
+<span><span class="co">#&gt;   |   K |   S |   E |   T |   % | Mutator  | File</span></span>
+<span><span class="co">#&gt; x |   0 |   1 |   0 |   1 |   0 | + → -    | calculate.R</span></span>
+<span><span class="co">#&gt; ✔ |   1 |   1 |   0 |   2 |  50 | * → /    | calculate.R</span></span>
+<span><span class="co">#&gt; ── Mutation Testing Results ────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]</span></span></code></pre></div>
 <p>The mutation score is: <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Mutation Score</mtext><mo>=</mo><mfrac><mtext mathvariant="normal">Killed Mutants</mtext><mtext mathvariant="normal">Total Mutants</mtext></mfrac><mo>×</mo><mn>100</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">\text{Mutation Score} = \frac{\text{Killed Mutants}}{\text{Total Mutants}} \times 100\%</annotation></semantics></math>, where a Mutant is defined as variant of the original code that is used to test the robustness of the test suite.</p>
 <p>In the example there were 2 mutants of the code:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -151,7 +144,7 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Jakub Sobolewski <br><small class="roles"> Author, maintainer </small>  </li>
+<li>Jakub Sobolewski <br><small class="roles"> Author, maintainer </small>   </li>
 </ul>
 </div>
 
@@ -174,7 +167,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer>

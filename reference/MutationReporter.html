@@ -79,18 +79,6 @@ the tests killed the mutation or the mutation survived.</p>
 <dd><p>Whether terminal hyperlinks are supported</p></dd>
 
 
-<dt><code>total_mutations</code></dt>
-<dd><p>Total number of mutation tests executed</p></dd>
-
-
-<dt><code>killed_mutations</code></dt>
-<dd><p>Number of mutations killed by tests</p></dd>
-
-
-<dt><code>survived_mutations</code></dt>
-<dd><p>Number of mutations that survived tests</p></dd>
-
-
 <dt><code>current_file</code></dt>
 <dd><p>Path of the file currently being mutated</p></dd>
 
@@ -103,8 +91,12 @@ the tests killed the mutation or the mutation survived.</p>
 <dd><p>Complete mutation plan for the test run</p></dd>
 
 
-<dt><code>temp_dir</code></dt>
-<dd><p>Path to the temporary directory for testing</p></dd>
+<dt><code>results</code></dt>
+<dd><p>List of mutation test results, indexed by file path</p></dd>
+
+
+<dt><code>current_score</code></dt>
+<dd><p>Current score of the mutation tests</p></dd>
 
 
 </dl><p></p></div>
@@ -123,6 +115,7 @@ the tests killed the mutation or the mutation survived.</p>
 <li><p><a href="#method-MutationReporter-end_mutator"><code>MutationReporter$end_mutator()</code></a></p></li>
 <li><p><a href="#method-MutationReporter-end_file"><code>MutationReporter$end_file()</code></a></p></li>
 <li><p><a href="#method-MutationReporter-end_reporter"><code>MutationReporter$end_reporter()</code></a></p></li>
+<li><p><a href="#method-MutationReporter-get_score"><code>MutationReporter$get_score()</code></a></p></li>
 <li><p><a href="#method-MutationReporter-cat_tight"><code>MutationReporter$cat_tight()</code></a></p></li>
 <li><p><a href="#method-MutationReporter-cat_line"><code>MutationReporter$cat_line()</code></a></p></li>
 <li><p><a href="#method-MutationReporter-rule"><code>MutationReporter$rule()</code></a></p></li>
@@ -151,7 +144,7 @@ the tests killed the mutation or the mutation survived.</p>
 <h3 id="method-start-reporter-">Method <code>start_reporter()</code><a class="anchor" aria-label="anchor" href="#method-start-reporter-"></a></h3>
 <p>Start reporter</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">start_reporter</span><span class="op">(</span>plan <span class="op">=</span> <span class="cn">NULL</span>, temp_dir <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">start_reporter</span><span class="op">(</span>plan <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -203,7 +196,7 @@ the tests killed the mutation or the mutation survived.</p>
 <h3 id="method-add-result-">Method <code>add_result()</code><a class="anchor" aria-label="anchor" href="#method-add-result-"></a></h3>
 <p>Add a mutation test result</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">add_result</span><span class="op">(</span><span class="va">file_path</span>, <span class="va">mutator</span>, <span class="va">test_results</span>, <span class="va">killed</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">add_result</span><span class="op">(</span><span class="va">file_path</span>, <span class="va">mutator</span>, <span class="va">killed</span>, <span class="va">survived</span>, <span class="va">errors</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -216,12 +209,16 @@ the tests killed the mutation or the mutation survived.</p>
 <dd><p>The mutator that was applied</p></dd>
 
 
-<dt><code>test_results</code></dt>
-<dd><p>Results from the test execution</p></dd>
-
-
 <dt><code>killed</code></dt>
 <dd><p>Whether the mutation was killed by tests</p></dd>
+
+
+<dt><code>survived</code></dt>
+<dd><p>Number of survived mutations</p></dd>
+
+
+<dt><code>errors</code></dt>
+<dd><p>Number of errors encountered</p></dd>
 
 
 </dl><p></p></div>
@@ -251,10 +248,18 @@ the tests killed the mutation or the mutation survived.</p>
 </div>
 
 
+</div><p></p><hr><a id="method-MutationReporter-get_score"></a><div class="section">
+<h3 id="method-get-score-">Method <code>get_score()</code><a class="anchor" aria-label="anchor" href="#method-get-score-"></a></h3>
+<p>Get the current score</p><div class="section">
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">get_score</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+
 </div><p></p><hr><a id="method-MutationReporter-cat_tight"></a><div class="section">
 <h3 id="method-cat-tight-">Method <code>cat_tight()</code><a class="anchor" aria-label="anchor" href="#method-cat-tight-"></a></h3>
 <p>Print a message to the output</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">cat_tight</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -270,7 +275,7 @@ the tests killed the mutation or the mutation survived.</p>
 </div><p></p><hr><a id="method-MutationReporter-cat_line"></a><div class="section">
 <h3 id="method-cat-line-">Method <code>cat_line()</code><a class="anchor" aria-label="anchor" href="#method-cat-line-"></a></h3>
 <p>Print a message to the output</p><div class="section">
-<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
+<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">cat_line</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -286,7 +291,7 @@ the tests killed the mutation or the mutation survived.</p>
 </div><p></p><hr><a id="method-MutationReporter-rule"></a><div class="section">
 <h3 id="method-rule-">Method <code>rule()</code><a class="anchor" aria-label="anchor" href="#method-rule-"></a></h3>
 <p>Print a message to the output with a rule</p><div class="section">
-<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
+<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">rule</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -302,7 +307,7 @@ the tests killed the mutation or the mutation survived.</p>
 </div><p></p><hr><a id="method-MutationReporter-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
+<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -328,7 +333,7 @@ the tests killed the mutation or the mutation survived.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer></div>
