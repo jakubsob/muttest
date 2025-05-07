@@ -10,7 +10,7 @@ Authors@R: c(
     )
   )
 Description: Mutation testing for R.
-    Run your tests agains mutated code to learn the quality of your assertions.
+    Run your tests against mutated code to learn the quality of your assertions.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
