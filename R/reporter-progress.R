@@ -294,7 +294,7 @@ MutationProgressReporter <- R6::R6Class(
       e <- sum(results$errors)
       score <- self$current_score
       self$cat_line()
-      cli::cli_rule(cli::style_bold("Mutation Testing Results"))
+      self$rule(cli::style_bold("Results"))
       self$cat_line(
         "[ ",
         cli::col_green("KILLED "),
