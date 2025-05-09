@@ -28,5 +28,10 @@ Imports:
     treesitter,
     treesitter.r,
     withr
+Remotes: jakubsob/cucumber@dev
 Config/testthat/edition: 3
 URL: https://jakubsob.github.io/muttest/
+Suggests:
+    box,
+    covr,
+    cucumber

@@ -106,7 +106,7 @@ FileTestStrategy <- R6::R6Class(
         return(.empty_test_result())
       }
       testthat::test_dir(
-        path,
+        path = path,
         filter = file_name,
         env = env,
         stop_on_failure = FALSE,

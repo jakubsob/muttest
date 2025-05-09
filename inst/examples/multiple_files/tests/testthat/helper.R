@@ -1,2 +1,0 @@
-helper_func <- function() {
-}

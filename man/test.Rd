@@ -5,17 +5,17 @@
 \title{Run a mutation test}
 \usage{
 test(
-  path,
   plan,
+  path = "tests/testthat",
   reporter = default_reporter(),
   test_strategy = default_test_strategy(),
   copy_strategy = default_copy_strategy()
 )
 }
 \arguments{
-\item{path}{Path to the test directory.}
-
 \item{plan}{A data frame with the test plan. See [test_plan()].}
+
+\item{path}{Path to the test directory.}
 
 \item{reporter}{Reporter to use for mutation testing results.}
 

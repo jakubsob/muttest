@@ -10,8 +10,8 @@
 #' @export
 #' @importFrom rlang .data
 test <- function(
-  path,
   plan,
+  path = "tests/testthat",
   reporter = default_reporter(),
   test_strategy = default_test_strategy(),
   copy_strategy = default_copy_strategy()
@@ -51,7 +51,7 @@ test <- function(
 
       dir <- copy_strategy$execute(getwd(), row)
       checkmate::assert_directory_exists(dir)
-
+      on.exit(fs::dir_delete(dir))
       withr::with_tempdir(tmpdir = dir, pattern = "", {
         withr::with_dir(dir, {
           temp_file_path <- file.path(dir, file_path)
@@ -94,7 +94,10 @@ test <- function(
 #' @param mutators A list of mutators to use.
 #' @return A data frame with the test plan.
 #' @export
-test_plan <- function(source_files, mutators) {
+test_plan <- function(
+  mutators,
+  source_files = fs::dir_ls("R", regexp = ".[rR]$")
+) {
   checkmate::assert_file_exists(source_files, extension = c("R", "r"))
   checkmate::assert_list(mutators)
   map_dfr <- purrr::compose(dplyr::bind_rows, purrr::map)

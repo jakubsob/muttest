@@ -4,12 +4,12 @@
 \alias{test_plan}
 \title{Create a test plan for mutation testing}
 \usage{
-test_plan(source_files, mutators)
+test_plan(mutators, source_files = fs::dir_ls("R", regexp = ".[rR]$"))
 }
 \arguments{
-\item{source_files}{A vector of file paths to the source files.}
-
 \item{mutators}{A list of mutators to use.}
+
+\item{source_files}{A vector of file paths to the source files.}
 }
 \value{
 A data frame with the test plan.
