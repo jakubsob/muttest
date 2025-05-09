@@ -1,5 +1,2 @@
-source("../../R/calculate.R")
-
-setup <- function() {
-
+setup_func <- function() {
 }

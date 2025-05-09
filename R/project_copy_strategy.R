@@ -1,8 +1,8 @@
-#' Project Copy Strategy
+#' Copy Strategy
 #'
 #' @export
-ProjectCopyStrategy <- R6::R6Class(
-  classname = "ProjectCopyStrategy",
+CopyStrategy <- R6::R6Class(
+  classname = "CopyStrategy",
   public = list(
     #' @description
     #' Copy project files according to the strategy
@@ -16,11 +16,11 @@ ProjectCopyStrategy <- R6::R6Class(
   )
 )
 
-#' StandardProjectCopyStrategy class
+#' PackageCopyStrategy class
 #' @export
-StandardProjectCopyStrategy <- R6::R6Class(
-  classname = "StandardProjectCopyStrategy",
-  inherit = ProjectCopyStrategy,
+PackageCopyStrategy <- R6::R6Class(
+  classname = "PackageCopyStrategy",
+  inherit = CopyStrategy,
   public = list(
     #' @description
     #' Copy project files, excluding hidden and temp directories
@@ -31,11 +31,13 @@ StandardProjectCopyStrategy <- R6::R6Class(
     execute = function(original_dir, plan) {
       temp_dir <- fs::path(tempdir(), digest::digest(plan))
 
-      # Get directories to copy (exclude hidden, temp directories)
-      dirs_to_copy <- list.dirs(original_dir, recursive = FALSE, full.names = FALSE)
+      dirs_to_copy <- list.dirs(
+        original_dir,
+        recursive = FALSE,
+        full.names = FALSE
+      )
       dirs_to_copy <- dirs_to_copy[!grepl("^\\.|tmp|temp", dirs_to_copy)]
 
-      # Use purrr::walk to copy directories
       purrr::walk(dirs_to_copy, function(dir) {
         src_path <- file.path(original_dir, dir)
         if (dir.exists(src_path)) {
@@ -47,6 +49,16 @@ StandardProjectCopyStrategy <- R6::R6Class(
         }
       })
 
+      files <- fs::dir_ls(original_dir, type = "file")
+      files <- fs::path_rel(files, original_dir)
+      purrr::walk(files, function(x) {
+        fs::file_copy(
+          x,
+          file.path(temp_dir, x),
+          overwrite = TRUE
+        )
+      })
+
       temp_dir
     }
   )
@@ -55,8 +67,8 @@ StandardProjectCopyStrategy <- R6::R6Class(
 #' Create a default project copy strategy
 #'
 #' @param ... Unused, saved for future expansion.
-#' @return A ProjectCopyStrategy object
+#' @return A CopyStrategy object
 #' @export
-default_project_copy_strategy <- function(...) {
-  StandardProjectCopyStrategy$new(...)
+default_copy_strategy <- function(...) {
+  PackageCopyStrategy$new(...)
 }

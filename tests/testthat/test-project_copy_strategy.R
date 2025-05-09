@@ -1,14 +1,14 @@
-describe("ProjectCopyStrategy", {
+describe("CopyStrategy", {
   it("throws error when calling execute", {
     # Arrange
-    strategy <- ProjectCopyStrategy$new()
+    strategy <- CopyStrategy$new()
 
     # Act, Assert
     expect_error(strategy$execute("original_dir"), "Not implemented")
   })
 })
 
-describe("StandardProjectCopyStrategy", {
+describe("PackageCopyStrategy", {
   it("copies project files excluding hidden and temp directories", {
     # Arrange
     temp_dir <- withr::local_tempdir()
@@ -20,7 +20,7 @@ describe("StandardProjectCopyStrategy", {
     dir.create(file.path(original_dir, "inst"))
     dir.create(file.path(original_dir, "src"))
 
-    strategy <- StandardProjectCopyStrategy$new()
+    strategy <- PackageCopyStrategy$new()
 
     # Act
     copied_dir <- strategy$execute(original_dir, data.frame())
@@ -35,12 +35,12 @@ describe("StandardProjectCopyStrategy", {
   })
 })
 
-describe("default_project_copy_strategy", {
-  it("returns a StandardProjectCopyStrategy object", {
+describe("default_copy_strategy", {
+  it("returns a CopyStrategy object", {
     # Act
-    strategy <- default_project_copy_strategy()
+    strategy <- default_copy_strategy()
 
     # Assert
-    expect_s3_class(strategy, "StandardProjectCopyStrategy")
+    expect_s3_class(strategy, "CopyStrategy")
   })
 })

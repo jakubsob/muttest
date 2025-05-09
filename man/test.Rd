@@ -9,8 +9,7 @@ test(
   plan,
   reporter = default_reporter(),
   test_strategy = default_test_strategy(),
-  source_loader = default_source_loader(),
-  project_copy_strategy = default_project_copy_strategy()
+  copy_strategy = default_copy_strategy()
 )
 }
 \arguments{
@@ -22,9 +21,7 @@ test(
 
 \item{test_strategy}{Strategy for running tests.}
 
-\item{source_loader}{Function to load source files.}
-
-\item{project_copy_strategy}{Strategy for copying the project.}
+\item{copy_strategy}{Strategy for copying the project.}
 }
 \value{
 A numeric value representing the mutation score.

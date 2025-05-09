@@ -1,3 +1,6 @@
+helper_func()
+setup_func()
+
 test_that("calculate returns a numeric", {
   expect_true(is.numeric(calculate(2, 2))) # ❌ This assertion doesn't kill mutants
 })

@@ -5,12 +5,16 @@
   )
 }
 
+test_ <- function(...) {
+  purrr::quietly(test)(...)$result
+}
+
 test_that("operators", {
   .with_example_dir("operators/", {
     mutators <- list(operator("+", "-"), operator("*", "/"))
     plan <- test_plan(fs::dir_ls("R"), mutators)
     expect_equal(
-      purrr::quietly(test)(path = "tests/testthat", plan = plan)$result,
+      test_(path = "tests/testthat", plan = plan),
       0.5
     )
   })
@@ -21,7 +25,7 @@ test_that("multiple_files", {
     mutators <- list(operator("+", "-"), operator("*", "/"))
     plan <- test_plan(fs::dir_ls("R"), mutators)
     expect_equal(
-      purrr::quietly(test)(path = "tests/testthat", plan = plan)$result,
+      test_(path = "tests/testthat", plan = plan),
       0.333,
       tolerance = 0.01
     )
@@ -33,20 +37,8 @@ test_that("no_mutations", {
     mutators <- list(operator("/", "*"))
     plan <- test_plan(fs::dir_ls("R"), mutators)
     expect_equal(
-      purrr::quietly(test)(path = "tests/testthat", plan = plan)$result,
+      test_(path = "tests/testthat", plan = plan),
       NA_real_
-    )
-  })
-})
-
-test_that("box", {
-  testthat::skip_if(testthat::is_checking())
-  .with_example_dir("box/", {
-    mutators <- list(operator("+", "-"))
-    plan <- test_plan(fs::dir_ls("R"), mutators)
-    expect_equal(
-      purrr::quietly(test)(path = "tests/testthat", plan = plan)$result,
-      1
     )
   })
 })

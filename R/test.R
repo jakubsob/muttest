@@ -4,8 +4,7 @@
 #' @param plan A data frame with the test plan. See [test_plan()].
 #' @param reporter Reporter to use for mutation testing results.
 #' @param test_strategy Strategy for running tests.
-#' @param source_loader Function to load source files.
-#' @param project_copy_strategy Strategy for copying the project.
+#' @param copy_strategy Strategy for copying the project.
 #' @return A numeric value representing the mutation score.
 #'
 #' @export
@@ -15,8 +14,7 @@ test <- function(
   plan,
   reporter = default_reporter(),
   test_strategy = default_test_strategy(),
-  source_loader = default_source_loader(),
-  project_copy_strategy = default_project_copy_strategy()
+  copy_strategy = default_copy_strategy()
 ) {
   checkmate::assert_directory_exists(path)
   checkmate::assert(
@@ -29,8 +27,7 @@ test <- function(
   )
   checkmate::assert_class(reporter, "MutationReporter")
   checkmate::assert_class(test_strategy, "TestStrategy", null.ok = TRUE)
-  checkmate::assert_function(source_loader, nargs = 1)
-  checkmate::assert_class(project_copy_strategy, "ProjectCopyStrategy")
+  checkmate::assert_class(copy_strategy, "CopyStrategy")
 
   if (nrow(plan) == 0) {
     return(invisible(NA_real_))
@@ -52,7 +49,7 @@ test <- function(
       reporter$start_mutator(mutator)
       reporter$update(force = TRUE)
 
-      dir <- project_copy_strategy$execute(getwd(), row)
+      dir <- copy_strategy$execute(getwd(), row)
       checkmate::assert_directory_exists(dir)
 
       withr::with_tempdir(tmpdir = dir, pattern = "", {
@@ -60,14 +57,11 @@ test <- function(
           temp_file_path <- file.path(dir, file_path)
           writeLines(mutated_code, temp_file_path)
 
-          env <- source_loader(dir)
-          checkmate::assert_environment(env)
-
           test_results <- test_strategy$execute(
             path = path,
             mutated_file = file_path,
             mutated_code = mutated_code,
-            env = env,
+            env = NULL,
             reporter = reporter$test_reporter
           )
           checkmate::assert_class(test_results, "testthat_results")

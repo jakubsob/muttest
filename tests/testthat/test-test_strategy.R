@@ -21,7 +21,7 @@ describe("FullTestStrategy", {
     test2 <- 'test_that("test2", { expect_true(TRUE) })'
     writeLines(test1, file.path(test_dir, "test-file1.R"))
     writeLines(test2, file.path(test_dir, "test-file2.R"))
-    strategy <- FullTestStrategy$new()
+    strategy <- FullTestStrategy$new(load_package = "none")
 
     # Act
     result <- strategy$execute(
@@ -48,7 +48,7 @@ describe("FileTestStrategy", {
     test2 <- 'test_that("test2", { expect_true(TRUE) })'
     writeLines(test1, file.path(test_dir, "test-file1.R"))
     writeLines(test2, file.path(test_dir, "test-file2.R"))
-    strategy <- FileTestStrategy$new()
+    strategy <- FileTestStrategy$new(load_package = "none")
 
     # Act
     result <- strategy$execute(
@@ -73,7 +73,7 @@ describe("FileTestStrategy", {
     test2 <- 'test_that("test2", { expect_true(TRUE) })'
     writeLines(test1, file.path(test_dir, "test-file1.R"))
     writeLines(test2, file.path(test_dir, "test-file2.R"))
-    strategy <- FileTestStrategy$new()
+    strategy <- FileTestStrategy$new(load_package = "none")
 
     # Act
     result <- strategy$execute(

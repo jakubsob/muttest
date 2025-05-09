@@ -31,7 +31,22 @@ TestStrategy <- R6::R6Class(
 FullTestStrategy <- R6::R6Class(
   classname = "FullTestStrategy",
   inherit = TestStrategy,
+  private = list(
+    args = list()
+  ),
   public = list(
+    #' @description Initialize the FileTestStrategy
+    #' @param load_helpers Whether to load test helpers
+    #' @param load_package The package loading strategy
+    initialize = function(
+      load_helpers = TRUE,
+      load_package = c("source", "none", "installed")
+    ) {
+      private$args <- list(
+        load_helpers = load_helpers,
+        load_package = load_package
+      )
+    },
     #' @description Execute the test strategy
     #' @param path The path to the test directory
     #' @param mutated_file The path to the file being tested
@@ -42,9 +57,12 @@ FullTestStrategy <- R6::R6Class(
     execute = function(path, mutated_file, mutated_code, env, reporter) {
       testthat::test_dir(
         path,
+        filter = NULL,
         env = env,
         stop_on_failure = FALSE,
-        reporter = reporter
+        reporter = reporter,
+        load_helpers = private$args$load_helpers,
+        load_package = private$args$load_package
       )
     }
   )
@@ -59,7 +77,22 @@ FullTestStrategy <- R6::R6Class(
 FileTestStrategy <- R6::R6Class(
   classname = "FileTestStrategy",
   inherit = TestStrategy,
+  private = list(
+    args = list()
+  ),
   public = list(
+    #' @description Initialize the FileTestStrategy
+    #' @param load_helpers Whether to load test helpers
+    #' @param load_package The package loading strategy
+    initialize = function(
+      load_helpers = TRUE,
+      load_package = c("source", "none", "installed")
+    ) {
+      private$args <- list(
+        load_helpers = load_helpers,
+        load_package = load_package
+      )
+    },
     #' @description Execute the test strategy
     #' @param path The path to the test directory
     #' @param mutated_file The path to the file being tested
@@ -77,7 +110,9 @@ FileTestStrategy <- R6::R6Class(
         filter = file_name,
         env = env,
         stop_on_failure = FALSE,
-        reporter = reporter
+        reporter = reporter,
+        load_helpers = private$args$load_helpers,
+        load_package = private$args$load_package
       )
     }
   )

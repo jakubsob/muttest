@@ -24,8 +24,31 @@ Other TestStrategy:
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-FullTestStrategy-new}{\code{FullTestStrategy$new()}}
 \item \href{#method-FullTestStrategy-execute}{\code{FullTestStrategy$execute()}}
 \item \href{#method-FullTestStrategy-clone}{\code{FullTestStrategy$clone()}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-FullTestStrategy-new"></a>}}
+\if{latex}{\out{\hypertarget{method-FullTestStrategy-new}{}}}
+\subsection{Method \code{new()}}{
+Initialize the FileTestStrategy
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{FullTestStrategy$new(
+  load_helpers = TRUE,
+  load_package = c("source", "none", "installed")
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{load_helpers}}{Whether to load test helpers}
+
+\item{\code{load_package}}{The package loading strategy}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
