@@ -28,11 +28,24 @@ include_file <- function(file, filename) {
 [![cucumber](https://img.shields.io/github/actions/workflow/status/jakubsob/muttest/test-acceptance.yaml?branch=main&label=cucumber&logo=cucumber&color=23D96C&labelColor=0f2a13)](https://github.com/jakubsob/muttest/actions/workflows/test-acceptance.yaml)
 <!-- badges: end -->
 
-> 🚧 **This package is in development and not yet ready for production use.** 🚧
+Measure quality of your tests with **{muttest}**.
 
-Mutation testing frameworks work by intentionally introducing small changes (called mutations) into your code to check whether your tests can detect them.
+[covr](https://github.com/r-lib/covr) tells you how much of your code is executed by tests, but it tells you nothing about the quality of those tests.
 
-The goal is to evaluate how effective your test suite is — if your tests fail when the code is altered, that’s a good sign. If they don’t, your tests might be missing something important.
+In fact, you can have tests with zero assertions and still get 100% coverage. That can give a false sense of security. Mutation testing addresses this gap.
+
+It works like this:
+
+- Define a set of code changes (mutations).
+- Run your test suite against mutated versions of your source code.
+- Measure how often the mutations are caught (i.e., cause test failures).
+
+This reveals whether your tests are asserting the right things:
+
+- 0% score → Your tests pass no matter what changes. Your assertions are weak.
+- 100% score → Every mutation triggers a test failure. Your tests are robust.
+
+{muttest} not only gives you the score, but it also tells you tests for which files require improved assertions.
 
 # Example
 
