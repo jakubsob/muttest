@@ -50,7 +50,7 @@
 
 
 <dl><dt id="arg-plan">plan<a class="anchor" aria-label="anchor" href="#arg-plan"></a></dt>
-<dd><p>A data frame with the test plan. See [test_plan()].</p></dd>
+<dd><p>A data frame with the test plan. See `test_plan()`.</p></dd>
 
 
 <dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
@@ -58,15 +58,19 @@
 
 
 <dt id="arg-reporter">reporter<a class="anchor" aria-label="anchor" href="#arg-reporter"></a></dt>
-<dd><p>Reporter to use for mutation testing results.</p></dd>
+<dd><p>Reporter to use for mutation testing results. See `?MutationReporter`.</p></dd>
 
 
 <dt id="arg-test-strategy">test_strategy<a class="anchor" aria-label="anchor" href="#arg-test-strategy"></a></dt>
-<dd><p>Strategy for running tests.</p></dd>
+<dd><p>Strategy for running tests. See `?TestStrategy`.
+The purpose of test strategy is to control how tests are executed.
+We can run all tests for each mutant, or only tests that are relevant to the mutant.</p></dd>
 
 
 <dt id="arg-copy-strategy">copy_strategy<a class="anchor" aria-label="anchor" href="#arg-copy-strategy"></a></dt>
-<dd><p>Strategy for copying the project.</p></dd>
+<dd><p>Strategy for copying the project. See `?CopyStrategy`.
+muttest creates mutants of the project in a temporary directory.
+This strategy controls which files are copied to the temporary directory.</p></dd>
 
 </dl></div>
     <div class="section level2">
