@@ -52,11 +52,21 @@
 </div>
 <!-- badges: start -->
 
-<blockquote>
-<p>🚧 <strong>This package is in development and not yet ready for production use.</strong> 🚧</p>
-</blockquote>
-<p>Mutation testing frameworks work by intentionally introducing small changes (called mutations) into your code to check whether your tests can detect them.</p>
-<p>The goal is to evaluate how effective your test suite is — if your tests fail when the code is altered, that’s a good sign. If they don’t, your tests might be missing something important.</p>
+<p>Measure quality of your tests with <strong>{muttest}</strong>.</p>
+<p><a href="https://github.com/r-lib/covr" class="external-link">covr</a> tells you how much of your code is executed by tests, but it tells you nothing about the quality of those tests.</p>
+<p>In fact, you can have tests with zero assertions and still get 100% coverage. That can give a false sense of security. Mutation testing addresses this gap.</p>
+<p>It works like this:</p>
+<ul>
+<li>Define a set of code changes (mutations).</li>
+<li>Run your test suite against mutated versions of your source code.</li>
+<li>Measure how often the mutations are caught (i.e., cause test failures).</li>
+</ul>
+<p>This reveals whether your tests are asserting the right things:</p>
+<ul>
+<li>0% score → Your tests pass no matter what changes. Your assertions are weak.</li>
+<li>100% score → Every mutation triggers a test failure. Your tests are robust.</li>
+</ul>
+<p>{muttest} not only gives you the score, but it also tells you tests for which files require improved assertions.</p>
 </div>
 <div class="section level1">
 <h1 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
