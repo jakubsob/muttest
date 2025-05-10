@@ -2,14 +2,17 @@
 % Please edit documentation in R/test_strategy.R
 \name{FileTestStrategy}
 \alias{FileTestStrategy}
-\title{FileTestStrategy class}
+\title{Run tests matching the source file name}
 \description{
-FileTestStrategy class
+Run tests matching the source file name
 
-FileTestStrategy class
+Run tests matching the source file name
 }
 \details{
 This class implements a test strategy that runs tests matching the source file name.
+
+If the source file name is `foo.R`, and there are test files named `test-foo.R` or `test-bar.R`,
+only `test-foo.R` will be run.
 }
 \seealso{
 Other TestStrategy: 

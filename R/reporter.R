@@ -1,8 +1,7 @@
 #' Reporter for Mutation Testing
 #'
-#' The job of a mutation reporter is to aggregate and display the results
-#' of mutation tests. It tracks each mutation attempt, reporting on whether
-#' the tests killed the mutation or the mutation survived.
+#' The job of a mutation reporter is to aggregate and display the results of mutation tests.
+#' It tracks each mutation attempt, reporting on whether the tests killed the mutation or the mutation survived.
 #'
 #' @field test_reporter Reporter to use for the testthat::test_dir function
 #' @field out Output destination for reporter messages

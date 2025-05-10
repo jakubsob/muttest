@@ -12,5 +12,12 @@ operator(from, to)
 \item{to}{The operator to replace with.}
 }
 \description{
-Operator mutator
+It changes a binary operator to another one.
+}
+\examples{
+operator("==", "!=")
+operator(">", "<")
+operator("<", ">")
+operator("+", "-")
+
 }

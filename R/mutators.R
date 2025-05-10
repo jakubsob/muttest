@@ -18,6 +18,15 @@ Mutator <- R6::R6Class(
 )
 
 #' Operator mutator
+#'
+#' It changes a binary operator to another one.
+#'
+#' @examples
+#' operator("==", "!=")
+#' operator(">", "<")
+#' operator("<", ">")
+#' operator("+", "-")
+#'
 #' @param from The operator to be replaced.
 #' @param to The operator to replace with.
 #' @export

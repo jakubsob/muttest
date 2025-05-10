@@ -2,11 +2,14 @@
 % Please edit documentation in R/project_copy_strategy.R
 \name{CopyStrategy}
 \alias{CopyStrategy}
-\title{Copy Strategy}
+\title{CopyStrategy interface}
 \description{
-Copy Strategy
+CopyStrategy interface
 
-Copy Strategy
+CopyStrategy interface
+}
+\details{
+Extend this class to implement a custom copy strategy.
 }
 \section{Methods}{
 \subsection{Public methods}{

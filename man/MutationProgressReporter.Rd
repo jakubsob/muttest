@@ -10,8 +10,7 @@ Progress Reporter for Mutation Testing
 }
 \details{
 A reporter that displays a progress indicator for mutation tests.
-It provides real-time feedback on which mutations are being tested
-and whether they were killed by tests.
+It provides real-time feedback on which mutants are being tested and whether they were killed by tests.
 }
 \seealso{
 Other reporters: 

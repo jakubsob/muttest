@@ -1,8 +1,7 @@
 #' Progress Reporter for Mutation Testing
 #'
 #' A reporter that displays a progress indicator for mutation tests.
-#' It provides real-time feedback on which mutations are being tested
-#' and whether they were killed by tests.
+#' It provides real-time feedback on which mutants are being tested and whether they were killed by tests.
 #'
 #' @field start_time Time when testing started (for duration calculation)
 #' @field min_time Minimum test duration to display timing information

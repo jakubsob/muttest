@@ -2,11 +2,14 @@
 % Please edit documentation in R/test_strategy.R
 \name{TestStrategy}
 \alias{TestStrategy}
-\title{Base TestStrategy class}
+\title{TestStrategy interface}
 \description{
-Base TestStrategy class
+TestStrategy interface
 
-Base TestStrategy class
+TestStrategy interface
+}
+\details{
+Extend this class to implement custom test strategy.
 }
 \seealso{
 Other TestStrategy: 

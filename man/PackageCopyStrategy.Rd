@@ -2,11 +2,14 @@
 % Please edit documentation in R/project_copy_strategy.R
 \name{PackageCopyStrategy}
 \alias{PackageCopyStrategy}
-\title{PackageCopyStrategy class}
+\title{Package copy strategy}
 \description{
-PackageCopyStrategy class
+Package copy strategy
 
-PackageCopyStrategy class
+Package copy strategy
+}
+\details{
+It copies all files and directories from the original directory to a temporary directory.
 }
 \section{Super class}{
 \code{\link[muttest:CopyStrategy]{muttest::CopyStrategy}} -> \code{PackageCopyStrategy}

@@ -2,14 +2,11 @@
 % Please edit documentation in R/test_strategy.R
 \name{FullTestStrategy}
 \alias{FullTestStrategy}
-\title{FullTestStrategy class}
+\title{Run all tests for a mutant}
 \description{
-FullTestStrategy class
+Run all tests for a mutant
 
-FullTestStrategy class
-}
-\details{
-This class implements a test strategy that runs all tests.
+Run all tests for a mutant
 }
 \seealso{
 Other TestStrategy: 
@@ -33,7 +30,7 @@ Other TestStrategy:
 \if{html}{\out{<a id="method-FullTestStrategy-new"></a>}}
 \if{latex}{\out{\hypertarget{method-FullTestStrategy-new}{}}}
 \subsection{Method \code{new()}}{
-Initialize the FileTestStrategy
+Initialize
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{FullTestStrategy$new(
   load_helpers = TRUE,

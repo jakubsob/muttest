@@ -7,7 +7,7 @@
 test_plan(mutators, source_files = fs::dir_ls("R", regexp = ".[rR]$"))
 }
 \arguments{
-\item{mutators}{A list of mutators to use.}
+\item{mutators}{A list of mutators to use. See \code{\link[=operator]{operator()}}.}
 
 \item{source_files}{A vector of file paths to the source files.}
 }
@@ -15,5 +15,13 @@ test_plan(mutators, source_files = fs::dir_ls("R", regexp = ".[rR]$"))
 A data frame with the test plan.
 }
 \description{
-Create a test plan for mutation testing
+The purpose of this function is to create and preview a plan for mutation testing.
+}
+\details{
+Each mutant requires rerunning the tests. For large project it might be not feasible to test all
+mutants in one go. This function allows you to create a plan for selected source files and mutators.
+
+The plan is in a data frame format, where each row represents a mutant.
+
+You can subset the plan before passing it to the \code{test()} function.
 }

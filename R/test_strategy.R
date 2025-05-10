@@ -1,7 +1,9 @@
 #' @import testthat
 NULL
 
-#' Base TestStrategy class
+#' TestStrategy interface
+#'
+#' Extend this class to implement custom test strategy.
 #'
 #' @md
 #' @export
@@ -22,9 +24,7 @@ TestStrategy <- R6::R6Class(
   )
 )
 
-#' FullTestStrategy class
-#'
-#' This class implements a test strategy that runs all tests.
+#' Run all tests for a mutant
 #'
 #' @export
 #' @family TestStrategy
@@ -35,7 +35,7 @@ FullTestStrategy <- R6::R6Class(
     args = list()
   ),
   public = list(
-    #' @description Initialize the FileTestStrategy
+    #' @description Initialize
     #' @param load_helpers Whether to load test helpers
     #' @param load_package The package loading strategy
     initialize = function(
@@ -68,9 +68,12 @@ FullTestStrategy <- R6::R6Class(
   )
 )
 
-#' FileTestStrategy class
+#' Run tests matching the source file name
 #'
 #' This class implements a test strategy that runs tests matching the source file name.
+#'
+#' If the source file name is `foo.R`, and there are test files named `test-foo.R` or `test-bar.R`,
+#' only `test-foo.R` will be run.
 #'
 #' @export
 #' @family TestStrategy
@@ -126,7 +129,7 @@ FileTestStrategy <- R6::R6Class(
 #' @export
 #' @family TestStrategy
 default_test_strategy <- function(...) {
-  FileTestStrategy$new(...)
+  FullTestStrategy$new(...)
 }
 
 .empty_test_result <- function() {

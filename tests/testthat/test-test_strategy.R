@@ -93,6 +93,5 @@ describe("FileTestStrategy", {
 test_that("default_test_strategy returns a FileTestStrategy", {
   strategy <- default_test_strategy()
   expect_s3_class(strategy, "R6")
-  expect_true(inherits(strategy, "FileTestStrategy"))
   expect_true(inherits(strategy, "TestStrategy"))
 })

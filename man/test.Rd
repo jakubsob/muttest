@@ -13,15 +13,19 @@ test(
 )
 }
 \arguments{
-\item{plan}{A data frame with the test plan. See [test_plan()].}
+\item{plan}{A data frame with the test plan. See `test_plan()`.}
 
 \item{path}{Path to the test directory.}
 
-\item{reporter}{Reporter to use for mutation testing results.}
+\item{reporter}{Reporter to use for mutation testing results. See `?MutationReporter`.}
 
-\item{test_strategy}{Strategy for running tests.}
+\item{test_strategy}{Strategy for running tests. See `?TestStrategy`.
+The purpose of test strategy is to control how tests are executed.
+We can run all tests for each mutant, or only tests that are relevant to the mutant.}
 
-\item{copy_strategy}{Strategy for copying the project.}
+\item{copy_strategy}{Strategy for copying the project. See `?CopyStrategy`.
+muttest creates mutants of the project in a temporary directory.
+This strategy controls which files are copied to the temporary directory.}
 }
 \value{
 A numeric value representing the mutation score.
