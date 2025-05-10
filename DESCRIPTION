@@ -34,4 +34,6 @@ URL: https://jakubsob.github.io/muttest/
 Suggests:
     box,
     covr,
-    cucumber
+    cucumber,
+    ggplot2,
+    shiny
