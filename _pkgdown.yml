@@ -1,4 +1,9 @@
 url: https://jakubsob.github.io/muttest/
 template:
   bootstrap: 5
-
+  light-switch: true
+  bslib:
+    bg: '#ffffff'
+    fg: '#000000'
+    primary: '#886868' 
+    secondary: '#F77669'
