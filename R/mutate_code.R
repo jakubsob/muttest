@@ -1,5 +1,4 @@
 replace <- function(code, node, mutator) {
-  start <- treesitter::node_start_byte(node)
   start_point <- treesitter::node_start_point(node)
   code[start_point$row + 1] <- paste0(
     substr(code[start_point$row + 1], 1, start_point$column),

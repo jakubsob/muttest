@@ -40,14 +40,13 @@ test <- function(
 
   reporter$start_reporter(plan)
 
-  results <- plan |>
+  plan |>
     dplyr::arrange(.data$file_path, .data$mutator) |>
     dplyr::rowwise() |>
     dplyr::group_split() |>
     purrr::walk(\(row) {
       mutator <- row$mutator[[1]]
       file_path <- row$file_path
-      original_code <- row$original_code[[1]]
       mutated_code <- row$mutated_code[[1]]
 
       reporter$start_file(file_path)
