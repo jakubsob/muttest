@@ -28,6 +28,7 @@ include_file <- function(file, filename) {
 [![muttest](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jakubsob/muttest/badges/.badges/muttest.json)](https://github.com/jakubsob/muttest/actions/workflows/test-mutation.yaml)
 [![Grand total](http://cranlogs.r-pkg.org/badges/grand-total/muttest)](https://cran.r-project.org/package=muttest)
 [![Last month](http://cranlogs.r-pkg.org/badges/last-month/muttest)](https://cran.r-project.org/package=muttest)
+[![muttest](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jakubsob/muttest/badges/badges/muttest.json)](https://github.com/jakubsob/muttest/actions/workflows/test-mutation.yaml)
 <!-- badges: end -->
 
 Measure quality of your tests with **{muttest}**.
