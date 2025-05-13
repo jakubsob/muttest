@@ -1,4 +1,4 @@
-Feature: Mutation testing of selected R packages
+Feature: Test real R package
 
   This specification ensures that {muttest} works for the few selected, popular packages.
 
@@ -13,7 +13,8 @@ Feature: Mutation testing of selected R packages
       )
       test(
         path = "tests/testthat",
-        plan = plan[1, ]
+        plan = plan[1:10, ],
+        test_strategy = FileTestStrategy$new()
       )
       """
     Then I get a mutation score
@@ -29,7 +30,8 @@ Feature: Mutation testing of selected R packages
       )
       test(
         path = "tests/testthat",
-        plan = plan[1, ]
+        plan = plan[1:10, ],
+        test_strategy = FileTestStrategy$new()
       )
       """
     Then I get a mutation score
@@ -40,8 +42,7 @@ Feature: Mutation testing of selected R packages
       """
       plan <- test_plan(
         mutators = list(
-          operator("==", "!="),
-          operator("!=", "==")
+          operator("==", "!=")
         )
       )
       test(
