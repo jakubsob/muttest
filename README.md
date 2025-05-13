@@ -13,6 +13,7 @@ status](https://www.r-pkg.org/badges/version/muttest)](https://CRAN.R-project.or
 [![Codecov test
 coverage](https://codecov.io/gh/jakubsob/muttest/graph/badge.svg)](https://app.codecov.io/gh/jakubsob/muttest)
 [![cucumber](https://img.shields.io/github/actions/workflow/status/jakubsob/muttest/test-acceptance.yaml?branch=main&label=cucumber&logo=cucumber&color=23D96C&labelColor=0f2a13)](https://github.com/jakubsob/muttest/actions/workflows/test-acceptance.yaml)
+[![muttest](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jakubsob/muttest/badges/.badges/muttest.json)](https://github.com/jakubsob/muttest/actions/workflows/test-mutation.yaml)
 <!-- badges: end -->
 
 Measure quality of your tests with **{muttest}**.

@@ -1,0 +1,134 @@
+on:
+  push:
+    branches:
+      - main
+
+name: test-mutation.yml
+permissions: write-all
+
+jobs:
+  generate-badge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::jsonlite
+
+      - name: Set up Git user
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+      - name: Update badge on badges branch to show "NA"
+        run: |
+          # Save current branch name
+          CURRENT_BRANCH=$(git symbolic-ref --short HEAD)
+
+          # Try to fetch the badges branch
+          git fetch origin badges || echo "No badges branch yet, will create it"
+
+          # If badges branch exists remotely, check it out
+          if git show-ref --verify --quiet refs/remotes/origin/badges; then
+            echo "Remote badges branch exists, checking it out"
+            git checkout -b badges origin/badges || git checkout badges
+          else
+            # Create a new orphan branch
+            echo "Creating new badges branch"
+            git checkout --orphan badges
+            # Remove all files from staging
+            git rm -rf --cached .
+            # Create empty commit to start the branch
+            git commit --allow-empty -m "Initial empty commit for badges branch"
+          fi
+
+          # Create badges directory
+          mkdir -p .badges
+
+          # Create temporary NA badge
+          echo '{
+            "schemaVersion": 1,
+            "label": "muttest",
+            "labelColor": "#0f2a13",
+            "message": "NA",
+            "color": "#858585",
+            "logoSvg": "<svg viewBox='\''0 0 24 24'\'' id='\''Layer_1'\'' data-name='\''Layer 1'\'' xmlns='\''http://www.w3.org/2000/svg'\''><defs><style>.cls-1{fill:none;stroke:#ffffff;stroke-miterlimit:10;stroke-width:1.91px;}</style></defs><path class='\''cls-1'\'' d='\''M15.82,1.5l-1,1A9.55,9.55,0,0,0,12,9.27v5.46a9.55,9.55,0,0,1-2.8,6.75l-1,1'\''/><path class='\''cls-1'\'' d='\''M9.27,12a9.55,9.55,0,0,0-6.75,2.8l-1,1'\''/><path class='\''cls-1'\'' d='\''M22.5,8.18l-1,1A9.55,9.55,0,0,1,14.73,12'\''/><line class='\''cls-1'\'' x1='\''13.91'\'' y1='\''2.45'\'' x2='\''21.07'\'' y2='\''9.61'\''/><line class='\''cls-1'\'' x1='\''12.95'\'' y1='\''6.27'\'' x2='\''15.82'\'' y2='\''9.14'\''/><line class='\''cls-1'\'' x1='\''2.45'\'' y1='\''13.91'\'' x2='\''9.14'\'' y2='\''20.59'\''/><line class='\''cls-1'\'' x1='\''8.18'\'' y1='\''14.86'\'' x2='\''11.52'\'' y2='\''18.2'\''/></svg>"
+          }' > .badges/muttest.json
+
+          # Add, commit and push
+          git add .badges/muttest.json
+          git commit -m "chore: :gears: Set badge message to NA before testing" || echo "No changes to commit"
+          git push --force-with-lease origin badges
+
+          # Return to the original branch
+          git checkout $CURRENT_BRANCH
+
+      - name: Mutation testing
+        shell: Rscript {0}
+        run: |
+          dir.create(".badges", showWarnings = FALSE)
+          color_scale <- function(score) {
+            rgb <- round(colorRamp(c("#D61F1F", "#FFD301", "#006B3D"))(score))
+            sprintf("#%02X%02X%02X", rgb[1], rgb[2], rgb[3])
+          }
+
+          create_badge <- function(score) {
+            jsonlite::write_json(
+              list(
+                schemaVersion = 1,
+                label = "muttest",
+                labelColor = "#0f2a13",
+                message = paste0(round(score, digits = 2) * 100, "%"),
+                color = color_scale(score),
+                logoSvg = "<svg viewBox='0 0 24 24' id='Layer_1' data-name='Layer 1' xmlns='http://www.w3.org/2000/svg'><defs><style>.cls-1{fill:none;stroke:#ffffff;stroke-miterlimit:10;stroke-width:1.91px;}</style></defs><path class='cls-1' d='M15.82,1.5l-1,1A9.55,9.55,0,0,0,12,9.27v5.46a9.55,9.55,0,0,1-2.8,6.75l-1,1'/><path class='cls-1' d='M9.27,12a9.55,9.55,0,0,0-6.75,2.8l-1,1'/><path class='cls-1' d='M22.5,8.18l-1,1A9.55,9.55,0,0,1,14.73,12'/><line class='cls-1' x1='13.91' y1='2.45' x2='21.07' y2='9.61'/><line class='cls-1' x1='12.95' y1='6.27' x2='15.82' y2='9.14'/><line class='cls-1' x1='2.45' y1='13.91' x2='9.14' y2='20.59'/><line class='cls-1' x1='8.18' y1='14.86' x2='11.52' y2='18.2'/></svg>"
+              ),
+              path = ".badges/muttest.json",
+              auto_unbox = TRUE
+            )
+          }
+
+          pkgload::load_all()
+
+          plan <- test_plan(
+            mutators = list(
+              operator("+", "-"),
+              operator("-", "+"),
+              operator("*", "/"),
+              operator("/", "*"),
+              operator("==", "!="),
+              operator("!=", "=="),
+              operator("<", ">"),
+              operator(">", "<"),
+              operator("<=", ">="),
+              operator(">=", "<=")
+            )
+          )
+          score <- test(plan)
+
+          create_badge(score)
+
+      - name: Update badge with test results
+        run: |
+          # Save the badge file to a temporary location
+          mkdir -p /tmp/muttest-badge
+          mv .badges/muttest.json /tmp/muttest-badge/
+
+          # Fetch and checkout badges branch
+          git fetch origin badges
+          git checkout badges
+
+          # Copy the badge file from temp location to badges directory
+          cp /tmp/muttest-badge/muttest.json .badges/
+
+          # Add, commit and push
+          git add .badges/muttest.json
+          git commit -m "chore: :gears: Update muttest badge with test results" || echo "No changes to commit"
+          git push --force-with-lease origin badges
