@@ -21,7 +21,9 @@ cucumber::given("I clone a repository from {string}", function(url, context) {
 cucumber::when("I run mutation tests with", function(code, context) {
   withr::with_output_sink(new = nullfile(), {
     withr::with_dir(context$dir, {
-      context$score <- eval(parse(text = code))
+      suppressPackageStartupMessages(
+        context$score <- eval(parse(text = code))
+      )
     })
   })
 })
