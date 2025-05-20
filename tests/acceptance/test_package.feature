@@ -186,3 +186,39 @@ Feature: Test package
       )
       """
     Then the mutation score should be 0.5
+
+  Scenario: Test runs with only errors
+    There are 2 mutations, 2 errors, 0 killed, score is 0%.
+
+    Given I have a "DESCRIPTION" file with
+      """
+      Package: example
+      Version: 0.1.0
+      """
+    Given I have a "R/calculate.R" file with
+      """
+      calculate <- function(x) {
+        score <- x + 1
+        stop("Score is zero")
+        score
+      }
+      """
+    And I have a "tests/testthat/test-calculate.R" file with
+      """
+      test_that("calculate adds 1", {
+        expect_equal(calculate(1), 2)
+      })
+      """
+    When I run mutation tests with
+      """
+      test(
+        path = "tests/testthat",
+        plan = test_plan(
+          mutators = list(
+            operator("+", "-"),
+            operator("+", "*")
+          )
+        )
+      )
+      """
+    Then the mutation score should be 0.0
