@@ -1,5 +1,6 @@
-#' Progress Reporter for Mutation Testing
+#' @title Progress Reporter for Mutation Testing
 #'
+#' @description
 #' A reporter that displays a progress indicator for mutation tests.
 #' It provides real-time feedback on which mutants are being tested and whether they were killed by tests.
 #'
@@ -9,8 +10,9 @@
 #'
 #' @importFrom R6 R6Class
 #' @importFrom cli col_green col_red col_yellow col_grey symbol
+#' @md
 #' @export
-#' @family reporters
+#' @family MutationReporter
 MutationProgressReporter <- R6::R6Class(
   classname = "MutationProgressReporter",
   inherit = MutationReporter,

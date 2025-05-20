@@ -4,13 +4,14 @@
 \alias{PackageCopyStrategy}
 \title{Package copy strategy}
 \description{
-Package copy strategy
-
-Package copy strategy
-}
-\details{
 It copies all files and directories from the original directory to a temporary directory.
 }
+\seealso{
+Other CopyStrategy: 
+\code{\link{CopyStrategy}},
+\code{\link{default_copy_strategy}()}
+}
+\concept{CopyStrategy}
 \section{Super class}{
 \code{\link[muttest:CopyStrategy]{muttest::CopyStrategy}} -> \code{PackageCopyStrategy}
 }

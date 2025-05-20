@@ -1,5 +1,6 @@
-#' Reporter for Mutation Testing
+#' @title Reporter for Mutation Testing
 #'
+#' @description
 #' The job of a mutation reporter is to aggregate and display the results of mutation tests.
 #' It tracks each mutation attempt, reporting on whether the tests killed the mutation or the mutation survived.
 #'
@@ -16,9 +17,10 @@
 #' @field results List of mutation test results, indexed by file path
 #' @field current_score Current score of the mutation tests
 #'
+#' @md
 #' @export
-#' @family reporters
 #' @importFrom rlang `%||%`
+#' @family MutationReporter
 MutationReporter <- R6::R6Class(
   classname = "MutationReporter",
   public = list(
@@ -155,10 +157,12 @@ MutationReporter <- R6::R6Class(
   )
 )
 
-#' Get a default reporter
+#' Create a default reporter
 #'
-#' @param ... Additional arguments passed to reporter constructor
+#' @param ... Arguments passed to the `?MutationProgressReporter` constructor.
+#' @md
 #' @export
+#' @family MutationReporter
 default_reporter <- function(...) {
   MutationProgressReporter$new(...)
 }

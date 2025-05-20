@@ -1,12 +1,13 @@
 #' @import testthat
 NULL
 
-#' TestStrategy interface
+#' @title TestStrategy interface
 #'
-#' Extend this class to implement custom test strategy.
+#' @description
+#' Extend this class to implement a custom test strategy.
 #'
-#' @md
 #' @export
+#' @md
 #' @family TestStrategy
 TestStrategy <- R6::R6Class(
   classname = "TestStrategy",
@@ -24,9 +25,15 @@ TestStrategy <- R6::R6Class(
   )
 )
 
-#' Run all tests for a mutant
+#' @title Run all tests for a mutant
+#'
+#' @description
+#' This test strategy tells if a mutant is caught by any test.
+#'
+#' To get faster results, especially for big codebases, use `?FileTestStrategy` instead.
 #'
 #' @export
+#' @md
 #' @family TestStrategy
 FullTestStrategy <- R6::R6Class(
   classname = "FullTestStrategy",
@@ -68,14 +75,19 @@ FullTestStrategy <- R6::R6Class(
   )
 )
 
-#' Run tests matching the source file name
+#' @title Run tests matching the mutated source file name
 #'
-#' This class implements a test strategy that runs tests matching the source file name.
+#' @description
+#' This strategy tells if a mutant is caught by a test matching the source file name.
 #'
-#' If the source file name is `foo.R`, and there are test files named `test-foo.R` or `test-bar.R`,
+#' For example, if the source file name is `foo.R`, and there are test files named `test-foo.R` or `test-bar.R`,
 #' only `test-foo.R` will be run.
 #'
+#' This strategy should give faster results than `?FullTestStrategy`, especially for big codebases,
+#' but the score might be less accurate.
+#'
 #' @export
+#' @md
 #' @family TestStrategy
 FileTestStrategy <- R6::R6Class(
   classname = "FileTestStrategy",
@@ -121,12 +133,13 @@ FileTestStrategy <- R6::R6Class(
   )
 )
 
-#' Create a run strategy
+#' @title Create a default run strategy
 #'
-#' @param ... Unused, kept for future expansion
-#' @return A Test object
+#' @param ... Arguments passed to the `?FullTestStrategy` constructor.
+#' @return A `?TestStrategy` object
 #'
 #' @export
+#' @md
 #' @family TestStrategy
 default_test_strategy <- function(...) {
   FullTestStrategy$new(...)

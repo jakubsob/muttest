@@ -1,8 +1,11 @@
-#' CopyStrategy interface
+#' @title CopyStrategy interface
 #'
+#' @description
 #' Extend this class to implement a custom copy strategy.
 #'
+#' @md
 #' @export
+#' @family CopyStrategy
 CopyStrategy <- R6::R6Class(
   classname = "CopyStrategy",
   public = list(
@@ -18,11 +21,14 @@ CopyStrategy <- R6::R6Class(
   )
 )
 
-#' Package copy strategy
+#' @title Package copy strategy
 #'
+#' @description
 #' It copies all files and directories from the original directory to a temporary directory.
 #'
+#' @md
 #' @export
+#' @family CopyStrategy
 PackageCopyStrategy <- R6::R6Class(
   classname = "PackageCopyStrategy",
   inherit = CopyStrategy,
@@ -71,9 +77,11 @@ PackageCopyStrategy <- R6::R6Class(
 
 #' Create a default project copy strategy
 #'
-#' @param ... Unused, saved for future expansion.
-#' @return A CopyStrategy object
+#' @param ... Arguments passed to the `?PackageCopyStrategy` constructor.
+#' @return A `?CopyStrategy` object
+#' @md
 #' @export
+#' @family CopyStrategy
 default_copy_strategy <- function(...) {
   PackageCopyStrategy$new(...)
 }

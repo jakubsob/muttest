@@ -1,0 +1,67 @@
+---
+title: "How it works"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+To get the mutation score, we need to do the following steps:
+
+# Generate mutants
+
+Project files are read and stored as character vectors by `test_plan`.
+`mutators` provided to `test_plan` are applied to the original code to generate mutants.
+
+If we have only one mutator `+` → `-` and code `a + b + c`, the generated mutants will be `a - b + c` and `a + b - c`.
+Even if we have only one mutator and one line of code, many mutants can be generated.
+
+Only one change like this is applied to the code at a time, one file at a time.
+
+# Copy the project and apply the mutation
+
+We copy the project to a temporary directory using `?CopyStrategy`.
+
+For each generated mutation, we create a fresh copy of the project, one copy is created at a time.
+
+We overwrite the mutated file in project copy.
+
+
+> 💡 This is needed since R is not a compiled language and code can be sourced during runtime.
+>
+> If the mutated code was evaluated from the lines we read and mutated in [step 1](#generate-mutants) (from memory), then we could miss some mutations, as some test files could source the original code.
+>
+> Even if we mutated the code from `R/calculate.R`, when running the test the original code would be sourced and the test would pass.
+>
+> ```r
+> #' testst/testthat/test_calculate.R
+> source("R/calculate.R")
+> test_that("calculate", {
+>   expect_equal(calculate(1, 2), 3)
+> })
+> ```
+>
+> It's even more apparent for projects that use modules like `box`, they always source the tested code on the fly.
+>
+> ```r
+> #' testst/testthat/test_calculate.R
+> box::use(R/calculate)
+> test_that("calculate", {
+>  expect_equal(calculate$calculate(1, 2), 3)
+> })
+> ```
+
+# Run tests and calculate the mutation score
+
+We run the tests on the copied project with the mutated code.
+
+The results are counted, only test failures and total number of test runs contribute to the mutation score.
+
+Some mutants will inevitably lead to runtime errors, those are not counted as failures and are not included in the mutation score.
+
+The mutation score is the percentage of mutants that were detected by the tests.
+
+# Clean up
+
+We clean up the temporary directory to remove any files that were created during the mutation testing process.

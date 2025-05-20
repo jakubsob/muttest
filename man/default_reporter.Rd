@@ -2,13 +2,19 @@
 % Please edit documentation in R/reporter.R
 \name{default_reporter}
 \alias{default_reporter}
-\title{Get a default reporter}
+\title{Create a default reporter}
 \usage{
 default_reporter(...)
 }
 \arguments{
-\item{...}{Additional arguments passed to reporter constructor}
+\item{...}{Arguments passed to the \code{?MutationProgressReporter} constructor.}
 }
 \description{
-Get a default reporter
+Create a default reporter
 }
+\seealso{
+Other MutationReporter: 
+\code{\link{MutationProgressReporter}},
+\code{\link{MutationReporter}}
+}
+\concept{MutationReporter}

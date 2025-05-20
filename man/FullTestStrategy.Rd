@@ -4,9 +4,9 @@
 \alias{FullTestStrategy}
 \title{Run all tests for a mutant}
 \description{
-Run all tests for a mutant
+This test strategy tells if a mutant is caught by any test.
 
-Run all tests for a mutant
+To get faster results, especially for big codebases, use \code{?FileTestStrategy} instead.
 }
 \seealso{
 Other TestStrategy: 

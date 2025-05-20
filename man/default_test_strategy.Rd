@@ -2,18 +2,18 @@
 % Please edit documentation in R/test_strategy.R
 \name{default_test_strategy}
 \alias{default_test_strategy}
-\title{Create a run strategy}
+\title{Create a default run strategy}
 \usage{
 default_test_strategy(...)
 }
 \arguments{
-\item{...}{Unused, kept for future expansion}
+\item{...}{Arguments passed to the \code{?FullTestStrategy} constructor.}
 }
 \value{
-A Test object
+A \code{?TestStrategy} object
 }
 \description{
-Create a run strategy
+Create a default run strategy
 }
 \seealso{
 Other TestStrategy: 

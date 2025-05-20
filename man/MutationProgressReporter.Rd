@@ -4,19 +4,15 @@
 \alias{MutationProgressReporter}
 \title{Progress Reporter for Mutation Testing}
 \description{
-Progress Reporter for Mutation Testing
-
-Progress Reporter for Mutation Testing
-}
-\details{
 A reporter that displays a progress indicator for mutation tests.
 It provides real-time feedback on which mutants are being tested and whether they were killed by tests.
 }
 \seealso{
-Other reporters: 
-\code{\link{MutationReporter}}
+Other MutationReporter: 
+\code{\link{MutationReporter}},
+\code{\link{default_reporter}()}
 }
-\concept{reporters}
+\concept{MutationReporter}
 \section{Super class}{
 \code{\link[muttest:MutationReporter]{muttest::MutationReporter}} -> \code{MutationProgressReporter}
 }

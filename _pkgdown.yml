@@ -5,5 +5,53 @@ template:
   bslib:
     bg: '#ffffff'
     fg: '#000000'
-    primary: '#886868' 
+    primary: '#886868'
     secondary: '#F77669'
+  includes:
+    in_header: |
+      <!-- Google tag (gtag.js) -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-N7MW34VJS3"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-N7MW34VJS3');
+      </script>
+
+navbar:
+  type: dark
+  structure:
+    left: [reference, articles, news]
+    right: [search, github, light-switch]
+  components:
+    articles:
+      text: Articles
+      menu:
+        - text: How it works
+          href: articles/how-it-works.html
+
+reference:
+  - title: Run
+    contents:
+      - test
+      - test_plan
+  - title: Mutators
+    contents:
+      - operator
+  - title: Test run strategy
+    contents:
+      - default_test_strategy
+      - FullTestStrategy
+      - FileTestStrategy
+      - TestStrategy
+  - title: Project copy strategy
+    contents:
+      - default_copy_strategy
+      - PackageCopyStrategy
+      - CopyStrategy
+  - title: Test reporting
+    contents:
+      - default_reporter
+      - MutationProgressReporter
+      - MutationReporter

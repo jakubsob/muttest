@@ -4,12 +4,7 @@
 \alias{TestStrategy}
 \title{TestStrategy interface}
 \description{
-TestStrategy interface
-
-TestStrategy interface
-}
-\details{
-Extend this class to implement custom test strategy.
+Extend this class to implement a custom test strategy.
 }
 \seealso{
 Other TestStrategy: 

@@ -13,6 +13,7 @@
 #' @return A numeric value representing the mutation score.
 #'
 #' @export
+#' @md
 #' @importFrom rlang .data
 test <- function(
   plan,

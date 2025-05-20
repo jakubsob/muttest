@@ -4,19 +4,15 @@
 \alias{MutationReporter}
 \title{Reporter for Mutation Testing}
 \description{
-Reporter for Mutation Testing
-
-Reporter for Mutation Testing
-}
-\details{
 The job of a mutation reporter is to aggregate and display the results of mutation tests.
 It tracks each mutation attempt, reporting on whether the tests killed the mutation or the mutation survived.
 }
 \seealso{
-Other reporters: 
-\code{\link{MutationProgressReporter}}
+Other MutationReporter: 
+\code{\link{MutationProgressReporter}},
+\code{\link{default_reporter}()}
 }
-\concept{reporters}
+\concept{MutationReporter}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
