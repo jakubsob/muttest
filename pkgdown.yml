@@ -3,7 +3,7 @@ pkgdown: 2.1.2
 pkgdown_sha: ~
 articles:
   articles/how-it-works: how-it-works.html
-last_built: 2025-05-20T19:00Z
+last_built: 2025-05-22T14:00Z
 urls:
   reference: https://jakubsob.github.io/muttest/reference
   article: https://jakubsob.github.io/muttest/articles
