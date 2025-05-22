@@ -30,6 +30,12 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch"><li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul></li>
       </ul></div>
 
 
@@ -169,12 +175,12 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
 <h3 id="method-start-file-">Method <code>start_file()</code><a class="anchor" aria-label="anchor" href="#method-start-file-"></a></h3>
 <p>Start testing a file</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">start_file</span><span class="op">(</span><span class="va">file_path</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">start_file</span><span class="op">(</span><span class="va">filename</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>file_path</code></dt>
+<p></p><div class="arguments"><dl><dt><code>filename</code></dt>
 <dd><p>Path to the file being mutated</p></dd>
 
 
@@ -201,12 +207,12 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
 <h3 id="method-add-result-">Method <code>add_result()</code><a class="anchor" aria-label="anchor" href="#method-add-result-"></a></h3>
 <p>Add a mutation test result</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">add_result</span><span class="op">(</span><span class="va">file_path</span>, <span class="va">mutator</span>, <span class="va">killed</span>, <span class="va">survived</span>, <span class="va">errors</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">add_result</span><span class="op">(</span><span class="va">filename</span>, <span class="va">mutator</span>, <span class="va">killed</span>, <span class="va">survived</span>, <span class="va">errors</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>file_path</code></dt>
+<p></p><div class="arguments"><dl><dt><code>filename</code></dt>
 <dd><p>Path to the file that was mutated</p></dd>
 
 
