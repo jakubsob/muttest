@@ -26,7 +26,7 @@ test <- function(
   checkmate::assert(
     checkmate::check_data_frame(plan),
     checkmate::check_set_equal(
-      c("file_path", "original_code", "mutated_code", "mutator"),
+      c("filename", "original_code", "mutated_code", "mutator"),
       names(plan)
     ),
     combine = "and"
@@ -42,15 +42,15 @@ test <- function(
   reporter$start_reporter(plan)
 
   plan |>
-    dplyr::arrange(.data$file_path, .data$mutator) |>
+    dplyr::arrange(.data$filename, .data$mutator) |>
     dplyr::rowwise() |>
     dplyr::group_split() |>
     purrr::walk(\(row) {
       mutator <- row$mutator[[1]]
-      file_path <- row$file_path
+      filename <- row$filename
       mutated_code <- row$mutated_code[[1]]
 
-      reporter$start_file(file_path)
+      reporter$start_file(filename)
       reporter$start_mutator(mutator)
       reporter$update(force = TRUE)
 
@@ -59,14 +59,12 @@ test <- function(
       on.exit(fs::dir_delete(dir))
       withr::with_tempdir(tmpdir = dir, pattern = "", {
         withr::with_dir(dir, {
-          temp_file_path <- file.path(dir, file_path)
-          writeLines(mutated_code, temp_file_path)
+          temp_filename <- file.path(dir, filename)
+          writeLines(mutated_code, temp_filename)
 
           test_results <- test_strategy$execute(
             path = path,
-            mutated_file = file_path,
-            mutated_code = mutated_code,
-            env = NULL,
+            plan = row,
             reporter = reporter$test_reporter
           )
           checkmate::assert_class(test_results, "testthat_results")
@@ -79,7 +77,7 @@ test <- function(
       errors <- sum(test_results_tibble$error)
 
       reporter$add_result(
-        file_path,
+        filename,
         mutator,
         killed,
         survived,
@@ -107,6 +105,14 @@ test <- function(
 #' @param mutators A list of mutators to use. See [operator()].
 #' @param source_files A vector of file paths to the source files.
 #' @return A data frame with the test plan.
+#'   The data frame has the following columns:
+#'   - `filename`: The name of the source file.
+#'   - `original_code`: The original code of the source file.
+#'   - `mutated_code`: The mutated code of the source file.
+#'   - `mutator`: The mutator that was applied.
+#'   - `filter`: The filter that can be used to select the tests to run.
+#'      Currenly not used by any `?TestStrategy`.
+#'
 #' @export
 #' @md
 test_plan <- function(
@@ -117,25 +123,27 @@ test_plan <- function(
   checkmate::assert_list(mutators)
   map_dfr <- purrr::compose(dplyr::bind_rows, purrr::map)
   map_dfr(mutators, function(mutator) {
-    map_dfr(source_files, function(file_path) {
-      code_lines <- readLines(file_path)
+    map_dfr(source_files, function(filename) {
+      code_lines <- readLines(filename)
       mutations <- mutate_code(code_lines, mutator)
       if (is.null(mutations)) {
         return(
           tibble::tibble(
-            file_path = character(),
+            filename = character(),
             original_code = list(character()),
             mutated_code = list(character()),
-            mutator = list(mutator)
+            mutator = list(mutator),
+            filter = NULL
           )
         )
       }
       map_dfr(mutations, function(mutation) {
         tibble::tibble(
-          file_path = file_path,
+          filename = filename,
           original_code = list(code_lines),
           mutated_code = list(mutation$code),
-          mutator = list(mutator)
+          mutator = list(mutator),
+          filter = NULL
         )
       })
     })

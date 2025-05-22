@@ -170,7 +170,7 @@ Start reporter
 Add a mutation test result
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MutationProgressReporter$add_result(
-  file_path,
+  filename,
   mutator,
   killed,
   survived,
@@ -181,7 +181,7 @@ Add a mutation test result
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{file_path}}{Path to the file that was mutated}
+\item{\code{filename}}{Path to the file that was mutated}
 
 \item{\code{mutator}}{The mutator that was applied}
 

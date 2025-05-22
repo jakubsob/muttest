@@ -13,6 +13,15 @@ test_plan(mutators, source_files = fs::dir_ls("R", regexp = ".[rR]$"))
 }
 \value{
 A data frame with the test plan.
+The data frame has the following columns:
+\itemize{
+\item \code{filename}: The name of the source file.
+\item \code{original_code}: The original code of the source file.
+\item \code{mutated_code}: The mutated code of the source file.
+\item \code{mutator}: The mutator that was applied.
+\item \code{filter}: The filter that can be used to select the tests to run.
+Currenly not used by any \code{?TestStrategy}.
+}
 }
 \description{
 The purpose of this function is to create and preview a plan for mutation testing.

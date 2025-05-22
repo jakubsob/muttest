@@ -14,12 +14,10 @@ TestStrategy <- R6::R6Class(
   public = list(
     #' @description Execute the test strategy
     #' @param path The path to the test directory
-    #' @param mutated_file The path to the file being tested
-    #' @param mutated_code The mutated code
-    #' @param env The environment to run the tests in
+    #' @param plan The current mutation plan. See `test_plan()`.
     #' @param reporter The reporter to use for test results
     #' @return The test result
-    execute = function(path, mutated_file, mutated_code, env, reporter) {
+    execute = function(path, plan, reporter) {
       stop("Not implemented")
     }
   )
@@ -56,16 +54,12 @@ FullTestStrategy <- R6::R6Class(
     },
     #' @description Execute the test strategy
     #' @param path The path to the test directory
-    #' @param mutated_file The path to the file being tested
-    #' @param mutated_code The mutated code
-    #' @param env The environment to run the tests in
+    #' @param plan The current mutation plan. See `test_plan()`.
     #' @param reporter The reporter to use for test results
     #' @return The test results
-    execute = function(path, mutated_file, mutated_code, env, reporter) {
+    execute = function(path, plan, reporter) {
       testthat::test_dir(
         path,
-        filter = NULL,
-        env = env,
         stop_on_failure = FALSE,
         reporter = reporter,
         load_helpers = private$args$load_helpers,
@@ -110,20 +104,17 @@ FileTestStrategy <- R6::R6Class(
     },
     #' @description Execute the test strategy
     #' @param path The path to the test directory
-    #' @param mutated_file The path to the file being tested
-    #' @param mutated_code The mutated code
-    #' @param env The environment to run the tests in
+    #' @param plan The current mutation plan. See `test_plan()`.
     #' @param reporter The reporter to use for test results
     #' @return The test results
-    execute = function(path, mutated_file, mutated_code, env, reporter) {
-      file_name <- tools::file_path_sans_ext(basename(mutated_file))
+    execute = function(path, plan, reporter) {
+      file_name <- tools::file_path_sans_ext(basename(plan$filename))
       if (!any(grepl(file_name, list.files(path)))) {
         return(.empty_test_result())
       }
       testthat::test_dir(
         path = path,
         filter = file_name,
-        env = env,
         stop_on_failure = FALSE,
         reporter = reporter,
         load_helpers = private$args$load_helpers,

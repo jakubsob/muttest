@@ -104,13 +104,13 @@ Start reporter
 \subsection{Method \code{start_file()}}{
 Start testing a file
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MutationReporter$start_file(file_path)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MutationReporter$start_file(filename)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{file_path}}{Path to the file being mutated}
+\item{\code{filename}}{Path to the file being mutated}
 }
 \if{html}{\out{</div>}}
 }
@@ -138,13 +138,13 @@ Start testing with a specific mutator
 \subsection{Method \code{add_result()}}{
 Add a mutation test result
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MutationReporter$add_result(file_path, mutator, killed, survived, errors)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MutationReporter$add_result(filename, mutator, killed, survived, errors)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{file_path}}{Path to the file that was mutated}
+\item{\code{filename}}{Path to the file that was mutated}
 
 \item{\code{mutator}}{The mutator that was applied}
 

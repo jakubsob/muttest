@@ -72,10 +72,10 @@ MutationReporter <- R6::R6Class(
     },
 
     #' @description Start testing a file
-    #' @param file_path Path to the file being mutated
-    start_file = function(file_path) {
-      self$current_file <- file_path
-      self$results[[file_path]] <- self$results[[file_path]] %||%
+    #' @param filename Path to the file being mutated
+    start_file = function(filename) {
+      self$current_file <- filename
+      self$results[[filename]] <- self$results[[filename]] %||%
         list(
           total = 0,
           killed = 0,
@@ -91,24 +91,24 @@ MutationReporter <- R6::R6Class(
     },
 
     #' @description Add a mutation test result
-    #' @param file_path Path to the file that was mutated
+    #' @param filename Path to the file that was mutated
     #' @param mutator The mutator that was applied
     #' @param killed Whether the mutation was killed by tests
     #' @param survived Number of survived mutations
     #' @param errors Number of errors encountered
     add_result = function(
-      file_path,
+      filename,
       mutator,
       killed,
       survived,
       errors
     ) {
-      self$results[[file_path]]$total <- self$results[[file_path]]$total + 1
-      self$results[[file_path]]$killed <- self$results[[file_path]]$killed +
+      self$results[[filename]]$total <- self$results[[filename]]$total + 1
+      self$results[[filename]]$killed <- self$results[[filename]]$killed +
         killed
-      self$results[[file_path]]$survived <- self$results[[file_path]]$survived +
+      self$results[[filename]]$survived <- self$results[[filename]]$survived +
         survived
-      self$results[[file_path]]$errors <- self$results[[file_path]]$errors +
+      self$results[[filename]]$errors <- self$results[[filename]]$errors +
         errors
       killed_counts <- purrr::map(self$results, "killed")
       total_counts <- purrr::map(self$results, "total")

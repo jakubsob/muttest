@@ -220,19 +220,19 @@ MutationProgressReporter <- R6::R6Class(
     },
 
     #' @description Add a mutation test result
-    #' @param file_path Path to the file that was mutated
+    #' @param filename Path to the file that was mutated
     #' @param mutator The mutator that was applied
     #' @param killed Whether the mutation was killed by tests
     #' @param survived Number of survived mutations
     #' @param errors Number of errors encountered
     add_result = function(
-      file_path,
+      filename,
       mutator,
       killed,
       survived,
       errors
     ) {
-      super$add_result(file_path, mutator, killed, survived, errors)
+      super$add_result(filename, mutator, killed, survived, errors)
 
       status_symbol <- if (killed) {
         cli::col_green(cli::symbol$tick)
@@ -240,11 +240,11 @@ MutationProgressReporter <- R6::R6Class(
         cli::col_red("x")
       }
 
-      k <- self$results[[file_path]]$killed
-      s <- self$results[[file_path]]$survived
-      t <- self$results[[file_path]]$total
-      e <- self$results[[file_path]]$errors
-      file_name <- basename(file_path)
+      k <- self$results[[filename]]$killed
+      s <- self$results[[filename]]$survived
+      t <- self$results[[filename]]$total
+      e <- self$results[[filename]]$errors
+      file_name <- basename(filename)
       score <- floor(self$current_score * 100)
 
       # Format and print the row using our formatting function

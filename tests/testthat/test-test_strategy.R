@@ -5,7 +5,7 @@ describe("TestStrategy", {
 
     # Act, Assert
     expect_error(
-      strategy$execute("path", "file.R", "code", new.env(), NULL),
+      strategy$execute("path", list(), NULL),
       "Not implemented"
     )
   })
@@ -26,9 +26,7 @@ describe("FullTestStrategy", {
     # Act
     result <- strategy$execute(
       path = test_dir,
-      mutated_file = "file.R",
-      mutated_code = "code",
-      env = new.env(),
+      plan = list(mutated_file = "file.R"),
       reporter = testthat::SilentReporter$new()
     )
 
@@ -53,9 +51,7 @@ describe("FileTestStrategy", {
     # Act
     result <- strategy$execute(
       path = test_dir,
-      mutated_file = "file1.R",
-      mutated_code = "code",
-      env = new.env(),
+      plan = data.frame(filename = "file1.R"),
       reporter = testthat::SilentReporter$new()
     )
 
@@ -78,9 +74,7 @@ describe("FileTestStrategy", {
     # Act
     result <- strategy$execute(
       path = test_dir,
-      mutated_file = "file3.R",
-      mutated_code = "code",
-      env = new.env(),
+      plan = data.frame(filename = "file3.R"),
       reporter = testthat::SilentReporter$new()
     )
 

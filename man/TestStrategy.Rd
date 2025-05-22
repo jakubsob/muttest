@@ -26,7 +26,7 @@ Other TestStrategy:
 \subsection{Method \code{execute()}}{
 Execute the test strategy
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TestStrategy$execute(path, mutated_file, mutated_code, env, reporter)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TestStrategy$execute(path, plan, reporter)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -34,11 +34,7 @@ Execute the test strategy
 \describe{
 \item{\code{path}}{The path to the test directory}
 
-\item{\code{mutated_file}}{The path to the file being tested}
-
-\item{\code{mutated_code}}{The mutated code}
-
-\item{\code{env}}{The environment to run the tests in}
+\item{\code{plan}}{The current mutation plan. See \code{test_plan()}.}
 
 \item{\code{reporter}}{The reporter to use for test results}
 }
