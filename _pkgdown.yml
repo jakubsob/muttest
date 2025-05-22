@@ -23,7 +23,6 @@ navbar:
   type: dark
   structure:
     left: [reference, articles, news]
-    right: [search, github, light-switch]
   components:
     articles:
       text: Articles
