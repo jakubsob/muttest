@@ -2,7 +2,7 @@
 % Please edit documentation in R/mutator-operator.R
 \name{operator}
 \alias{operator}
-\title{Operator mutator}
+\title{Mutate an operator}
 \usage{
 operator(from, to)
 }

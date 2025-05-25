@@ -20,7 +20,7 @@ Mutator <- R6::R6Class(
   )
 )
 
-#' Operator mutator
+#' Mutate an operator
 #'
 #' It changes a binary operator to another one.
 #'

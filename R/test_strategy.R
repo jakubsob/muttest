@@ -14,7 +14,7 @@ TestStrategy <- R6::R6Class(
   public = list(
     #' @description Execute the test strategy
     #' @param path The path to the test directory
-    #' @param plan The current mutation plan. See `test_plan()`.
+    #' @param plan The current mutation plan. See `plan()`.
     #' @param reporter The reporter to use for test results
     #' @return The test result
     execute = function(path, plan, reporter) {
@@ -54,7 +54,7 @@ FullTestStrategy <- R6::R6Class(
     },
     #' @description Execute the test strategy
     #' @param path The path to the test directory
-    #' @param plan The current mutation plan. See `test_plan()`.
+    #' @param plan The current mutation plan. See `plan()`.
     #' @param reporter The reporter to use for test results
     #' @return The test results
     execute = function(path, plan, reporter) {
@@ -104,7 +104,7 @@ FileTestStrategy <- R6::R6Class(
     },
     #' @description Execute the test strategy
     #' @param path The path to the test directory
-    #' @param plan The current mutation plan. See `test_plan()`.
+    #' @param plan The current mutation plan. See `plan()`.
     #' @param reporter The reporter to use for test results
     #' @return The test results
     execute = function(path, plan, reporter) {

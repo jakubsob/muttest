@@ -34,7 +34,7 @@ Execute the test strategy
 \describe{
 \item{\code{path}}{The path to the test directory}
 
-\item{\code{plan}}{The current mutation plan. See \code{test_plan()}.}
+\item{\code{plan}}{The current mutation plan. See \code{plan()}.}
 
 \item{\code{reporter}}{The reporter to use for test results}
 }

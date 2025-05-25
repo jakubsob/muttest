@@ -23,9 +23,9 @@ Feature: Test package
       """
     When I run mutation tests with
       """
-      test(
+      muttest(
         path = "tests/testthat",
-        plan = test_plan(
+        plan = plan(
           mutators = list(
             operator("+", "-")
           )
@@ -54,9 +54,9 @@ Feature: Test package
       """
     When I run mutation tests with
       """
-      test(
+      muttest(
         path = "tests/testthat",
-        plan = test_plan(
+        plan = plan(
           mutators = list(
             operator("+", "-"),
             operator("/", "*")
@@ -98,9 +98,9 @@ Feature: Test package
       """
     When I run mutation tests with
       """
-      test(
+      muttest(
         path = "tests/testthat",
-        plan = test_plan(
+        plan = plan(
           mutators = list(
             operator("+", "-"),
             operator("/", "*")
@@ -133,9 +133,9 @@ Feature: Test package
       """
     When I run mutation tests with
       """
-      test(
+      muttest(
         path = "tests/testthat",
-        plan = test_plan(
+        plan = plan(
           mutators = list(
             operator("*", "/")
           )
@@ -175,9 +175,9 @@ Feature: Test package
       """
     When I run mutation tests with
       """
-      test(
+      muttest(
         path = "tests/testthat",
-        plan = test_plan(
+        plan = plan(
           mutators = list(
             operator("+", "-"),
             operator("+", "*")
@@ -211,9 +211,9 @@ Feature: Test package
       """
     When I run mutation tests with
       """
-      test(
+      muttest(
         path = "tests/testthat",
-        plan = test_plan(
+        plan = plan(
           mutators = list(
             operator("+", "-"),
             operator("+", "*")

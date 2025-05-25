@@ -91,7 +91,7 @@ MutationReporter <- R6::R6Class(
     },
 
     #' @description Add a mutation test result
-    #' @param plan Current testing plan. See `test_plan()`.
+    #' @param plan Current testing plan. See `plan()`.
     #' @param killed Whether the mutation was killed by tests
     #' @param survived Number of survived mutations
     #' @param errors Number of errors encountered

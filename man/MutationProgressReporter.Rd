@@ -175,7 +175,7 @@ Add a mutation test result
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{plan}}{Current testing plan. See \code{test_plan()}.}
+\item{\code{plan}}{Current testing plan. See \code{plan()}.}
 
 \item{\code{killed}}{Whether the mutation was killed by tests}
 

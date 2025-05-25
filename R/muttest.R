@@ -1,21 +1,20 @@
 #' Run a mutation test
 #'
-#' @param plan A data frame with the test plan. See `test_plan()`.
+#' @param plan A data frame with the test plan. See `plan()`.
 #' @param path Path to the test directory.
 #' @param reporter Reporter to use for mutation testing results. See `?MutationReporter`.
 #' @param test_strategy Strategy for running tests. See `?TestStrategy`.
 #'   The purpose of test strategy is to control how tests are executed.
 #'   We can run all tests for each mutant, or only tests that are relevant to the mutant.
 #' @param copy_strategy Strategy for copying the project. See `?CopyStrategy`.
-#'   muttest creates mutants of the project in a temporary directory.
-#'   This strategy controls which files are copied to the temporary directory.
+#'   This strategy controls which files are copied to the temporary directory, where the tests are run.
 #'
 #' @return A numeric value representing the mutation score.
 #'
 #' @export
 #' @md
 #' @importFrom rlang .data
-test <- function(
+muttest <- function(
   plan,
   path = "tests/testthat",
   reporter = default_reporter(),
@@ -90,16 +89,14 @@ test <- function(
   invisible(reporter$get_score())
 }
 
-#' Create a test plan for mutation testing
-#'
-#' The purpose of this function is to create and preview a plan for mutation testing.
+#' Create a plan for mutation testing
 #'
 #' Each mutant requires rerunning the tests. For large project it might be not feasible to test all
 #' mutants in one go. This function allows you to create a plan for selected source files and mutators.
 #'
 #' The plan is in a data frame format, where each row represents a mutant.
 #'
-#' You can subset the plan before passing it to the `test()` function.
+#' You can subset the plan before passing it to the `muttest()` function.
 #'
 #' @param mutators A list of mutators to use. See [operator()].
 #' @param source_files A vector of file paths to the source files.
@@ -112,7 +109,7 @@ test <- function(
 #'
 #' @export
 #' @md
-test_plan <- function(
+plan <- function(
   mutators,
   source_files = fs::dir_ls("R", regexp = ".[rR]$")
 ) {

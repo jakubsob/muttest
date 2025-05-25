@@ -33,8 +33,8 @@ navbar:
 reference:
   - title: Run
     contents:
-      - test
-      - test_plan
+      - muttest
+      - plan
   - title: Mutators
     contents:
       - operator

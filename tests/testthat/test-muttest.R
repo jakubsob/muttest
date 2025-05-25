@@ -6,13 +6,13 @@
 }
 
 test_ <- function(...) {
-  purrr::quietly(test)(...)$result
+  purrr::quietly(muttest)(...)$result
 }
 
 test_that("operators", {
   .with_example_dir("operators/", {
     mutators <- list(operator("+", "-"), operator("*", "/"))
-    plan <- test_plan(mutators, fs::dir_ls("R"))
+    plan <- plan(mutators, fs::dir_ls("R"))
     expect_equal(
       test_(plan),
       0.5

@@ -72,11 +72,11 @@ include_file(
 ```
 
 
-When running `muttest::test()` we'll get a report of the mutation score:
+When running `muttest::muttest()` we'll get a report of the mutation score:
 
 ```{r}
 #| eval: false
-plan <- muttest::test_plan(
+plan <- muttest::plan(
   source_files = "R/calculate.R",
   mutators = list(
     muttest::operator("+", "-"),

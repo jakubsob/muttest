@@ -65,10 +65,11 @@ test_that("calculate always returns 0", {
 })
 ```
 
-When running `muttest::test()` we’ll get a report of the mutation score:
+When running `muttest::muttest()` we’ll get a report of the mutation
+score:
 
 ``` r
-plan <- muttest::test_plan(
+plan <- muttest::plan(
   source_files = "R/calculate.R",
   mutators = list(
     muttest::operator("+", "-"),
