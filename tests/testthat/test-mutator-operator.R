@@ -1,20 +1,17 @@
-describe("mutate_code", {
+describe("operator", {
   it("should generate mutations for a single operator", {
     # Arrange
     code <- c("x <- 1 + 2")
     mutator <- operator("+", "-")
 
     # Act
-    mutations <- mutate_code(code, mutator)
+    mutations <- mutator$mutate(code)
 
     # Assert
     expect_equal(
       mutations,
       list(
-        list(
-          code = c("x <- 1 - 2"),
-          mutator = mutator
-        )
+        c("x <- 1 - 2")
       )
     )
   })
@@ -25,7 +22,7 @@ describe("mutate_code", {
     mutator <- operator("+", "-")
 
     # Act
-    mutations <- mutate_code(code, mutator)
+    mutations <- mutator$mutate(code)
 
     # Assert
     expect_null(mutations)
@@ -37,20 +34,14 @@ describe("mutate_code", {
     mutator <- operator("+", "-")
 
     # Act
-    mutations <- mutate_code(code, mutator)
+    mutations <- mutator$mutate(code)
 
     # Assert
     expect_equal(
       mutations,
       list(
-        list(
-          code = c("x <- 1 - 2 + 3"),
-          mutator = mutator
-        ),
-        list(
-          code = c("x <- 1 + 2 - 3"),
-          mutator = mutator
-        )
+        c("x <- 1 - 2 + 3"),
+        c("x <- 1 + 2 - 3")
       )
     )
   })
@@ -61,20 +52,14 @@ describe("mutate_code", {
     mutator <- operator("+", "-")
 
     # Act
-    mutations <- mutate_code(code, mutator)
+    mutations <- mutator$mutate(code)
 
     # Assert
     expect_equal(
       mutations,
       list(
-        list(
-          code = c("x <- 1 - 2", "y <- x + 3"),
-          mutator = mutator
-        ),
-        list(
-          code = c("x <- 1 + 2", "y <- x - 3"),
-          mutator = mutator
-        )
+        c("x <- 1 - 2", "y <- x + 3"),
+        c("x <- 1 + 2", "y <- x - 3")
       )
     )
   })

@@ -125,8 +125,8 @@ test_plan <- function(
   map_dfr(mutators, function(mutator) {
     map_dfr(source_files, function(filename) {
       code_lines <- readLines(filename)
-      mutations <- mutate_code(code_lines, mutator)
-      if (is.null(mutations)) {
+      mutations <- mutator$mutate(code_lines)
+      if (length(mutations) == 0) {
         return(
           tibble::tibble(
             filename = character(),
@@ -141,7 +141,7 @@ test_plan <- function(
         tibble::tibble(
           filename = filename,
           original_code = list(code_lines),
-          mutated_code = list(mutation$code),
+          mutated_code = list(mutation),
           mutator = list(mutator),
           filter = NULL
         )
