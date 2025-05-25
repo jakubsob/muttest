@@ -113,9 +113,9 @@
 <span><span class="fu">test_that</span><span class="op">(</span><span class="st">"calculate always returns 0"</span>, <span class="op">{</span></span>
 <span>  <span class="fu">expect_equal</span><span class="op">(</span><span class="fu">calculate</span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fl">0</span><span class="op">)</span> <span class="co"># ✅ This assertion only kills "*" -&gt; "/" mutant</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<p>When running <code><a href="reference/test.html">muttest::test()</a></code> we’ll get a report of the mutation score:</p>
+<p>When running <code><a href="reference/muttest.html">muttest::muttest()</a></code> we’ll get a report of the mutation score:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu">muttest</span><span class="fu">::</span><span class="fu"><a href="reference/test_plan.html">test_plan</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu">muttest</span><span class="fu">::</span><span class="fu"><a href="reference/plan.html">plan</a></span><span class="op">(</span></span>
 <span>  source_files <span class="op">=</span> <span class="st">"R/calculate.R"</span>,</span>
 <span>  mutators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    <span class="fu">muttest</span><span class="fu">::</span><span class="fu"><a href="reference/operator.html">operator</a></span><span class="op">(</span><span class="st">"+"</span>, <span class="st">"-"</span><span class="op">)</span>,</span>
@@ -123,7 +123,7 @@
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">muttest</span><span class="fu">::</span><span class="fu"><a href="reference/test.html">test</a></span><span class="op">(</span><span class="st">"tests/testthat"</span>, <span class="va">plan</span><span class="op">)</span></span>
+<span><span class="fu">muttest</span><span class="fu">::</span><span class="fu"><a href="reference/muttest.html">muttest</a></span><span class="op">(</span><span class="st">"tests/testthat"</span>, <span class="va">plan</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ℹ Mutation Testing</span></span>
 <span><span class="co">#&gt;   |   K |   S |   E |   T |   % | Mutator  | File</span></span>
 <span><span class="co">#&gt; x |   0 |   1 |   0 |   1 |   0 | + → -    | calculate.R</span></span>
