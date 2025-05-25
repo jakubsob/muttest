@@ -207,17 +207,13 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
 <h3 id="method-add-result-">Method <code>add_result()</code><a class="anchor" aria-label="anchor" href="#method-add-result-"></a></h3>
 <p>Add a mutation test result</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">add_result</span><span class="op">(</span><span class="va">filename</span>, <span class="va">mutator</span>, <span class="va">killed</span>, <span class="va">survived</span>, <span class="va">errors</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">add_result</span><span class="op">(</span><span class="va">plan</span>, <span class="va">killed</span>, <span class="va">survived</span>, <span class="va">errors</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>filename</code></dt>
-<dd><p>Path to the file that was mutated</p></dd>
-
-
-<dt><code>mutator</code></dt>
-<dd><p>The mutator that was applied</p></dd>
+<p></p><div class="arguments"><dl><dt><code>plan</code></dt>
+<dd><p>Current testing plan. See <code><a href="test_plan.html">test_plan()</a></code>.</p></dd>
 
 
 <dt><code>killed</code></dt>
@@ -344,7 +340,7 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>
