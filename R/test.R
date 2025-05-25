@@ -77,8 +77,7 @@ test <- function(
       errors <- sum(test_results_tibble$error)
 
       reporter$add_result(
-        filename,
-        mutator,
+        row,
         killed,
         survived,
         errors

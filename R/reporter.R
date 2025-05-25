@@ -91,18 +91,18 @@ MutationReporter <- R6::R6Class(
     },
 
     #' @description Add a mutation test result
-    #' @param filename Path to the file that was mutated
-    #' @param mutator The mutator that was applied
+    #' @param plan Current testing plan. See `test_plan()`.
     #' @param killed Whether the mutation was killed by tests
     #' @param survived Number of survived mutations
     #' @param errors Number of errors encountered
+    #' @md
     add_result = function(
-      filename,
-      mutator,
+      plan,
       killed,
       survived,
       errors
     ) {
+      filename <- plan$filename
       self$results[[filename]]$total <- self$results[[filename]]$total + 1
       self$results[[filename]]$killed <- self$results[[filename]]$killed +
         killed

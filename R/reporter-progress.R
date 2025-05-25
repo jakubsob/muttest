@@ -220,19 +220,18 @@ MutationProgressReporter <- R6::R6Class(
     },
 
     #' @description Add a mutation test result
-    #' @param filename Path to the file that was mutated
-    #' @param mutator The mutator that was applied
+    #' @param plan Current testing plan. See `test_plan()`.
     #' @param killed Whether the mutation was killed by tests
     #' @param survived Number of survived mutations
     #' @param errors Number of errors encountered
+    #' @md
     add_result = function(
-      filename,
-      mutator,
+      plan,
       killed,
       survived,
       errors
     ) {
-      super$add_result(filename, mutator, killed, survived, errors)
+      super$add_result(plan, killed, survived, errors)
 
       status_symbol <- if (killed) {
         cli::col_green(cli::symbol$tick)
@@ -240,6 +239,8 @@ MutationProgressReporter <- R6::R6Class(
         cli::col_red("x")
       }
 
+      filename <- plan$filename
+      mutator <- plan$mutator[[1]]
       k <- self$results[[filename]]$killed
       s <- self$results[[filename]]$survived
       t <- self$results[[filename]]$total

@@ -138,15 +138,13 @@ Start testing with a specific mutator
 \subsection{Method \code{add_result()}}{
 Add a mutation test result
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MutationReporter$add_result(filename, mutator, killed, survived, errors)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MutationReporter$add_result(plan, killed, survived, errors)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{filename}}{Path to the file that was mutated}
-
-\item{\code{mutator}}{The mutator that was applied}
+\item{\code{plan}}{Current testing plan. See \code{test_plan()}.}
 
 \item{\code{killed}}{Whether the mutation was killed by tests}
 
