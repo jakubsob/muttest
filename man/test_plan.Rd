@@ -19,8 +19,6 @@ The data frame has the following columns:
 \item \code{original_code}: The original code of the source file.
 \item \code{mutated_code}: The mutated code of the source file.
 \item \code{mutator}: The mutator that was applied.
-\item \code{filter}: The filter that can be used to select the tests to run.
-Currenly not used by any \code{?TestStrategy}.
 }
 }
 \description{

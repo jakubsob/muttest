@@ -109,8 +109,6 @@ test <- function(
 #'   - `original_code`: The original code of the source file.
 #'   - `mutated_code`: The mutated code of the source file.
 #'   - `mutator`: The mutator that was applied.
-#'   - `filter`: The filter that can be used to select the tests to run.
-#'      Currenly not used by any `?TestStrategy`.
 #'
 #' @export
 #' @md
@@ -131,8 +129,7 @@ test_plan <- function(
             filename = character(),
             original_code = list(character()),
             mutated_code = list(character()),
-            mutator = list(mutator),
-            filter = NULL
+            mutator = list(mutator)
           )
         )
       }
@@ -141,8 +138,7 @@ test_plan <- function(
           filename = filename,
           original_code = list(code_lines),
           mutated_code = list(mutation),
-          mutator = list(mutator),
-          filter = NULL
+          mutator = list(mutator)
         )
       })
     })
