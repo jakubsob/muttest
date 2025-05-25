@@ -84,7 +84,7 @@ plan <- muttest::test_plan(
   )
 )
 
-muttest::test("tests/testthat", plan)
+muttest::muttest(plan)
 #> ℹ Mutation Testing
 #>   |   K |   S |   E |   T |   % | Mutator  | File
 #> x |   0 |   1 |   0 |   1 |   0 | + → -    | calculate.R
