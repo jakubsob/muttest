@@ -6,12 +6,13 @@
 <url><loc>https://jakubsob.github.io/muttest/articles/index.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/authors.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/index.html</loc></url>
+<url><loc>https://jakubsob.github.io/muttest/news/index.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/reference/CopyStrategy.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/reference/FileTestStrategy.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/reference/FullTestStrategy.html</loc></url>
-<url><loc>https://jakubsob.github.io/muttest/reference/MutationProgressReporter.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/reference/MutationReporter.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/reference/PackageCopyStrategy.html</loc></url>
+<url><loc>https://jakubsob.github.io/muttest/reference/ProgressMutationReporter.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/reference/TestStrategy.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/reference/default_copy_strategy.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/reference/default_reporter.html</loc></url>
