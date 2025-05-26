@@ -7,14 +7,14 @@
 default_reporter(...)
 }
 \arguments{
-\item{...}{Arguments passed to the \code{?MutationProgressReporter} constructor.}
+\item{...}{Arguments passed to the \code{?ProgressMutationReporter} constructor.}
 }
 \description{
 Create a default reporter
 }
 \seealso{
 Other MutationReporter: 
-\code{\link{MutationProgressReporter}},
-\code{\link{MutationReporter}}
+\code{\link{MutationReporter}},
+\code{\link{ProgressMutationReporter}}
 }
 \concept{MutationReporter}

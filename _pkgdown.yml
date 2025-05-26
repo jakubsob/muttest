@@ -52,5 +52,5 @@ reference:
   - title: Test reporting
     contents:
       - default_reporter
-      - MutationProgressReporter
+      - ProgressMutationReporter
       - MutationReporter

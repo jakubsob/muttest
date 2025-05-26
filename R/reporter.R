@@ -159,10 +159,10 @@ MutationReporter <- R6::R6Class(
 
 #' Create a default reporter
 #'
-#' @param ... Arguments passed to the `?MutationProgressReporter` constructor.
+#' @param ... Arguments passed to the `?ProgressMutationReporter` constructor.
 #' @md
 #' @export
 #' @family MutationReporter
 default_reporter <- function(...) {
-  MutationProgressReporter$new(...)
+  ProgressMutationReporter$new(...)
 }

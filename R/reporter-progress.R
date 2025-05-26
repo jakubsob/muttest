@@ -13,8 +13,8 @@
 #' @md
 #' @export
 #' @family MutationReporter
-MutationProgressReporter <- R6::R6Class(
-  classname = "MutationProgressReporter",
+ProgressMutationReporter <- R6::R6Class(
+  classname = "ProgressMutationReporter",
   inherit = MutationReporter,
   public = list(
     start_time = NULL,

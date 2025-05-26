@@ -9,7 +9,7 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
 }
 \seealso{
 Other MutationReporter: 
-\code{\link{MutationProgressReporter}},
+\code{\link{ProgressMutationReporter}},
 \code{\link{default_reporter}()}
 }
 \concept{MutationReporter}
