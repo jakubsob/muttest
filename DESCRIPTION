@@ -9,11 +9,14 @@ Authors@R: c(
       role = c("aut", "cre")
     )
   )
-Description: Mutation testing for R.
-    Run your tests against mutated code to learn the quality of your assertions.
+Description: Measure quality of your tests.
+    muttest introduces small changes (mutations) to your code
+    and runs your tests to check if they catch the changes.
+    If they do, your tests are good.
+    If not, your assertions are not specific enough.
+    muttest gives you percent score of how often your tests catch the changes.
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 RoxygenNote: 7.3.2
 Depends:
   R (>= 4.1.0)
