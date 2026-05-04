@@ -133,7 +133,7 @@ test_plan <- function(
         tibble::tibble(
           file_path = file_path,
           original_code = list(code_lines),
-          mutated_code = list(mutation$code),
+          mutated_code = list(mutation),
           mutator = list(mutator)
         )
       })

@@ -133,3 +133,29 @@ test_that("calculate returns a numeric", {
 ```
 
 We have killed 1 mutant out of 2, so the mutation score is 50%.
+
+# Available mutators
+
+A mutator describes one kind of code change. Pass a list of mutators to
+`plan()` to control what gets mutated.
+
+| Category | Function | Description | Example |
+|:---|:---|:---|:---|
+| Operator | `operator()` | Mutate an operator | `operator("+", "-")`: `a + b` → `a - b` |
+| Operator | `arithmetic_operators()` | Arithmetic operator mutators | all arithmetic swaps: `+`↔`-`, `*`↔`/`, `^`→`*`, `%%`→`*`, `%/%`→`/` |
+| Operator | `comparison_operators()` | Comparison operator mutators | all comparison swaps: `<`↔`>`, `==`↔`!=`, boundary shifts `<`→`<=` … |
+| Operator | `logical_operators()` | Logical operator mutators | all logical swaps: `&&`↔`&#124;&#124;`, `&`↔`&#124;` |
+| Boolean literal | `boolean_literal()` | Mutate a boolean literal | `boolean_literal("TRUE", "FALSE")`: `TRUE` → `FALSE` |
+| Function call | `call_name()` | Mutate a function call name | `call_name("any", "all")`: `any(x)` → `all(x)` |
+| String | `string_empty()` | Mutate non-empty string literals to the empty string | `string_empty()`: `"hello"` → `""` |
+| String | `string_fill()` | Mutate the empty string literal to a placeholder string | `string_fill()`: `""` → `"mutant"` |
+| Numeric | `numeric_increment()` | Increment numeric literals by one | `numeric_increment()`: `5` → `6` |
+| Numeric | `numeric_decrement()` | Decrement numeric literals by one | `numeric_decrement()`: `5` → `4` |
+| Condition | `negate_condition()` | Negate the condition of if/while statements | `negate_condition()`: `if (x > 0)` → `if (!(x > 0))` |
+| Condition | `remove_condition_negation()` | Remove negation from the condition of if/while statements | `remove_condition_negation()`: `if (!done)` → `if (done)` |
+| Unary | `remove_negation()` | Remove logical negation | `remove_negation()`: `!is.na(x)` → `is.na(x)` |
+
+Convenience preset functions (`arithmetic_operators()`,
+`comparison_operators()`, `logical_operators()`) return a ready-made
+list of `operator()` mutators so you don’t have to enumerate each pair
+manually.

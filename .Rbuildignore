@@ -7,3 +7,8 @@
 ^pkgdown$
 ^\.github$
 ^README\.Rmd$
+^vignettes/articles$
+^\.lintr$
+^CRAN-SUBMISSION$
+^cran-comments\.md$
+^CLAUDE.md$

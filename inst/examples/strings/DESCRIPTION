@@ -1,0 +1,6 @@
+Package: strings
+Title: String Literal Example Package for muttest
+Version: 0.1.0
+Description: Example package demonstrating string_empty and string_fill mutators.
+License: MIT
+Encoding: UTF-8

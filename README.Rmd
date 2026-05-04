@@ -134,3 +134,65 @@ test_that("calculate returns a numeric", {
 ```
 
 We have killed 1 mutant out of 2, so the mutation score is 50%.
+
+# Available mutators
+
+A mutator describes one kind of code change. Pass a list of mutators to `plan()` to control what gets mutated.
+
+```{r mutator-table, echo=FALSE, results='asis'}
+rd_title <- function(fn_name) {
+  rd_file <- sprintf("man/%s.Rd", fn_name)
+  if (!file.exists(rd_file)) return("")
+  lines <- readLines(rd_file, warn = FALSE)
+  title_line <- grep("^\\\\title\\{", lines, value = TRUE)[1]
+  if (is.na(title_line)) return("")
+  trimws(sub("^\\\\title\\{(.+)\\}$", "\\1", title_line))
+}
+
+catalog <- data.frame(
+  Category = c(
+    "Operator", "Operator", "Operator", "Operator",
+    "Boolean literal",
+    "Function call",
+    "String", "String",
+    "Numeric", "Numeric",
+    "Condition", "Condition",
+    "Unary"
+  ),
+  fn_name = c(
+    "operator", "arithmetic_operators", "comparison_operators", "logical_operators",
+    "boolean_literal",
+    "call_name",
+    "string_empty", "string_fill",
+    "numeric_increment", "numeric_decrement",
+    "negate_condition", "remove_condition_negation",
+    "remove_negation"
+  ),
+  Example = c(
+    "`operator(\"+\", \"-\")`: `a + b` → `a - b`",
+    "all arithmetic swaps: `+`↔`-`, `*`↔`/`, `^`→`*`, `%%`→`*`, `%/%`→`/`",
+    "all comparison swaps: `<`↔`>`, `==`↔`!=`, boundary shifts `<`→`<=` …",
+    "all logical swaps: `&&`&#x2194;`&#124;&#124;`, `&`&#x2194;`&#124;`",
+    "`boolean_literal(\"TRUE\", \"FALSE\")`: `TRUE` → `FALSE`",
+    "`call_name(\"any\", \"all\")`: `any(x)` → `all(x)`",
+    "`string_empty()`: `\"hello\"` → `\"\"`",
+    "`string_fill()`: `\"\"` → `\"mutant\"`",
+    "`numeric_increment()`: `5` → `6`",
+    "`numeric_decrement()`: `5` → `4`",
+    "`negate_condition()`: `if (x > 0)` → `if (!(x > 0))`",
+    "`remove_condition_negation()`: `if (!done)` → `if (done)`",
+    "`remove_negation()`: `!is.na(x)` → `is.na(x)`"
+  ),
+  stringsAsFactors = FALSE
+)
+
+catalog$Description <- vapply(catalog$fn_name, rd_title, character(1))
+catalog$Function    <- sprintf("`%s()`", catalog$fn_name)
+
+knitr::kable(
+  catalog[, c("Category", "Function", "Description", "Example")],
+  format = "markdown"
+)
+```
+
+Convenience preset functions (`arithmetic_operators()`, `comparison_operators()`, `logical_operators()`) return a ready-made list of `operator()` mutators so you don't have to enumerate each pair manually.
