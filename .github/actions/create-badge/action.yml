@@ -1,0 +1,34 @@
+name: Create muttest badge
+description: Creates a shields.io-compatible badge JSON from a mutation score.
+
+inputs:
+  score:
+    description: Mutation score between 0 and 1.
+    required: true
+  output-path:
+    description: Path to write the badge JSON file.
+    required: false
+    default: .badges/muttest.json
+
+runs:
+  using: composite
+  steps:
+    - name: Create badge
+      shell: Rscript {0}
+      run: |
+        score <- as.numeric("${{ inputs.score }}")
+        logo_svg <- paste(readLines("inst/badge-logo.svg"), collapse = "")
+        rgb <- round(colorRamp(c("#D61F1F", "#FFD301", "#006B3D"))(score))
+        dir.create(dirname("${{ inputs.output-path }}"), showWarnings = FALSE, recursive = TRUE)
+        jsonlite::write_json(
+          list(
+            schemaVersion = 1,
+            label = "muttest",
+            labelColor = "#0f2a13",
+            message = paste0(round(score, digits = 2) * 100, "%"),
+            color = sprintf("#%02X%02X%02X", rgb[1], rgb[2], rgb[3]),
+            logoSvg = logo_svg
+          ),
+          path = "${{ inputs.output-path }}",
+          auto_unbox = TRUE
+        )

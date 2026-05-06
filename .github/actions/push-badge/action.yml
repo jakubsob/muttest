@@ -1,0 +1,51 @@
+name: Push badge to badges branch
+description: >
+  Commits a badge JSON file to the badges branch, creating the branch if it
+  does not exist yet. Optionally returns to another branch afterwards.
+
+inputs:
+  badge-path:
+    description: Path to the badge JSON file to push.
+    required: true
+  badge-name:
+    description: Filename to store on the badges branch.
+    required: false
+    default: badge.json
+  commit-message:
+    description: Commit message.
+    required: false
+    default: "chore: update badge"
+  return-to:
+    description: Branch to check out after pushing (leave empty to stay on badges).
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Push badge
+      shell: bash
+      run: |
+        cp "${{ inputs.badge-path }}" /tmp/_badge_push.json
+        rm -rf .badges
+
+        git fetch origin badges 2>/dev/null || true
+
+        if git show-ref --verify --quiet refs/remotes/origin/badges; then
+          git checkout -b badges origin/badges 2>/dev/null || git checkout badges
+        else
+          git checkout --orphan badges
+          git rm -rf --cached .
+          git clean -fd
+          git commit --allow-empty -m "chore: initial badges branch"
+        fi
+
+        mkdir -p "$(dirname ".badges/${{ inputs.badge-name }}")"
+        cp /tmp/_badge_push.json ".badges/${{ inputs.badge-name }}"
+        git add ".badges/${{ inputs.badge-name }}"
+        git commit -m "${{ inputs.commit-message }}" || true
+        git push --force-with-lease origin badges
+
+        if [ -n "${{ inputs.return-to }}" ]; then
+          git checkout "${{ inputs.return-to }}"
+        fi
