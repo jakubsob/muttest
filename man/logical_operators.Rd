@@ -23,11 +23,11 @@ from this preset typically means test inputs are symmetric — both flags
 logical_operators()
 
 \dontrun{
-plan <- test_plan(
+plan <- plan(
   source_files = "R/access.R",
   mutators = logical_operators()
 )
-test(plan, "tests/testthat")
+muttest(plan, "tests/testthat")
 }
 }
 \seealso{

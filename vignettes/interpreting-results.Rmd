@@ -18,7 +18,7 @@ The mutation score is only useful if you know how to read it. This article walks
 
 ## The output table
 
-Every `muttest::test()` run produces a table like this:
+Every `muttest::muttest()` run produces a table like this:
 
 ```
 ℹ Mutation Testing
@@ -72,11 +72,11 @@ test_that("heavy packages cost more", {
 The tests pass. Code coverage is 100%. But when you run mutation testing:
 
 ```r
-plan <- test_plan(
+plan <- plan(
   source_files = "R/shipping.R",
   mutators = comparison_operators()
 )
-muttest::test(plan, "tests/testthat")
+muttest::muttest(plan, "tests/testthat")
 ```
 
 ```

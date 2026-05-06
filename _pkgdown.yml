@@ -8,6 +8,17 @@ template:
     fg: '#000000'
     primary: '#886868'
     secondary: '#F77669'
+  includes:
+    in_header: |
+      <!-- Google tag (gtag.js) -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-N7MW34VJS3"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-N7MW34VJS3');
+      </script>
 
 navbar:
   structure:
@@ -44,8 +55,8 @@ reference:
   - title: Core
     desc: Run mutation tests and define test plans.
     contents:
-      - test
-      - test_plan
+      - muttest
+      - plan
   - title: Mutators
     desc: Individual mutators — each defines one kind of code change.
     contents:
@@ -70,7 +81,7 @@ reference:
     desc: Control how results are displayed.
     contents:
       - MutationReporter
-      - MutationProgressReporter
+      - ProgressMutationReporter
       - default_reporter
   - title: Strategies
     desc: Control how tests are run and source files are copied.

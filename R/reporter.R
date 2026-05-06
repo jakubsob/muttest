@@ -1,5 +1,6 @@
-#' Reporter for Mutation Testing
+#' @title Reporter for Mutation Testing
 #'
+#' @description
 #' The job of a mutation reporter is to aggregate and display the results of mutation tests.
 #' It tracks each mutation attempt, reporting on whether the tests killed the mutation or the mutation survived.
 #'
@@ -16,9 +17,10 @@
 #' @field results List of mutation test results, indexed by file path
 #' @field current_score Current score of the mutation tests
 #'
+#' @md
 #' @export
-#' @family reporters
 #' @importFrom rlang `%||%`
+#' @family MutationReporter
 MutationReporter <- R6::R6Class(
   classname = "MutationReporter",
   public = list(
@@ -70,10 +72,10 @@ MutationReporter <- R6::R6Class(
     },
 
     #' @description Start testing a file
-    #' @param file_path Path to the file being mutated
-    start_file = function(file_path) {
-      self$current_file <- file_path
-      self$results[[file_path]] <- self$results[[file_path]] %||%
+    #' @param filename Path to the file being mutated
+    start_file = function(filename) {
+      self$current_file <- filename
+      self$results[[filename]] <- self$results[[filename]] %||%
         list(
           total = 0,
           killed = 0,
@@ -89,28 +91,27 @@ MutationReporter <- R6::R6Class(
     },
 
     #' @description Add a mutation test result
-    #' @param file_path Path to the file that was mutated
-    #' @param mutator The mutator that was applied
+    #' @param plan Current testing plan. See `plan()`.
     #' @param killed Whether the mutation was killed by tests
     #' @param survived Number of survived mutations
     #' @param errors Number of errors encountered
     #' @param original_code Original source lines before mutation
     #' @param mutated_code Mutated source lines
     add_result = function(
-      file_path,
-      mutator,
+      plan,
       killed,
       survived,
       errors,
       original_code = NULL,
       mutated_code = NULL
     ) {
-      self$results[[file_path]]$total <- self$results[[file_path]]$total + 1
-      self$results[[file_path]]$killed <- self$results[[file_path]]$killed +
+      filename <- plan$filename
+      self$results[[filename]]$total <- self$results[[filename]]$total + 1
+      self$results[[filename]]$killed <- self$results[[filename]]$killed +
         killed
-      self$results[[file_path]]$survived <- self$results[[file_path]]$survived +
+      self$results[[filename]]$survived <- self$results[[filename]]$survived +
         survived
-      self$results[[file_path]]$errors <- self$results[[file_path]]$errors +
+      self$results[[filename]]$errors <- self$results[[filename]]$errors +
         errors
       killed_counts <- purrr::map(self$results, "killed")
       total_counts <- purrr::map(self$results, "total")
@@ -159,10 +160,12 @@ MutationReporter <- R6::R6Class(
   )
 )
 
-#' Get a default reporter
+#' Create a default reporter
 #'
-#' @param ... Additional arguments passed to reporter constructor
+#' @param ... Arguments passed to the `?ProgressMutationReporter` constructor.
+#' @md
 #' @export
+#' @family MutationReporter
 default_reporter <- function(...) {
-  MutationProgressReporter$new(...)
+  ProgressMutationReporter$new(...)
 }

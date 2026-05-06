@@ -1,7 +1,7 @@
 # progress reporter shows all killed
 
     Code
-      test(plan, reporter = MutationProgressReporter$new(min_time = Inf,
+      muttest(plan, reporter = ProgressMutationReporter$new(min_time = Inf,
         survived_detail = "none"))
     Output
       i Mutation Testing
@@ -13,7 +13,7 @@
 # progress reporter shows survived mutants inline
 
     Code
-      test(plan, reporter = MutationProgressReporter$new(min_time = Inf,
+      muttest(plan, reporter = ProgressMutationReporter$new(min_time = Inf,
         survived_detail = "inline"))
     Output
       i Mutation Testing
@@ -29,7 +29,7 @@
 # progress reporter shows survived mutants in summary
 
     Code
-      test(plan, reporter = MutationProgressReporter$new(min_time = Inf,
+      muttest(plan, reporter = ProgressMutationReporter$new(min_time = Inf,
         survived_detail = "summary"))
     Output
       i Mutation Testing
@@ -46,7 +46,7 @@
 # progress reporter shows survived mutants in both
 
     Code
-      test(plan, reporter = MutationProgressReporter$new(min_time = Inf,
+      muttest(plan, reporter = ProgressMutationReporter$new(min_time = Inf,
         survived_detail = "both"))
     Output
       i Mutation Testing
@@ -66,7 +66,7 @@
 # progress reporter shows doesn't show survived mutants
 
     Code
-      test(plan, reporter = MutationProgressReporter$new(min_time = Inf,
+      muttest(plan, reporter = ProgressMutationReporter$new(min_time = Inf,
         survived_detail = "none"))
     Output
       i Mutation Testing

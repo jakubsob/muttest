@@ -5,14 +5,17 @@
 
 <!-- badges: start -->
 
-[![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/muttest)](https://CRAN.R-project.org/package=muttest)
 [![R-CMD-check](https://github.com/jakubsob/muttest/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jakubsob/muttest/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/jakubsob/muttest/graph/badge.svg)](https://app.codecov.io/gh/jakubsob/muttest)
 [![cucumber](https://img.shields.io/github/actions/workflow/status/jakubsob/muttest/test-acceptance.yaml?branch=main&label=cucumber&logo=cucumber&color=23D96C&labelColor=0f2a13)](https://github.com/jakubsob/muttest/actions/workflows/test-acceptance.yaml)
+[![muttest](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jakubsob/muttest/badges/.badges/muttest.json)](https://github.com/jakubsob/muttest/actions/workflows/test-mutation.yaml)
+[![Grand
+total](http://cranlogs.r-pkg.org/badges/grand-total/muttest)](https://cran.r-project.org/package=muttest)
+[![Last
+month](http://cranlogs.r-pkg.org/badges/last-month/muttest)](https://cran.r-project.org/package=muttest)
 [![muttest](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jakubsob/muttest/badges/badges/muttest.json)](https://github.com/jakubsob/muttest/actions/workflows/test-mutation.yaml)
 <!-- badges: end -->
 
@@ -36,7 +39,7 @@ this code were subtly wrong, would your tests notice?*
 ## A word on LLM-generated tests
 
 Many teams now use LLMs to write their tests. LLMs are good at producing
-syntactically correct, passing tests quickly — but they tend to cover
+syntactically correct, passing tests quickly — but they might cover only
 the obvious cases and miss the boundaries:
 
 ``` r
@@ -57,7 +60,7 @@ Both test suites pass. Both have 100% coverage. Only one would catch a
 developer accidentally writing `age > 18` instead of `age >= 18`.
 
 Mutation testing gives you a score that reflects **assertion quality**,
-not just execution. It is the fastest way to understand the real
+not just execution. It gives you a concrete way to understand the real
 strength — and the real gaps — in an LLM-generated test suite.
 
 ## How it works
@@ -103,15 +106,16 @@ test_that("is_adult returns FALSE for minors", {
 })
 ```
 
-When running `muttest::test()` we’ll get a report of the mutation score:
+When running `muttest::muttest()` we’ll get a report of the mutation
+score:
 
 ``` r
-plan <- muttest::test_plan(
+plan <- muttest::plan(
   source_files = "R/is_adult.R",
   mutators = muttest::comparison_operators()
 )
 
-muttest::test(plan, "tests/testthat")
+muttest::muttest(plan, "tests/testthat")
 #> ℹ Mutation Testing
 #>   |   K |   S |   E |   T |   % | Mutator      | File
 #> ✔ |   1 |   1 |   0 |   2 |  50 | >= → >       | is_adult.R

@@ -23,11 +23,11 @@ order) rather than a specific value — replacing \code{expect_gte()} with
 arithmetic_operators()
 
 \dontrun{
-plan <- test_plan(
+plan <- plan(
   source_files = "R/stats.R",
   mutators = arithmetic_operators()
 )
-test(plan, "tests/testthat")
+muttest(plan, "tests/testthat")
 }
 }
 \seealso{

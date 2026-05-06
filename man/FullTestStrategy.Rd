@@ -4,9 +4,9 @@
 \alias{FullTestStrategy}
 \title{Run all tests for a mutant}
 \description{
-Run all tests for a mutant
+This test strategy tells if a mutant is caught by any test.
 
-Run all tests for a mutant
+To get faster results, especially for big codebases, use \code{?FileTestStrategy} instead.
 }
 \seealso{
 Other TestStrategy: 
@@ -54,7 +54,7 @@ Initialize
 \subsection{Method \code{execute()}}{
 Execute the test strategy
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FullTestStrategy$execute(path, mutated_file, mutated_code, env, reporter)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{FullTestStrategy$execute(path, plan, reporter)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -62,11 +62,7 @@ Execute the test strategy
 \describe{
 \item{\code{path}}{The path to the test directory}
 
-\item{\code{mutated_file}}{The path to the file being tested}
-
-\item{\code{mutated_code}}{The mutated code}
-
-\item{\code{env}}{The environment to run the tests in}
+\item{\code{plan}}{The current mutation plan. See \code{plan()}.}
 
 \item{\code{reporter}}{The reporter to use for test results}
 }

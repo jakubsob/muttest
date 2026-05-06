@@ -1,18 +1,22 @@
-#' Progress Reporter for Mutation Testing
+#' @title Progress Reporter for Mutation Testing
 #'
+#' @description
 #' A reporter that displays a progress indicator for mutation tests.
 #' It provides real-time feedback on which mutants are being tested and whether they were killed by tests.
 #'
 #' @field start_time Time when testing started (for duration calculation)
 #' @field min_time Minimum test duration to display timing information
 #' @field col_config List of column configuration for report formatting
+#' @field survived_detail Controls how survived mutants are reported (summary, inline, both, none)
+#' @field survived_mutants List to store details of survived mutants for summary reporting
 #'
 #' @importFrom R6 R6Class
 #' @importFrom cli col_green col_red col_yellow col_grey symbol
+#' @md
 #' @export
-#' @family reporters
-MutationProgressReporter <- R6::R6Class(
-  classname = "MutationProgressReporter",
+#' @family MutationReporter
+ProgressMutationReporter <- R6::R6Class(
+  classname = "ProgressMutationReporter",
   inherit = MutationReporter,
   public = list(
     start_time = NULL,
@@ -225,23 +229,21 @@ MutationProgressReporter <- R6::R6Class(
     },
 
     #' @description Add a mutation test result
-    #' @param file_path Path to the file that was mutated
-    #' @param mutator The mutator that was applied
+    #' @param plan Current testing plan. See `plan()`.
     #' @param killed Whether the mutation was killed by tests
     #' @param survived Number of survived mutations
     #' @param errors Number of errors encountered
     #' @param original_code Original source lines before mutation
     #' @param mutated_code Mutated source lines
     add_result = function(
-      file_path,
-      mutator,
+      plan,
       killed,
       survived,
       errors,
       original_code = NULL,
       mutated_code = NULL
     ) {
-      super$add_result(file_path, mutator, killed, survived, errors)
+      super$add_result(plan, killed, survived, errors)
 
       status_symbol <- if (killed) {
         cli::col_green(cli::symbol$tick)
@@ -249,11 +251,13 @@ MutationProgressReporter <- R6::R6Class(
         cli::col_red("x")
       }
 
-      k <- self$results[[file_path]]$killed
-      s <- self$results[[file_path]]$survived
-      t <- self$results[[file_path]]$total
-      e <- self$results[[file_path]]$errors
-      file_name <- basename(file_path)
+      filename <- plan$filename
+      mutator <- plan$mutator[[1]]
+      k <- self$results[[filename]]$killed
+      s <- self$results[[filename]]$survived
+      t <- self$results[[filename]]$total
+      e <- self$results[[filename]]$errors
+      file_name <- basename(filename)
       score <- floor(self$current_score * 100)
 
       self$cat_line(self$fmt_r(
@@ -272,7 +276,7 @@ MutationProgressReporter <- R6::R6Class(
           self$print_survived_diff(
             original_code,
             mutated_code,
-            file_path,
+            filename,
             mutator
           )
         }
@@ -280,7 +284,7 @@ MutationProgressReporter <- R6::R6Class(
           self$survived_mutants <- c(
             self$survived_mutants,
             list(list(
-              file_path = file_path,
+              file_path = filename,
               mutator = mutator,
               original_code = original_code,
               mutated_code = mutated_code
@@ -311,7 +315,7 @@ MutationProgressReporter <- R6::R6Class(
         basename(file_path),
         "  ",
         mutator$from,
-        " → ",
+        " \u2192 ",
         mutator$to
       )))
       for (i in changed) {

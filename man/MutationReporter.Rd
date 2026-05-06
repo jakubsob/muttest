@@ -4,19 +4,15 @@
 \alias{MutationReporter}
 \title{Reporter for Mutation Testing}
 \description{
-Reporter for Mutation Testing
-
-Reporter for Mutation Testing
-}
-\details{
 The job of a mutation reporter is to aggregate and display the results of mutation tests.
 It tracks each mutation attempt, reporting on whether the tests killed the mutation or the mutation survived.
 }
 \seealso{
-Other reporters: 
-\code{\link{MutationProgressReporter}}
+Other MutationReporter: 
+\code{\link{ProgressMutationReporter}},
+\code{\link{default_reporter}()}
 }
-\concept{reporters}
+\concept{MutationReporter}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
@@ -108,13 +104,13 @@ Start reporter
 \subsection{Method \code{start_file()}}{
 Start testing a file
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MutationReporter$start_file(file_path)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MutationReporter$start_file(filename)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{file_path}}{Path to the file being mutated}
+\item{\code{filename}}{Path to the file being mutated}
 }
 \if{html}{\out{</div>}}
 }
@@ -142,21 +138,30 @@ Start testing with a specific mutator
 \subsection{Method \code{add_result()}}{
 Add a mutation test result
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MutationReporter$add_result(file_path, mutator, killed, survived, errors)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MutationReporter$add_result(
+  plan,
+  killed,
+  survived,
+  errors,
+  original_code = NULL,
+  mutated_code = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{file_path}}{Path to the file that was mutated}
-
-\item{\code{mutator}}{The mutator that was applied}
+\item{\code{plan}}{Current testing plan. See \code{plan()}.}
 
 \item{\code{killed}}{Whether the mutation was killed by tests}
 
 \item{\code{survived}}{Number of survived mutations}
 
 \item{\code{errors}}{Number of errors encountered}
+
+\item{\code{original_code}}{Original source lines before mutation}
+
+\item{\code{mutated_code}}{Mutated source lines}
 }
 \if{html}{\out{</div>}}
 }

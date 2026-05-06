@@ -13,3 +13,7 @@
 ^cran-comments\.md$
 ^CLAUDE.md$
 ^badges$
+^vignettes/articles$
+^\.lintr$
+^CRAN-SUBMISSION$
+^cran-comments\.md$

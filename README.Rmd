@@ -21,11 +21,13 @@ include_file <- function(file, filename) {
 # muttest <img src="man/figures/logo.png" align="right" alt="" width="120" />
 
 <!-- badges: start -->
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN status](https://www.r-pkg.org/badges/version/muttest)](https://CRAN.R-project.org/package=muttest)
 [![R-CMD-check](https://github.com/jakubsob/muttest/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jakubsob/muttest/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/jakubsob/muttest/graph/badge.svg)](https://app.codecov.io/gh/jakubsob/muttest)
 [![cucumber](https://img.shields.io/github/actions/workflow/status/jakubsob/muttest/test-acceptance.yaml?branch=main&label=cucumber&logo=cucumber&color=23D96C&labelColor=0f2a13)](https://github.com/jakubsob/muttest/actions/workflows/test-acceptance.yaml)
+[![muttest](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jakubsob/muttest/badges/.badges/muttest.json)](https://github.com/jakubsob/muttest/actions/workflows/test-mutation.yaml)
+[![Grand total](http://cranlogs.r-pkg.org/badges/grand-total/muttest)](https://cran.r-project.org/package=muttest)
+[![Last month](http://cranlogs.r-pkg.org/badges/last-month/muttest)](https://cran.r-project.org/package=muttest)
 [![muttest](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jakubsob/muttest/badges/badges/muttest.json)](https://github.com/jakubsob/muttest/actions/workflows/test-mutation.yaml)
 <!-- badges: end -->
 
@@ -99,16 +101,16 @@ include_file(
 )
 ```
 
-When running `muttest::test()` we'll get a report of the mutation score:
+When running `muttest::muttest()` we'll get a report of the mutation score:
 
 ```{r}
 #| eval: false
-plan <- muttest::test_plan(
+plan <- muttest::plan(
   source_files = "R/is_adult.R",
   mutators = muttest::comparison_operators()
 )
 
-muttest::test(plan, "tests/testthat")
+muttest::muttest(plan, "tests/testthat")
 #> ℹ Mutation Testing
 #>   |   K |   S |   E |   T |   % | Mutator      | File
 #> ✔ |   1 |   1 |   0 |   2 |  50 | >= → >       | is_adult.R

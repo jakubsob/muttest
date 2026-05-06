@@ -54,14 +54,14 @@ jobs:
       - name: Run mutation tests
         shell: Rscript {0}
         run: |
-          plan <- muttest::test_plan(
+          plan <- muttest::plan(
             source_files = "R/calculate.R",
             mutators = c(
               muttest::arithmetic_operators(),
               muttest::comparison_operators()
             )
           )
-          muttest::test("tests/testthat", plan)
+          muttest::muttest("tests/testthat", plan)
 ```
 
 Adjust `source_files` and `mutators` to match your package.
@@ -97,7 +97,7 @@ A practical approach: define a narrow `source_files` list in your CI plan coveri
 To enforce a minimum mutation score, parse the output or use R's exit codes. A simple approach with `tryCatch`:
 
 ```r
-results <- muttest::test("tests/testthat", plan)
+results <- muttest::muttest("tests/testthat", plan)
 
 score <- attr(results, "score")  # check actual attribute name in ?test
 if (score < 0.7) {

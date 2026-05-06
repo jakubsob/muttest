@@ -2,17 +2,15 @@
 % Please edit documentation in R/test_strategy.R
 \name{FileTestStrategy}
 \alias{FileTestStrategy}
-\title{Run tests matching the source file name}
+\title{Run tests matching the mutated source file name}
 \description{
-Run tests matching the source file name
+This strategy tells if a mutant is caught by a test matching the source file name.
 
-Run tests matching the source file name
-}
-\details{
-This class implements a test strategy that runs tests matching the source file name.
-
-If the source file name is \code{foo.R}, and there are test files named \code{test-foo.R} or \code{test-bar.R},
+For example, if the source file name is \code{foo.R}, and there are test files named \code{test-foo.R} or \code{test-bar.R},
 only \code{test-foo.R} will be run.
+
+This strategy should give faster results than \code{?FullTestStrategy}, especially for big codebases,
+but the score might be less accurate.
 }
 \seealso{
 Other TestStrategy: 
@@ -60,7 +58,7 @@ Initialize the FileTestStrategy
 \subsection{Method \code{execute()}}{
 Execute the test strategy
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FileTestStrategy$execute(path, mutated_file, mutated_code, env, reporter)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{FileTestStrategy$execute(path, plan, reporter)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -68,11 +66,7 @@ Execute the test strategy
 \describe{
 \item{\code{path}}{The path to the test directory}
 
-\item{\code{mutated_file}}{The path to the file being tested}
-
-\item{\code{mutated_code}}{The mutated code}
-
-\item{\code{env}}{The environment to run the tests in}
+\item{\code{plan}}{The current mutation plan. See \code{plan()}.}
 
 \item{\code{reporter}}{The reporter to use for test results}
 }

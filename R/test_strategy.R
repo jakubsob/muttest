@@ -1,32 +1,37 @@
 #' @import testthat
 NULL
 
-#' TestStrategy interface
+#' @title TestStrategy interface
 #'
-#' Extend this class to implement custom test strategy.
+#' @description
+#' Extend this class to implement a custom test strategy.
 #'
-#' @md
 #' @export
+#' @md
 #' @family TestStrategy
 TestStrategy <- R6::R6Class(
   classname = "TestStrategy",
   public = list(
     #' @description Execute the test strategy
     #' @param path The path to the test directory
-    #' @param mutated_file The path to the file being tested
-    #' @param mutated_code The mutated code
-    #' @param env The environment to run the tests in
+    #' @param plan The current mutation plan. See `plan()`.
     #' @param reporter The reporter to use for test results
     #' @return The test result
-    execute = function(path, mutated_file, mutated_code, env, reporter) {
+    execute = function(path, plan, reporter) {
       stop("Not implemented")
     }
   )
 )
 
-#' Run all tests for a mutant
+#' @title Run all tests for a mutant
+#'
+#' @description
+#' This test strategy tells if a mutant is caught by any test.
+#'
+#' To get faster results, especially for big codebases, use `?FileTestStrategy` instead.
 #'
 #' @export
+#' @md
 #' @family TestStrategy
 FullTestStrategy <- R6::R6Class(
   classname = "FullTestStrategy",
@@ -49,16 +54,12 @@ FullTestStrategy <- R6::R6Class(
     },
     #' @description Execute the test strategy
     #' @param path The path to the test directory
-    #' @param mutated_file The path to the file being tested
-    #' @param mutated_code The mutated code
-    #' @param env The environment to run the tests in
+    #' @param plan The current mutation plan. See `plan()`.
     #' @param reporter The reporter to use for test results
     #' @return The test results
-    execute = function(path, mutated_file, mutated_code, env, reporter) {
+    execute = function(path, plan, reporter) {
       testthat::test_dir(
         path,
-        filter = NULL,
-        env = env,
         stop_on_failure = FALSE,
         reporter = reporter,
         load_helpers = private$args$load_helpers,
@@ -68,14 +69,19 @@ FullTestStrategy <- R6::R6Class(
   )
 )
 
-#' Run tests matching the source file name
+#' @title Run tests matching the mutated source file name
 #'
-#' This class implements a test strategy that runs tests matching the source file name.
+#' @description
+#' This strategy tells if a mutant is caught by a test matching the source file name.
 #'
-#' If the source file name is `foo.R`, and there are test files named `test-foo.R` or `test-bar.R`,
+#' For example, if the source file name is `foo.R`, and there are test files named `test-foo.R` or `test-bar.R`,
 #' only `test-foo.R` will be run.
 #'
+#' This strategy should give faster results than `?FullTestStrategy`, especially for big codebases,
+#' but the score might be less accurate.
+#'
 #' @export
+#' @md
 #' @family TestStrategy
 FileTestStrategy <- R6::R6Class(
   classname = "FileTestStrategy",
@@ -98,20 +104,17 @@ FileTestStrategy <- R6::R6Class(
     },
     #' @description Execute the test strategy
     #' @param path The path to the test directory
-    #' @param mutated_file The path to the file being tested
-    #' @param mutated_code The mutated code
-    #' @param env The environment to run the tests in
+    #' @param plan The current mutation plan. See `plan()`.
     #' @param reporter The reporter to use for test results
     #' @return The test results
-    execute = function(path, mutated_file, mutated_code, env, reporter) {
-      file_name <- tools::file_path_sans_ext(basename(mutated_file))
+    execute = function(path, plan, reporter) {
+      file_name <- tools::file_path_sans_ext(basename(plan$filename))
       if (!any(grepl(file_name, list.files(path)))) {
         return(.empty_test_result())
       }
       testthat::test_dir(
         path = path,
         filter = file_name,
-        env = env,
         stop_on_failure = FALSE,
         reporter = reporter,
         load_helpers = private$args$load_helpers,
@@ -121,12 +124,13 @@ FileTestStrategy <- R6::R6Class(
   )
 )
 
-#' Create a run strategy
+#' @title Create a default run strategy
 #'
-#' @param ... Unused, kept for future expansion
-#' @return A Test object
+#' @param ... Arguments passed to the `?FullTestStrategy` constructor.
+#' @return A `?TestStrategy` object
 #'
 #' @export
+#' @md
 #' @family TestStrategy
 default_test_strategy <- function(...) {
   FullTestStrategy$new(...)

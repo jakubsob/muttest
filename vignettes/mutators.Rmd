@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-A mutator defines one kind of code change. When you pass a mutator to `test_plan()`, muttest finds every matching pattern in your source file and produces one mutant per match.
+A mutator defines one kind of code change. When you pass a mutator to `plan()`, muttest finds every matching pattern in your source file and produces one mutant per match.
 
 ## Operator mutators
 
@@ -46,7 +46,7 @@ Returns a ready-made list of operator mutators covering common arithmetic mistak
 **When to use:** Any function that performs calculations — finance, statistics, data transformations. Arithmetic operator swaps can happen easily and go unnoticed.
 
 ```r
-plan <- test_plan(
+plan <- plan(
   source_files = "R/finance.R",
   mutators = arithmetic_operators()
 )
@@ -294,7 +294,7 @@ call_name("sum", "prod")  # sum(x) → prod(x)
 If you are unsure where to begin, this combination covers the most common real-world bug categories:
 
 ```r
-plan <- test_plan(
+plan <- plan(
   source_files = "R/my_file.R",
   mutators = c(
     arithmetic_operators(),

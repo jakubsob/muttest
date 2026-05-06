@@ -20,8 +20,8 @@ Feature: Test klmr::box project
       """
     When I run mutation tests with
       """
-      test(
-        plan = test_plan(
+      muttest(
+        plan = plan(
           mutators = list(
             operator("+", "-")
           ),
@@ -66,14 +66,14 @@ Feature: Test klmr::box project
       """
     When I run mutation tests with
       """
-      plan <- test_plan(
+      plan <- plan(
         mutators = list(
           operator("+", "-"),
           operator("*", "/")
         ),
         source_files = c("src/calculate.R", "src/calculate2.R")
       )
-      test(
+      muttest(
         plan = plan,
         path = "tests",
         test_strategy = FileTestStrategy$new(load_package = "none")

@@ -23,11 +23,11 @@ boundary value kills it.
 comparison_operators()
 
 \dontrun{
-plan <- test_plan(
+plan <- plan(
   source_files = "R/shipping.R",
   mutators = comparison_operators()
 )
-test(plan, "tests/testthat")
+muttest(plan, "tests/testthat")
 }
 }
 \seealso{

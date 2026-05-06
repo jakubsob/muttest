@@ -20,11 +20,11 @@
 #' arithmetic_operators()
 #'
 #' \dontrun{
-#' plan <- test_plan(
+#' plan <- plan(
 #'   source_files = "R/stats.R",
 #'   mutators = arithmetic_operators()
 #' )
-#' test(plan, "tests/testthat")
+#' muttest(plan, "tests/testthat")
 #' }
 arithmetic_operators <- function() {
   list(
@@ -60,11 +60,11 @@ arithmetic_operators <- function() {
 #' comparison_operators()
 #'
 #' \dontrun{
-#' plan <- test_plan(
+#' plan <- plan(
 #'   source_files = "R/shipping.R",
 #'   mutators = comparison_operators()
 #' )
-#' test(plan, "tests/testthat")
+#' muttest(plan, "tests/testthat")
 #' }
 comparison_operators <- function() {
   list(
@@ -103,11 +103,11 @@ comparison_operators <- function() {
 #' logical_operators()
 #'
 #' \dontrun{
-#' plan <- test_plan(
+#' plan <- plan(
 #'   source_files = "R/access.R",
 #'   mutators = logical_operators()
 #' )
-#' test(plan, "tests/testthat")
+#' muttest(plan, "tests/testthat")
 #' }
 logical_operators <- function() {
   list(

@@ -1,4 +1,4 @@
-describe("mutate_code", {
+describe("operator", {
   it("should generate mutations for a single operator", {
     code <- c("x <- 1 + 2")
     mutator <- operator("+", "-")

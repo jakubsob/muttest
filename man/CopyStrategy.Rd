@@ -4,13 +4,14 @@
 \alias{CopyStrategy}
 \title{CopyStrategy interface}
 \description{
-CopyStrategy interface
-
-CopyStrategy interface
-}
-\details{
 Extend this class to implement a custom copy strategy.
 }
+\seealso{
+Other CopyStrategy: 
+\code{\link{PackageCopyStrategy}},
+\code{\link{default_copy_strategy}()}
+}
+\concept{CopyStrategy}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{

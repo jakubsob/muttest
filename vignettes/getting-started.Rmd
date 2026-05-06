@@ -63,7 +63,7 @@ A test plan describes *what* to mutate and *which* mutations to apply:
 ```r
 library(muttest)
 
-plan <- test_plan(
+plan <- plan(
   source_files = "R/is_adult.R",
   mutators = comparison_operators()
 )
@@ -74,7 +74,7 @@ plan <- test_plan(
 ## Step 3 — Run the tests
 
 ```r
-muttest::test(plan, "tests/testthat")
+muttest::muttest(plan, "tests/testthat")
 ```
 
 You will see output like this:

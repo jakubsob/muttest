@@ -7,11 +7,17 @@
 default_copy_strategy(...)
 }
 \arguments{
-\item{...}{Unused, saved for future expansion.}
+\item{...}{Arguments passed to the \code{?PackageCopyStrategy} constructor.}
 }
 \value{
-A CopyStrategy object
+A \code{?CopyStrategy} object
 }
 \description{
 Create a default project copy strategy
 }
+\seealso{
+Other CopyStrategy: 
+\code{\link{CopyStrategy}},
+\code{\link{PackageCopyStrategy}}
+}
+\concept{CopyStrategy}
