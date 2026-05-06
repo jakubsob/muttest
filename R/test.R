@@ -82,7 +82,9 @@ test <- function(
         mutator,
         killed,
         survived,
-        errors
+        errors,
+        original_code = row$original_code[[1]],
+        mutated_code  = mutated_code
       )
       reporter$end_mutator()
       reporter$end_file()

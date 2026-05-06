@@ -17,6 +17,8 @@ MutationProgressReporter <- R6::R6Class(
   public = list(
     start_time = NULL,
     min_time = 1,
+    survived_detail = "summary",
+    survived_mutants = list(),
     col_config = list(
       "status" = list(
         padding_left = 0,
@@ -196,14 +198,18 @@ MutationProgressReporter <- R6::R6Class(
     #' @param test_reporter Reporter to use for testthat::test_dir
     #' @param min_time Minimum time to show elapsed time (default: 1s)
     #' @param file Output destination (default: stdout)
+    #' @param survived_detail Controls how survived mutants are reported.
+    #'   One of `"none"`, `"inline"`, `"summary"` (default), or `"both"`.
     initialize = function(
       test_reporter = "silent",
       min_time = 1,
-      file = stdout()
+      file = stdout(),
+      survived_detail = c("summary", "inline", "both", "none")
     ) {
       super$initialize(test_reporter, file)
 
       self$min_time <- min_time
+      self$survived_detail <- match.arg(survived_detail)
       self$results <- list()
     },
 
@@ -213,6 +219,7 @@ MutationProgressReporter <- R6::R6Class(
       super$start_reporter(plan)
       self$start_time <- proc.time()
       self$results <- list()
+      self$survived_mutants <- list()
       self$cat_line(paste(cli::symbol$info, "Mutation Testing"))
       self$cat_line(self$fmt_h())
     },
@@ -223,12 +230,16 @@ MutationProgressReporter <- R6::R6Class(
     #' @param killed Whether the mutation was killed by tests
     #' @param survived Number of survived mutations
     #' @param errors Number of errors encountered
+    #' @param original_code Original source lines before mutation
+    #' @param mutated_code Mutated source lines
     add_result = function(
       file_path,
       mutator,
       killed,
       survived,
-      errors
+      errors,
+      original_code = NULL,
+      mutated_code = NULL
     ) {
       super$add_result(file_path, mutator, killed, survived, errors)
 
@@ -245,7 +256,6 @@ MutationProgressReporter <- R6::R6Class(
       file_name <- basename(file_path)
       score <- floor(self$current_score * 100)
 
-      # Format and print the row using our formatting function
       self$cat_line(self$fmt_r(
         status_symbol,
         k,
@@ -256,12 +266,73 @@ MutationProgressReporter <- R6::R6Class(
         info_oneline(mutator),
         file_name
       ))
+
+      if (survived == 1 && !is.null(original_code) && !is.null(mutated_code)) {
+        if (self$survived_detail %in% c("inline", "both")) {
+          self$print_survived_diff(
+            original_code,
+            mutated_code,
+            file_path,
+            mutator
+          )
+        }
+        if (self$survived_detail %in% c("summary", "both")) {
+          self$survived_mutants <- c(
+            self$survived_mutants,
+            list(list(
+              file_path = file_path,
+              mutator = mutator,
+              original_code = original_code,
+              mutated_code = mutated_code
+            ))
+          )
+        }
+      }
+    },
+
+    #' @description Print a unified diff for a survived mutant
+    #' @param original_code Original source lines
+    #' @param mutated_code Mutated source lines
+    #' @param file_path Path to the mutated file
+    #' @param mutator The mutator that was applied
+    print_survived_diff = function(
+      original_code,
+      mutated_code,
+      file_path,
+      mutator
+    ) {
+      changed <- which(original_code != mutated_code)
+      if (length(changed) == 0) {
+        return(invisible(NULL))
+      }
+
+      self$cat_line(cli::col_grey(paste0(
+        "  Survived: ",
+        basename(file_path),
+        "  ",
+        mutator$from,
+        " → ",
+        mutator$to
+      )))
+      for (i in changed) {
+        self$cat_line(cli::col_red(paste0(
+          "  ",
+          i,
+          "- ",
+          trimws(original_code[[i]], "right")
+        )))
+        self$cat_line(cli::col_green(paste0(
+          "  ",
+          i,
+          "+ ",
+          trimws(mutated_code[[i]], "right")
+        )))
+      }
     },
 
     #' @description Update status spinner (for long-running operations)
     #' @param force Force update even if interval hasn't elapsed
-    update = function(force = FALSE) {
-    },
+    update = function(force = FALSE) {},
 
     #' @description End testing current file
     end_file = function() {
@@ -270,8 +341,7 @@ MutationProgressReporter <- R6::R6Class(
 
     #' @description Carriage return if dynamic, newline otherwise
     # nocov start
-    cr = function() {
-    },
+    cr = function() {},
     # nocov end
 
     #' @description End reporter with detailed summary
@@ -284,6 +354,23 @@ MutationProgressReporter <- R6::R6Class(
           "Duration: ",
           sprintf("%.2f s", time[[3]])
         )))
+      }
+
+      if (
+        self$survived_detail %in%
+          c("summary", "both") &&
+          length(self$survived_mutants) > 0
+      ) {
+        self$cat_line()
+        self$rule(cli::style_bold("Survived Mutants"))
+        for (entry in self$survived_mutants) {
+          self$print_survived_diff(
+            entry$original_code,
+            entry$mutated_code,
+            entry$file_path,
+            entry$mutator
+          )
+        }
       }
 
       results <- dplyr::bind_rows(self$results)

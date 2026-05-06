@@ -94,12 +94,16 @@ MutationReporter <- R6::R6Class(
     #' @param killed Whether the mutation was killed by tests
     #' @param survived Number of survived mutations
     #' @param errors Number of errors encountered
+    #' @param original_code Original source lines before mutation
+    #' @param mutated_code Mutated source lines
     add_result = function(
       file_path,
       mutator,
       killed,
       survived,
-      errors
+      errors,
+      original_code = NULL,
+      mutated_code = NULL
     ) {
       self$results[[file_path]]$total <- self$results[[file_path]]$total + 1
       self$results[[file_path]]$killed <- self$results[[file_path]]$killed +

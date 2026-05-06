@@ -1,0 +1,78 @@
+# progress reporter shows all killed
+
+    Code
+      test(plan, reporter = MutationProgressReporter$new(min_time = Inf,
+        survived_detail = "none"))
+    Output
+      i Mutation Testing
+      |   K |   S |   E |   T |   % | Mutator  | File
+      x |   0 |   1 |   0 |   1 |   0 | + > -    | calculate.R
+      -- Results ---------------------------------------------------------------------
+      [ KILLED 0 | SURVIVED 1 | ERRORS 0 | TOTAL 1 | SCORE 0.0% ]
+
+# progress reporter shows survived mutants inline
+
+    Code
+      test(plan, reporter = MutationProgressReporter$new(min_time = Inf,
+        survived_detail = "inline"))
+    Output
+      i Mutation Testing
+      |   K |   S |   E |   T |   % | Mutator  | File
+      x |   0 |   1 |   0 |   1 |   0 | + > -    | calculate.R
+      Survived: calculate.R  + → -
+      2-   (x + y) * 0
+      2+   (x - y) * 0
+      v |   1 |   1 |   0 |   2 |  50 | * > /    | calculate.R
+      -- Results ---------------------------------------------------------------------
+      [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
+
+# progress reporter shows survived mutants in summary
+
+    Code
+      test(plan, reporter = MutationProgressReporter$new(min_time = Inf,
+        survived_detail = "summary"))
+    Output
+      i Mutation Testing
+      |   K |   S |   E |   T |   % | Mutator  | File
+      x |   0 |   1 |   0 |   1 |   0 | + > -    | calculate.R
+      v |   1 |   1 |   0 |   2 |  50 | * > /    | calculate.R
+      -- Survived Mutants ------------------------------------------------------------
+      Survived: calculate.R  + → -
+      2-   (x + y) * 0
+      2+   (x - y) * 0
+      -- Results ---------------------------------------------------------------------
+      [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
+
+# progress reporter shows survived mutants in both
+
+    Code
+      test(plan, reporter = MutationProgressReporter$new(min_time = Inf,
+        survived_detail = "both"))
+    Output
+      i Mutation Testing
+      |   K |   S |   E |   T |   % | Mutator  | File
+      x |   0 |   1 |   0 |   1 |   0 | + > -    | calculate.R
+      Survived: calculate.R  + → -
+      2-   (x + y) * 0
+      2+   (x - y) * 0
+      v |   1 |   1 |   0 |   2 |  50 | * > /    | calculate.R
+      -- Survived Mutants ------------------------------------------------------------
+      Survived: calculate.R  + → -
+      2-   (x + y) * 0
+      2+   (x - y) * 0
+      -- Results ---------------------------------------------------------------------
+      [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
+
+# progress reporter shows doesn't show survived mutants
+
+    Code
+      test(plan, reporter = MutationProgressReporter$new(min_time = Inf,
+        survived_detail = "none"))
+    Output
+      i Mutation Testing
+      |   K |   S |   E |   T |   % | Mutator  | File
+      x |   0 |   1 |   0 |   1 |   0 | + > -    | calculate.R
+      v |   1 |   1 |   0 |   2 |  50 | * > /    | calculate.R
+      -- Results ---------------------------------------------------------------------
+      [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
+
