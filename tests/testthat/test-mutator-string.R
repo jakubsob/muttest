@@ -4,6 +4,11 @@ describe("string_empty", {
     expect_mutates_to(mutator, c('x <- "hello"'), list(c('x <- ""')))
   })
 
+  it("should work with = assignment operator", {
+    mutator <- string_empty()
+    expect_mutates_to(mutator, c('x = "hello"'), list(c('x = ""')))
+  })
+
   it("should return NULL when only empty strings are present", {
     mutator <- string_empty()
     expect_no_mutations(mutator, c('x <- ""'))
@@ -32,6 +37,11 @@ describe("string_fill", {
   it("should replace an empty string with a placeholder", {
     mutator <- string_fill()
     expect_mutates_to(mutator, c('x <- ""'), list(c('x <- "mutant"')))
+  })
+
+  it("should work with = assignment operator", {
+    mutator <- string_fill()
+    expect_mutates_to(mutator, c('x = ""'), list(c('x = "mutant"')))
   })
 
   it("should return NULL when no empty strings are present", {

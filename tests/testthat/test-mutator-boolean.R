@@ -45,4 +45,9 @@ describe("boolean_literal", {
     mutator <- boolean_literal("TRUE", "FALSE")
     expect_no_mutations(mutator, c("if (FALSE) 1"))
   })
+
+  it("should work with = assignment operator", {
+    mutator <- boolean_literal("TRUE", "FALSE")
+    expect_mutates_to(mutator, c("x = TRUE"), list(c("x = FALSE")))
+  })
 })

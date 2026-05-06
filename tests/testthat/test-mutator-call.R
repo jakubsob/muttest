@@ -32,4 +32,9 @@ describe("call_name", {
     # 'max' appearing as a variable, not as a call
     expect_no_mutations(mutator, c("max <- 10"))
   })
+
+  it("should work with = assignment operator", {
+    mutator <- call_name("sum", "prod")
+    expect_mutates_to(mutator, c("x = sum(y)"), list(c("x = prod(y)")))
+  })
 })

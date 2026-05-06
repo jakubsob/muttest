@@ -41,4 +41,9 @@ describe("remove_negation", {
     expect_equal(mutations[[1]], c("x <- a", "y <- !b"))
     expect_equal(mutations[[2]], c("x <- !a", "y <- b"))
   })
+
+  it("should work with = assignment operator", {
+    mutator <- remove_negation()
+    expect_mutates_to(mutator, c("x = !a"), list(c("x = a")))
+  })
 })

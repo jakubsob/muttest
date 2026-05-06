@@ -36,6 +36,11 @@ describe("numeric_increment", {
     expect_equal(mutations[[1]], c("a <- 11", "b <- 20"))
     expect_equal(mutations[[2]], c("a <- 10", "b <- 21"))
   })
+
+  it("should work with = assignment operator", {
+    mutator <- numeric_increment()
+    expect_mutates_to(mutator, c("x = 5"), list(c("x = 6")))
+  })
 })
 
 describe("numeric_decrement", {
@@ -61,6 +66,11 @@ describe("numeric_decrement", {
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c("f(2, 7)"))
     expect_equal(mutations[[2]], c("f(3, 6)"))
+  })
+
+  it("should work with = assignment operator", {
+    mutator <- numeric_decrement()
+    expect_mutates_to(mutator, c("x = 5"), list(c("x = 4")))
   })
 })
 
