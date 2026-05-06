@@ -1,0 +1,311 @@
+---
+title: "Mutator Reference and Choosing the Right Mutators"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Mutator Reference and Choosing the Right Mutators}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+A mutator defines one kind of code change. When you pass a mutator to `test_plan()`, muttest finds every matching pattern in your source file and produces one mutant per match.
+
+## Operator mutators
+
+### `operator()` — custom pair
+
+The most flexible mutator. Replaces any token with any other token.
+
+```r
+operator("+", "-")   # every + becomes -
+operator("==", "!=") # every == becomes !=
+```
+
+Use this when you need a specific swap not covered by the preset functions.
+
+### `arithmetic_operators()` — preset for arithmetic
+
+Returns a ready-made list of operator mutators covering common arithmetic mistakes:
+
+| Original | Mutant |
+|----------|--------|
+| `+` | `-` |
+| `-` | `+` |
+| `*` | `/` |
+| `/` | `*` |
+| `^` | `*` |
+| `%%` | `*` |
+| `%/%` | `/` |
+
+**When to use:** Any function that performs calculations — finance, statistics, data transformations. Arithmetic operator swaps can happen easily and go unnoticed.
+
+```r
+plan <- test_plan(
+  source_files = "R/finance.R",
+  mutators = arithmetic_operators()
+)
+```
+
+#### What it catches — direction-insensitive assertions
+
+Consider a function that computes the mean absolute deviation:
+
+```r
+# R/stats.R
+mean_absolute_deviation <- function(x, center) {
+  mean(abs(x - center))
+}
+```
+
+A test that only checks the sign of the result will not kill the `- → +` mutant:
+
+```r
+test_that("mean absolute deviation is non-negative", {
+  expect_gte(mean_absolute_deviation(c(1, 3, 5), 3), 0)
+})
+```
+
+```text
+ℹ Mutation Testing
+  |   K |   S |   E |   T |   % | Mutator  | File
+x |   0 |   1 |   0 |   1 |   0 | - → +    | stats.R
+```
+
+`abs(x + center)` is also non-negative — the assertion passes regardless of which operator is used. Any test that checks direction (`expect_gt`, `expect_gte`) instead of a specific value leaves arithmetic operator swaps invisible.
+
+Fix: assert the exact expected value instead of a property of it.
+
+```r
+test_that("mean absolute deviation equals average distance from center", {
+  # |1-3| + |3-3| + |5-3| = 2 + 0 + 2 = 4; mean = 4/3
+  expect_equal(mean_absolute_deviation(c(1, 3, 5), 3), 4/3)
+})
+```
+
+Now `abs(x + center)` gives `mean(c(4, 6, 8)) = 6`, which is not `4/3` — the mutant is killed.
+
+### `comparison_operators()` — preset for comparisons
+
+Covers boundary and direction mistakes in comparison expressions:
+
+| Original | Mutant |
+|----------|--------|
+| `<` | `>` |
+| `>` | `<` |
+| `<=` | `>=` |
+| `>=` | `<=` |
+| `==` | `!=` |
+| `!=` | `==` |
+| `<` | `<=` |
+| `>` | `>=` |
+
+**When to use:** Functions with threshold logic, range checks, or filter conditions. Off-by-one and direction errors are easy to introduce and hard to catch with weak tests.
+
+#### What it catches — missing boundary values
+
+Consider a shipping cost function with a strict threshold:
+
+```r
+# R/shipping.R
+shipping_cost <- function(weight_kg) {
+  if (weight_kg > 5) 15.00 else 5.00
+}
+```
+
+Tests that only check "clearly above" and "clearly below" will not kill the `> → >=` mutant:
+
+```r
+test_that("heavy packages cost more", {
+  expect_gt(shipping_cost(10), shipping_cost(2))
+})
+```
+
+```text
+ℹ Mutation Testing
+  |   K |   S |   E |   T |   % | Mutator  | File
+x |   0 |   1 |   0 |   1 |   0 | > → >=   | shipping.R
+✔ |   1 |   0 |   0 |   1 | 100 | > → <    | shipping.R
+```
+
+The `> → <` mutant is killed because it completely reverses the tiers. The `> → >=` mutant survives because changing `> 5` to `>= 5` only affects one input — `weight_kg = 5` exactly — which was never tested.
+
+The surviving mutant names the precise value your test suite has never seen. In production, `>= 5` instead of `> 5` would route 5kg shipments to the expensive tier, and no test would catch it.
+
+Fix: add a test that passes the exact boundary value.
+
+```r
+test_that("5kg falls into the lower-cost tier", {
+  # > 5 is FALSE at 5; >= 5 would be TRUE and return 15.00
+  expect_equal(shipping_cost(5), 5.00)
+})
+```
+
+### `logical_operators()` — preset for logical operators
+
+| Original | Mutant |
+|----------|--------|
+| `&&` | `\|\|` |
+| `\|\|` | `&&` |
+| `&` | `\|` |
+| `\|` | `&` |
+
+**When to use:** Functions with compound conditions (`if (a && b)`). Swapping `&&` for `||` is a classic logic bug that coverage cannot detect.
+
+#### What it catches — symmetric inputs that hide `&&`/`||`
+
+Consider an access control check:
+
+```r
+# R/access.R
+can_access <- function(is_admin, is_owner) {
+  is_admin || is_owner
+}
+```
+
+Tests that only cover the "both true" and "both false" cases will not kill the `|| → &&` mutant:
+
+```r
+test_that("access control works", {
+  expect_true(can_access(TRUE, TRUE))
+  expect_false(can_access(FALSE, FALSE))
+})
+```
+
+```text
+ℹ Mutation Testing
+  |   K |   S |   E |   T |   % | Mutator  | File
+x |   0 |   2 |   0 |   2 |   0 | || → &&  | access.R
+```
+
+`TRUE && TRUE = TRUE` and `FALSE && FALSE = FALSE` — symmetric inputs produce the same result for both `||` and `&&`. The logical difference only appears when the two flags disagree. No test ever passes `(FALSE, TRUE)` or `(TRUE, FALSE)`, so the function behaves identically for `||` and `&&` under the entire test suite.
+
+Fix: add asymmetric inputs that expose the distinction.
+
+```r
+test_that("owner-only access is granted", {
+  # || gives TRUE; && gives FALSE — this kills the mutant
+  expect_true(can_access(FALSE, TRUE))
+})
+```
+
+---
+
+## Boolean literal mutator
+
+### `boolean_literal()` — flip TRUE/FALSE
+
+```r
+boolean_literal("TRUE", "FALSE")  # TRUE → FALSE
+boolean_literal("FALSE", "TRUE")  # FALSE → TRUE
+```
+
+**When to use:** Functions with hard-coded boolean flags or default arguments like `na.rm = TRUE`, `stringsAsFactors = FALSE`. Flipping the default reveals whether tests exercise both states.
+
+---
+
+## Numeric mutators
+
+### `numeric_increment()` — add 1 to every numeric literal
+
+```r
+numeric_increment()  # 5 → 6, 0 → 1, 100 → 101
+```
+
+### `numeric_decrement()` — subtract 1 from every numeric literal
+
+```r
+numeric_decrement()  # 5 → 4, 1 → 0, 100 → 99
+```
+
+**When to use:** Functions where exact numeric constants matter — thresholds, window sizes, counts, index boundaries. Off-by-one errors in constants are common and often untested.
+
+---
+
+## String mutators
+
+### `string_empty()` — replace strings with `""`
+
+```r
+string_empty()  # "hello" → ""
+```
+
+### `string_fill()` — replace empty strings with `"mutant"`
+
+```r
+string_fill()  # "" → "mutant"
+```
+
+**When to use:** `string_empty()` is useful for functions that return or compare string values — it checks whether your tests would notice a blank output. `string_fill()` tests whether your code handles non-empty strings where empty ones are expected.
+
+---
+
+## Condition mutators
+
+### `negate_condition()` — wrap condition in `!(...)`
+
+```r
+negate_condition()
+# if (x > 0)   →   if (!(x > 0))
+# while (done) →   while (!(done))
+```
+
+### `remove_condition_negation()` — strip leading `!`
+
+```r
+remove_condition_negation()
+# if (!done)  →  if (done)
+# if (!valid) →  if (valid)
+```
+
+### `remove_negation()` — remove `!` anywhere
+
+```r
+remove_negation()
+# !is.na(x)    →  is.na(x)
+# !is.null(y)  →  is.null(y)
+```
+
+**When to use:** Functions with guard clauses and early returns. These mutators reveal whether your tests cover both branches of a condition. A surviving `negate_condition()` mutant means the test inputs never trigger the `FALSE` branch.
+
+---
+
+## Function call mutator
+
+### `call_name()` — swap one function name for another
+
+```r
+call_name("any", "all")   # any(x) → all(x)
+call_name("min", "max")   # min(x) → max(x)
+call_name("sum", "prod")  # sum(x) → prod(x)
+```
+
+**When to use:** Functions that delegate to summary or aggregation helpers. `any` vs `all` and `min` vs `max` are among the easiest mistakes to make and the hardest to spot in a review.
+
+---
+
+## Recommended starting set
+
+If you are unsure where to begin, this combination covers the most common real-world bug categories:
+
+```r
+plan <- test_plan(
+  source_files = "R/my_file.R",
+  mutators = c(
+    arithmetic_operators(),
+    comparison_operators(),
+    logical_operators(),
+    list(
+      negate_condition(),
+      remove_negation()
+    )
+  )
+)
+```
+
+Start here, look at the survivors, then add more targeted mutators for the specific patterns in your code.

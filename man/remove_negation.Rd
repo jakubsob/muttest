@@ -7,11 +7,11 @@
 remove_negation()
 }
 \value{
-A [Mutator] object.
+A \link{Mutator} object.
 }
 \description{
-Removes the `!` unary operator from an expression.
-For example, `!is.na(x)` becomes `is.na(x)` and `!(a > b)` becomes `(a > b)`.
+Removes the \code{!} unary operator from an expression.
+For example, \code{!is.na(x)} becomes \code{is.na(x)} and \code{!(a > b)} becomes \code{(a > b)}.
 }
 \examples{
 remove_negation()

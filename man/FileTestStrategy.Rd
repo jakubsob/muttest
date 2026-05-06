@@ -11,8 +11,8 @@ Run tests matching the source file name
 \details{
 This class implements a test strategy that runs tests matching the source file name.
 
-If the source file name is `foo.R`, and there are test files named `test-foo.R` or `test-bar.R`,
-only `test-foo.R` will be run.
+If the source file name is \code{foo.R}, and there are test files named \code{test-foo.R} or \code{test-bar.R},
+only \code{test-foo.R} will be run.
 }
 \seealso{
 Other TestStrategy: 

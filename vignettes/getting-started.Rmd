@@ -1,0 +1,139 @@
+---
+title: "Getting Started with muttest"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with muttest}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This guide walks you through your first mutation test run, from setup to interpreting results.
+
+## Prerequisites
+
+`muttest` works with packages that use `testthat`. You need:
+
+- An R package with at least one source file in `R/`
+- Tests in `tests/testthat/`
+
+## Installation
+
+```r
+# install.packages("pak")
+pak::pak("jakubsob/muttest")
+```
+
+## Step 1 — Pick a source file to mutate
+
+Start small. Choose one file from `R/` that contains meaningful logic — branching, arithmetic, comparisons. Avoid files that are mostly glue code or just call other functions.
+
+For this guide we use a simple `is_adult` function:
+
+```r
+# R/is_adult.R
+is_adult <- function(age) {
+  age >= 18
+}
+```
+
+And its tests:
+
+```r
+# tests/testthat/test-is_adult.R
+test_that("is_adult returns TRUE for adults", {
+  expect_true(is_adult(25))
+})
+
+test_that("is_adult returns FALSE for minors", {
+  expect_false(is_adult(10))
+})
+```
+
+## Step 2 — Define a test plan
+
+A test plan describes *what* to mutate and *which* mutations to apply:
+
+```r
+library(muttest)
+
+plan <- test_plan(
+  source_files = "R/is_adult.R",
+  mutators = comparison_operators()
+)
+```
+
+`comparison_operators()` is a preset that generates mutants by swapping each comparison operator for related alternatives. For `>=` it produces two mutants: `>=` → `>` and `>=` → `<=`.
+
+## Step 3 — Run the tests
+
+```r
+muttest::test(plan, "tests/testthat")
+```
+
+You will see output like this:
+
+```
+ℹ Mutation Testing
+  |   K |   S |   E |   T |   % | Mutator      | File
+✔ |   1 |   1 |   0 |   2 |  50 | >= → >       | is_adult.R
+── Mutation Testing Results ────────────────────────────────────────────────────
+[ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
+```
+
+## Step 4 — Read the output
+
+Each column in the progress table means:
+
+| Column | Meaning |
+|--------|---------|
+| K | Killed — mutants your tests caught |
+| S | Survived — mutants your tests missed |
+| E | Errors — mutants that caused unexpected errors |
+| T | Total mutants for this mutator/file combination |
+| % | Mutation score for this row |
+
+A `✔` row means at least one mutant was killed. An `x` row means all mutants survived — your tests didn't notice anything changed.
+
+The **mutation score** is:
+
+```
+Mutation Score = (Killed / Total) × 100%
+```
+
+## Step 5 — Improve a weak test
+
+The `>= → >` mutant survived. That means when we change `age >= 18` to `age > 18`, the tests still pass. Why? The boundary value `18` is never tested, so the test suite cannot tell `>=` from `>`.
+
+- Mutant 2 (`>=` → `<=`) is **killed**: `is_adult(25)` now returns `FALSE`, which fails the first test.
+- Mutant 1 (`>=` → `>`) **survives**: `is_adult(25)` still returns `TRUE` and `is_adult(10)` still returns `FALSE`.
+
+Adding a test at the boundary fixes this:
+
+```r
+test_that("is_adult returns TRUE at the boundary age", {
+  expect_true(is_adult(18))  # kills mutant 1: age > 18 returns FALSE for age = 18
+})
+```
+
+With this test added the score reaches 100%.
+
+## The feedback loop
+
+```
+Write tests → Run muttest → Find survivors → Strengthen tests → Repeat
+```
+
+Start with one file. Aim for a meaningful score improvement each iteration rather than chasing 100% immediately. A score of 80%+ on critical business logic can be a reasonable target to start from.
+
+## Next steps
+
+- [What is Mutation Testing?](mutation-testing-101.html) — conceptual background and when mutation testing pays off most
+- [Mutator Reference](mutators.html) — all available mutators and how to pick the right ones
+- [CI Integration](ci-integration.html) — run mutation tests automatically on every push

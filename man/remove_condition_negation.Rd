@@ -11,15 +11,15 @@ remove_condition_negation(statements = c("if", "while"))
 Must be a subset of \code{c("if", "while")}. Defaults to both.}
 }
 \value{
-A [Mutator] object.
+A \link{Mutator} object.
 }
 \description{
-The inverse of [negate_condition()]. Strips the leading \code{!} from any
-already-negated condition, so \code{if (!done)} becomes \code{if (done)} and
-\code{while (!ready)} becomes \code{while (ready)}.
+The inverse of \code{\link[=negate_condition]{negate_condition()}}. Strips the leading \code{!} from any
+already-negated condition, so \verb{if (!done)} becomes \verb{if (done)} and
+\verb{while (!ready)} becomes \verb{while (ready)}.
 }
 \details{
-Unlike [remove_negation()], this mutator is scoped exclusively to
+Unlike \code{\link[=remove_negation]{remove_negation()}}, this mutator is scoped exclusively to
 conditions, leaving negations in other positions (assignments, return
 values, etc.) untouched.
 }

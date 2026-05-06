@@ -7,12 +7,12 @@
 boolean_literal(from, to)
 }
 \arguments{
-\item{from}{The literal to be replaced. One of `"TRUE"`, `"FALSE"`, `"T"`, `"F"`.}
+\item{from}{The literal to be replaced. One of \code{"TRUE"}, \code{"FALSE"}, \code{"T"}, \code{"F"}.}
 
 \item{to}{The literal to replace with.}
 }
 \description{
-Replaces a boolean constant (`TRUE`, `FALSE`, `T`, or `F`) with another one.
+Replaces a boolean constant (\code{TRUE}, \code{FALSE}, \code{T}, or \code{F}) with another one.
 }
 \examples{
 boolean_literal("TRUE", "FALSE")

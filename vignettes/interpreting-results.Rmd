@@ -1,0 +1,243 @@
+---
+title: "Reading mutation results and strengthening tests"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Reading mutation results and strengthening tests}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The mutation score is only useful if you know how to read it. This article walks through three real scenarios — one for each operator class — showing what a surviving mutant looks like in the output, what it tells you about your tests, and exactly what to change.
+
+## The output table
+
+Every `muttest::test()` run produces a table like this:
+
+```
+ℹ Mutation Testing
+  |   K |   S |   E |   T |   % | Mutator      | File
+✔ |   1 |   1 |   0 |   2 |  50 | >= → >       | is_adult.R
+── Mutation Testing Results ────────────────────────────────────────────────────
+[ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
+```
+
+| Column | Meaning |
+|--------|---------|
+| K | **Killed** — mutants that caused at least one test to fail. Your tests caught the change. |
+| S | **Survived** — mutants that passed all tests. Your tests did not notice the change. |
+| E | **Errors** — mutants that produced a parse or execution error (neither killed nor survived). |
+| T | **Total** — mutants generated for this mutator/file pair. |
+| % | **Score** — `K / (K + S) × 100`. |
+
+A `✔` row means at least one mutant was killed. An `x` row means every mutant survived — your tests passed unchanged.
+
+## What the score tells you
+
+| Score | Signal |
+|-------|--------|
+| 0% | Your assertions do not constrain the outcome. Tests pass no matter what. |
+| 1–99% | Some cases are well-tested; others are not. The survivors point at the gaps. |
+| 100% | Every generated mutant was caught. Your tests are robust against these specific changes. |
+
+A 100% score does not mean there are no bugs — it means there are no untested bugs *of the kinds the mutators probe*. Start with the survivors; they are the actionable signal.
+
+---
+
+## Case study 1: Comparison operators — the missing boundary
+
+**The function**
+
+```r
+# R/shipping.R
+shipping_cost <- function(weight_kg) {
+  if (weight_kg > 5) 15.00 else 5.00
+}
+```
+
+**Weak tests**
+
+```r
+test_that("heavy packages cost more", {
+  expect_gt(shipping_cost(10), shipping_cost(2))
+})
+```
+
+The tests pass. Code coverage is 100%. But when you run mutation testing:
+
+```r
+plan <- test_plan(
+  source_files = "R/shipping.R",
+  mutators = comparison_operators()
+)
+muttest::test(plan, "tests/testthat")
+```
+
+```
+x |   0 |   1 |   0 |   1 |   0 | > → >= | shipping.R
+✔ |   1 |   0 |   0 |   1 | 100 | > → <  | shipping.R
+── Mutation Testing Results ────────────────────────────────────────────────────
+[ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
+```
+
+**Reading the output**
+
+The `> → <` mutant is killed: changing `> 5` to `< 5` reverses the tiers completely — `shipping_cost(10)` now returns `5.00` while `shipping_cost(2)` returns `15.00`, which fails `expect_gt`.
+
+The `> → >=` mutant survives: changing `> 5` to `>= 5` only affects one input — `weight_kg = 5` exactly. Your tests never pass `5`, so the function behaves identically for `10` and `2` regardless of which operator is used.
+
+**What this survivor means**
+
+The surviving mutant tells you: *there is a boundary value that no test covers*. The function's behaviour at `weight_kg = 5` is untested. In production, a developer who accidentally writes `>= 5` instead of `> 5` would route 5kg shipments to the expensive tier — and your test suite would not catch it.
+
+**The fix**
+
+```r
+test_that("5kg falls into the lower-cost tier", {
+  # > 5 is FALSE when weight_kg = 5, so the result is 5.00
+  # >= 5 would be TRUE, giving 15.00 — this test kills that mutant
+  expect_equal(shipping_cost(5), 5.00)
+})
+```
+
+**Rule:** When a comparison mutant survives, find the boundary value implied by the operator and add a test that passes exactly that value.
+
+---
+
+## Case study 2: Arithmetic operators — checking properties instead of values
+
+**The function**
+
+```r
+# R/stats.R
+mean_absolute_deviation <- function(x, center) {
+  mean(abs(x - center))
+}
+```
+
+**Weak tests**
+
+```r
+test_that("mean absolute deviation is non-negative", {
+  expect_gte(mean_absolute_deviation(c(1, 3, 5), 3), 0)
+})
+```
+
+Running mutation testing:
+
+```
+x |   0 |   1 |   0 |   1 |   0 | - → + | stats.R
+x |   0 |   1 |   0 |   1 |   0 | + → - | stats.R  # from (1 + rate) patterns if any
+── Mutation Testing Results ────────────────────────────────────────────────────
+[ KILLED 0 | SURVIVED 1 | ERRORS 0 | TOTAL 1 | SCORE 0.0% ]
+```
+
+**Reading the output**
+
+The `- → +` mutant changes `x - center` to `x + center`. For inputs `c(1, 3, 5)` and `center = 3`:
+- Original: `abs(c(-2, 0, 2))` → `mean(c(2, 0, 2))` = `1.33`
+- Mutant: `abs(c(4, 6, 8))` → `mean(c(4, 6, 8))` = `6`
+
+Both results are non-negative. The assertion `expect_gte(..., 0)` passes for both.
+
+**What this survivor means**
+
+The assertion checks a *property* of the result (sign) rather than the *value*. Any assertion that only verifies direction (`expect_gt`, `expect_gte`, `expect_lt`, `expect_lte`) without anchoring to a specific number will be blind to operator swaps, because both the original and the mutant satisfy the same directional constraint.
+
+This pattern can appear in LLM-generated tests: the model may write a test that checks what is *obviously true* about the function's output (it's positive, it's non-null, it's a numeric) rather than what is *specifically correct*. Mutation testing is a way to check whether that's the case.
+
+**The fix**
+
+```r
+test_that("mean absolute deviation equals average distance from center", {
+  # |1-3| + |3-3| + |5-3| = 2 + 0 + 2 = 4; mean = 4/3 ≈ 1.33
+  expect_equal(mean_absolute_deviation(c(1, 3, 5), 3), 4/3)
+})
+```
+
+Now `abs(x + center)` gives `mean(c(4, 6, 8)) = 6`, which is not `4/3`. Mutant killed.
+
+**Rule:** When an arithmetic mutant survives, replace directional assertions (`expect_gt`) with exact-value assertions (`expect_equal`). Compute the expected value by hand and hard-code it.
+
+---
+
+## Case study 3: Logical operators — symmetric inputs hide `&&`/`||`
+
+**The function**
+
+```r
+# R/access.R
+can_access <- function(is_admin, is_owner) {
+  is_admin || is_owner
+}
+```
+
+**Weak tests**
+
+```r
+test_that("access control works", {
+  expect_true(can_access(TRUE, TRUE))    # both flags true
+  expect_false(can_access(FALSE, FALSE)) # both flags false
+})
+```
+
+Running mutation testing:
+
+```
+x |   0 |   2 |   0 |   2 |   0 | || → && | access.R
+── Mutation Testing Results ────────────────────────────────────────────────────
+[ KILLED 0 | SURVIVED 2 | ERRORS 0 | TOTAL 2 | SCORE 0.0% ]
+```
+
+**Reading the output**
+
+Both mutants survive. With `|| → &&`:
+- `can_access(TRUE, TRUE)`: `TRUE && TRUE = TRUE` — still passes `expect_true`
+- `can_access(FALSE, FALSE)`: `FALSE && FALSE = FALSE` — still passes `expect_false`
+
+The test inputs are symmetric: both arguments are always the same value. `||` and `&&` give identical results when both operands are equal. The logical distinction between them only appears when the operands differ.
+
+**What this survivor means**
+
+Your tests never exercise the case where `is_admin` and `is_owner` disagree. In production, `can_access(FALSE, TRUE)` should return `TRUE` (owner access), but a developer who writes `&&` instead of `||` would make it return `FALSE`. The test suite cannot catch that regression.
+
+This pattern is especially common in tests written for "happy path" scenarios, where the inputs are all-valid or all-invalid rather than individually varying each flag.
+
+**The fix**
+
+```r
+test_that("owner-only access is granted", {
+  # || gives TRUE; && gives FALSE — this kills the mutant
+  expect_true(can_access(FALSE, TRUE))
+})
+
+test_that("admin-only access is granted", {
+  expect_true(can_access(TRUE, FALSE))
+})
+```
+
+**Rule:** When a logical operator mutant survives, add tests with asymmetric inputs — one flag true and the other false. These inputs reveal the difference between `&&` (requires both) and `||` (requires either).
+
+---
+
+## Summary: three patterns, three fixes
+
+| Surviving mutant | Root cause | Fix |
+|-----------------|------------|-----|
+| Comparison (`>=` → `>`) | Boundary value never tested | Add a test that passes the exact threshold value |
+| Arithmetic (`-` → `+`) | Assertion checks direction, not value | Replace `expect_gt/gte` with `expect_equal` and a computed expected value |
+| Logical (`\|\|` → `&&`) | Symmetric inputs (both true or both false) | Add a test with asymmetric inputs (one true, one false) |
+
+The feedback loop is:
+
+```
+Run muttest → find survivors → identify the pattern → add the missing test → repeat
+```
+
+Start with one file and one mutator preset. Look at what survives. The survivor names the exact operator that your tests cannot distinguish — that is your actionable signal.

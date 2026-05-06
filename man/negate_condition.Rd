@@ -11,11 +11,11 @@ negate_condition(statements = c("if", "while"))
 Must be a subset of \code{c("if", "while")}. Defaults to both.}
 }
 \value{
-A [Mutator] object.
+A \link{Mutator} object.
 }
 \description{
 Wraps the condition expression of each matching statement in \code{!(...)}.
-For example, \code{if (x > 0)} becomes \code{if (!(x > 0))}.
+For example, \verb{if (x > 0)} becomes \verb{if (!(x > 0))}.
 }
 \examples{
 negate_condition()

@@ -1,9 +1,84 @@
 url: https://jakubsob.github.io/muttest/
+
 template:
   bootstrap: 5
   light-switch: true
   bslib:
     bg: '#ffffff'
     fg: '#000000'
-    primary: '#886868' 
+    primary: '#886868'
     secondary: '#F77669'
+
+navbar:
+  structure:
+    left: [intro, articles, reference, news]
+  components:
+    articles:
+      text: Articles
+      menu:
+        - text: Getting Started
+          href: articles/getting-started.html
+        - text: What is Mutation Testing?
+          href: articles/mutation-testing-101.html
+        - text: Mutator Reference
+          href: articles/mutators.html
+        - text: Reading Results
+          href: articles/interpreting-results.html
+        - text: CI Integration
+          href: articles/ci-integration.html
+
+articles:
+  - title: Start here
+    navbar: Start here
+    contents:
+      - getting-started
+      - mutation-testing-101
+      - interpreting-results
+  - title: Reference
+    navbar: Reference
+    contents:
+      - mutators
+      - ci-integration
+
+reference:
+  - title: Core
+    desc: Run mutation tests and define test plans.
+    contents:
+      - test
+      - test_plan
+  - title: Mutators
+    desc: Individual mutators — each defines one kind of code change.
+    contents:
+      - Mutator
+      - operator
+      - boolean_literal
+      - call_name
+      - string_empty
+      - string_fill
+      - numeric_increment
+      - numeric_decrement
+      - negate_condition
+      - remove_condition_negation
+      - remove_negation
+  - title: Mutator presets
+    desc: Ready-made collections of related mutators for common bug categories.
+    contents:
+      - arithmetic_operators
+      - comparison_operators
+      - logical_operators
+  - title: Reporters
+    desc: Control how results are displayed.
+    contents:
+      - MutationReporter
+      - MutationProgressReporter
+      - default_reporter
+  - title: Strategies
+    desc: Control how tests are run and source files are copied.
+    contents:
+      - TestStrategy
+      - FileTestStrategy
+      - FullTestStrategy
+      - CopyStrategy
+      - PackageCopyStrategy
+      - default_test_strategy
+      - default_copy_strategy

@@ -1,45 +1,30 @@
-Mutator <- R6::R6Class(
-  "Mutator",
-  public = list(
-    from = NULL,
-    to = NULL,
-    query = NULL,
-    match_fn = NULL,       # function(node_text) -> bool; overrides `node_text == from`
-    replacement_fn = NULL, # function(node_text) -> string; overrides `to`
-    per_match_fn = NULL,   # function(code, named_captures) -> code|NULL; multi-node mutations
-    initialize = function(from, to, query, match_fn = NULL, replacement_fn = NULL, per_match_fn = NULL) {
-      self$from <- from
-      self$to <- to
-      self$query <- query
-      self$match_fn <- match_fn
-      self$replacement_fn <- replacement_fn
-      self$per_match_fn <- per_match_fn
-    },
-    mutate = function(code) {
-      mutate_code(code, self)
-    },
-    # nocov start
-    print = function() {
-      cat(sprintf("Mutator: %s -> %s\n", self$from, self$to))
-      cat(sprintf("Query: %s\n", self$query))
-    }
-    # nocov end
-  )
-)
-
-#' Mutate an operator
+#' Mutate a binary operator
 #'
-#' It changes a binary operator to another one.
+#' Produces one mutant per occurrence of `from` in the source file, replacing
+#' it with `to`. A surviving mutant means your tests cannot distinguish the
+#' original operator from the replacement — pointing at the missing assertion
+#' or input value.
 #'
-#' @examples
-#' operator("==", "!=")
-#' operator(">", "<")
-#' operator("<", ">")
-#' operator("+", "-")
+#' Use this when you need a specific swap not covered by the preset collections
+#' ([arithmetic_operators()], [comparison_operators()], [logical_operators()]).
 #'
-#' @param from The operator to be replaced.
-#' @param to The operator to replace with.
+#' @param from The operator to replace (e.g. `"+"`, `"=="`, `">"`).
+#' @param to The replacement operator.
+#' @return A [Mutator] object.
+#' @seealso
+#'   [comparison_operators()], [arithmetic_operators()], [logical_operators()]
+#'   for ready-made preset lists.
+#'
+#'   `vignette("mutators", package = "muttest")` for the full operator
+#'   reference with examples of what each preset catches.
+#'
+#'   `vignette("interpreting-results", package = "muttest")` to learn how to
+#'   read surviving mutants and strengthen the tests they expose.
 #' @export
+#' @examples
+#' operator("+", "-")
+#' operator("==", "!=")
+#' operator(">", ">=")  # probe the strict vs. non-strict boundary
 operator <- function(from, to) {
   Mutator$new(
     from = from,

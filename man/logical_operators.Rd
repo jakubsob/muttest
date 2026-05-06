@@ -7,12 +7,33 @@
 logical_operators()
 }
 \value{
-A list of [operator()] mutators.
+A list of \code{\link[=operator]{operator()}} mutators.
 }
 \description{
-Returns a list of mutators covering logical operator replacements,
-for both short-circuit (`&&`/`||`) and vectorised (`&`/`|`) forms.
+Returns a ready-made list of \code{\link[=operator]{operator()}} mutators covering short-circuit
+(\code{&&}/\code{||}) and vectorised (\code{&}/\code{|}) logical operator swaps.
+}
+\details{
+Use on any file with compound conditions (\verb{if (a && b)}). A surviving mutant
+from this preset typically means test inputs are symmetric — both flags
+\code{TRUE} or both \code{FALSE}. Adding a test with one flag \code{TRUE} and the other
+\code{FALSE} exposes the difference between \code{&&} and \code{||} and kills the mutant.
 }
 \examples{
 logical_operators()
+
+\dontrun{
+plan <- test_plan(
+  source_files = "R/access.R",
+  mutators = logical_operators()
+)
+test(plan, "tests/testthat")
+}
+}
+\seealso{
+\code{vignette("mutators", package = "muttest")} for the full operator table
+and a worked example showing the symmetric-input pattern.
+
+\code{vignette("interpreting-results", package = "muttest")} for how to
+diagnose survivors and fix the underlying test weakness.
 }

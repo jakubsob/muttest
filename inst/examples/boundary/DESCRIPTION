@@ -1,0 +1,6 @@
+Package: boundary
+Title: Boundary Condition Example Package for muttest
+Version: 0.1.0
+Description: Example package demonstrating comparison_operators mutators.
+License: MIT
+Encoding: UTF-8

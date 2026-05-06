@@ -14,6 +14,7 @@ Description: Mutation testing for R.
 License: MIT + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.3.3
+Roxygen: list(markdown = TRUE)
 Depends:
   R (>= 4.1.0)
 Imports:
@@ -37,4 +38,7 @@ Suggests:
     covr,
     cucumber,
     ggplot2,
+    knitr,
+    rmarkdown,
     shiny
+VignetteBuilder: knitr

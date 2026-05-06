@@ -10,7 +10,7 @@ numeric_increment(by = 1)
 \item{by}{The amount to add. Defaults to \code{1}.}
 }
 \value{
-A [Mutator] object.
+A \link{Mutator} object.
 }
 \description{
 Replaces every numeric literal \code{n} with \code{n + by}.

@@ -7,11 +7,33 @@
 arithmetic_operators()
 }
 \value{
-A list of [operator()] mutators.
+A list of \code{\link[=operator]{operator()}} mutators.
 }
 \description{
-Returns a list of mutators covering common arithmetic operator replacements.
+Returns a ready-made list of \code{\link[=operator]{operator()}} mutators covering common
+arithmetic swaps: \code{+}/\code{-}, \code{*}/\code{/}, \code{^}/\code{*}, \code{\%\%}/\code{*}, \code{\%/\%}/\code{/}.
+}
+\details{
+Use on any file that performs calculations. A surviving mutant from this
+preset typically means an assertion checks a \emph{property} of the result (sign,
+order) rather than a specific value — replacing \code{expect_gte()} with
+\code{expect_equal()} and a computed expected value usually kills it.
 }
 \examples{
 arithmetic_operators()
+
+\dontrun{
+plan <- test_plan(
+  source_files = "R/stats.R",
+  mutators = arithmetic_operators()
+)
+test(plan, "tests/testthat")
+}
+}
+\seealso{
+\code{vignette("mutators", package = "muttest")} for the full operator table
+and a worked example showing the direction-insensitive assertion pattern.
+
+\code{vignette("interpreting-results", package = "muttest")} for how to
+diagnose survivors and fix the underlying test weakness.
 }

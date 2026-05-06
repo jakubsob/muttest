@@ -13,8 +13,8 @@ call_name(from, to)
 }
 \description{
 Replaces a function name in a call expression with another name.
-Useful for swapping semantically related functions such as `any`/`all`,
-`min`/`max`, or `sum`/`prod`.
+Useful for swapping semantically related functions such as \code{any}/\code{all},
+\code{min}/\code{max}, or \code{sum}/\code{prod}.
 }
 \examples{
 call_name("any", "all")

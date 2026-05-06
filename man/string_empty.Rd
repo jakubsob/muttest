@@ -7,11 +7,11 @@
 string_empty()
 }
 \value{
-A [Mutator] object.
+A \link{Mutator} object.
 }
 \description{
-Replaces any non-empty string literal in the source code with `""`.
-The empty string itself is not mutated (use [string_fill()] for that).
+Replaces any non-empty string literal in the source code with \code{""}.
+The empty string itself is not mutated (use \code{\link[=string_fill]{string_fill()}} for that).
 }
 \examples{
 string_empty()

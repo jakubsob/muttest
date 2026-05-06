@@ -7,12 +7,33 @@
 comparison_operators()
 }
 \value{
-A list of [operator()] mutators.
+A list of \code{\link[=operator]{operator()}} mutators.
 }
 \description{
-Returns a list of mutators covering comparison operator replacements,
-including boundary shifts (e.g. `<` to `<=`).
+Returns a ready-made list of \code{\link[=operator]{operator()}} mutators covering direction swaps
+(\code{<}/\code{>}, \code{<=}/\code{>=}, \code{==}/\code{!=}) and boundary shifts (\code{<}/\code{<=}, \code{>}/\code{>=}).
+}
+\details{
+Use on any file with threshold logic, range checks, or filter conditions.
+A surviving mutant from this preset means the exact boundary value implied
+by the operator was never passed to the function — adding a test at that
+boundary value kills it.
 }
 \examples{
 comparison_operators()
+
+\dontrun{
+plan <- test_plan(
+  source_files = "R/shipping.R",
+  mutators = comparison_operators()
+)
+test(plan, "tests/testthat")
+}
+}
+\seealso{
+\code{vignette("mutators", package = "muttest")} for the full operator table
+and a worked example showing the missing boundary value pattern.
+
+\code{vignette("interpreting-results", package = "muttest")} for how to
+diagnose survivors and fix the underlying test weakness.
 }

@@ -11,7 +11,7 @@ string_fill(fill = "mutant")
 the codebase already contains \code{"mutant"} as a meaningful value.}
 }
 \value{
-A [Mutator] object.
+A \link{Mutator} object.
 }
 \description{
 Replaces \code{""} with a fill string (default \code{"mutant"}) so that code paths
