@@ -2,17 +2,21 @@
 % Please edit documentation in R/mutator-numeric.R
 \name{numeric_increment}
 \alias{numeric_increment}
-\title{Increment numeric literals by one}
+\title{Increment numeric literals}
 \usage{
-numeric_increment()
+numeric_increment(by = 1)
+}
+\arguments{
+\item{by}{The amount to add. Defaults to \code{1}.}
 }
 \value{
 A [Mutator] object.
 }
 \description{
-Replaces every numeric literal `n` with `n + 1`.
-Handles both integer (e.g. `5L`) and floating-point (e.g. `3.14`) literals.
+Replaces every numeric literal \code{n} with \code{n + by}.
+Handles both integer (e.g. \code{5L}) and floating-point (e.g. \code{3.14}) literals.
 }
 \examples{
 numeric_increment()
+numeric_increment(by = 2)
 }

@@ -2,17 +2,21 @@
 % Please edit documentation in R/mutator-numeric.R
 \name{numeric_decrement}
 \alias{numeric_decrement}
-\title{Decrement numeric literals by one}
+\title{Decrement numeric literals}
 \usage{
-numeric_decrement()
+numeric_decrement(by = 1)
+}
+\arguments{
+\item{by}{The amount to subtract. Defaults to \code{1}.}
 }
 \value{
 A [Mutator] object.
 }
 \description{
-Replaces every numeric literal `n` with `n - 1`.
-Handles both integer (e.g. `5L`) and floating-point (e.g. `3.14`) literals.
+Replaces every numeric literal \code{n} with \code{n - by}.
+Handles both integer (e.g. \code{5L}) and floating-point (e.g. \code{3.14}) literals.
 }
 \examples{
 numeric_decrement()
+numeric_decrement(by = 2)
 }

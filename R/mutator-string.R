@@ -19,19 +19,23 @@ string_empty <- function() {
 
 #' Mutate the empty string literal to a placeholder string
 #'
-#' Replaces `""` with `"mutant"` so that code paths that depend on an empty
-#' string can be detected.
+#' Replaces `""` with a fill string (default `"mutant"`) so that code paths
+#' that depend on an empty string can be detected.
 #'
+#' @param fill The replacement string. Defaults to `"mutant"`. Override when
+#'   the codebase already contains `"mutant"` as a meaningful value.
 #' @return A [Mutator] object.
 #' @export
 #' @examples
 #' string_fill()
-string_fill <- function() {
+#' string_fill(fill = "PLACEHOLDER")
+string_fill <- function(fill = "mutant") {
+  quoted <- paste0("\"", fill, "\"")
   Mutator$new(
     from = "\"\"",
-    to = "\"mutant\"",
+    to = quoted,
     query = "(string) @value",
     match_fn = function(text) text == "\"\"",
-    replacement_fn = function(text) "\"mutant\""
+    replacement_fn = function(text) quoted
   )
 }

@@ -4,15 +4,19 @@
 \alias{remove_condition_negation}
 \title{Remove negation from the condition of if/while statements}
 \usage{
-remove_condition_negation()
+remove_condition_negation(statements = c("if", "while"))
+}
+\arguments{
+\item{statements}{Character vector of statement types to target.
+Must be a subset of \code{c("if", "while")}. Defaults to both.}
 }
 \value{
 A [Mutator] object.
 }
 \description{
-The inverse of [negate_condition()]. Strips the leading `!` from any
-already-negated condition, so `if (!done)` becomes `if (done)` and
-`while (!ready)` becomes `while (ready)`.
+The inverse of [negate_condition()]. Strips the leading \code{!} from any
+already-negated condition, so \code{if (!done)} becomes \code{if (done)} and
+\code{while (!ready)} becomes \code{while (ready)}.
 }
 \details{
 Unlike [remove_negation()], this mutator is scoped exclusively to
@@ -21,4 +25,5 @@ values, etc.) untouched.
 }
 \examples{
 remove_condition_negation()
+remove_condition_negation(statements = "while")
 }

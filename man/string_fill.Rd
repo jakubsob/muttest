@@ -4,15 +4,20 @@
 \alias{string_fill}
 \title{Mutate the empty string literal to a placeholder string}
 \usage{
-string_fill()
+string_fill(fill = "mutant")
+}
+\arguments{
+\item{fill}{The replacement string. Defaults to \code{"mutant"}. Override when
+the codebase already contains \code{"mutant"} as a meaningful value.}
 }
 \value{
 A [Mutator] object.
 }
 \description{
-Replaces `""` with `"mutant"` so that code paths that depend on an empty
-string can be detected.
+Replaces \code{""} with a fill string (default \code{"mutant"}) so that code paths
+that depend on an empty string can be detected.
 }
 \examples{
 string_fill()
+string_fill(fill = "PLACEHOLDER")
 }

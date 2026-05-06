@@ -47,4 +47,14 @@ describe("string_fill", {
     expect_equal(mutations[[1]], c('f("mutant", "")'))
     expect_equal(mutations[[2]], c('f("", "mutant")'))
   })
+
+  it("should use a custom fill value", {
+    mutator <- string_fill(fill = "PLACEHOLDER")
+    expect_mutates_to(mutator, c('x <- ""'), list(c('x <- "PLACEHOLDER"')))
+  })
+
+  it("should reflect custom fill in the to label", {
+    mutator <- string_fill(fill = "X")
+    expect_equal(mutator$to, '"X"')
+  })
 })

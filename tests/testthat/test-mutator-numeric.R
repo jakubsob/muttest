@@ -63,3 +63,27 @@ describe("numeric_decrement", {
     expect_equal(mutations[[2]], c("f(3, 6)"))
   })
 })
+
+describe("numeric_increment with custom by", {
+  it("should increment by the given amount", {
+    mutator <- numeric_increment(by = 2)
+    expect_mutates_to(mutator, c("x <- 5"), list(c("x <- 7")))
+  })
+
+  it("should increment by a fractional amount", {
+    mutator <- numeric_increment(by = 0.5)
+    expect_mutates_to(mutator, c("x <- 1.0"), list(c("x <- 1.5")))
+  })
+})
+
+describe("numeric_decrement with custom by", {
+  it("should decrement by the given amount", {
+    mutator <- numeric_decrement(by = 3)
+    expect_mutates_to(mutator, c("x <- 10"), list(c("x <- 7")))
+  })
+
+  it("should decrement by a fractional amount", {
+    mutator <- numeric_decrement(by = 0.5)
+    expect_mutates_to(mutator, c("x <- 2.0"), list(c("x <- 1.5")))
+  })
+})

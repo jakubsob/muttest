@@ -1,35 +1,39 @@
-#' Increment numeric literals by one
+#' Increment numeric literals
 #'
-#' Replaces every numeric literal `n` with `n + 1`.
+#' Replaces every numeric literal `n` with `n + by`.
 #' Handles both integer (e.g. `5L`) and floating-point (e.g. `3.14`) literals.
 #'
+#' @param by The amount to add. Defaults to `1`.
 #' @return A [Mutator] object.
 #' @export
 #' @examples
 #' numeric_increment()
-numeric_increment <- function() {
+#' numeric_increment(by = 2)
+numeric_increment <- function(by = 1) {
   numeric_literal_mutator(
-    label = "<n> + 1",
+    label = paste0("<n> + ", by),
     transform = function(text) {
-      as.character(suppressWarnings(as.numeric(text)) + 1)
+      as.character(suppressWarnings(as.numeric(text)) + by)
     }
   )
 }
 
-#' Decrement numeric literals by one
+#' Decrement numeric literals
 #'
-#' Replaces every numeric literal `n` with `n - 1`.
+#' Replaces every numeric literal `n` with `n - by`.
 #' Handles both integer (e.g. `5L`) and floating-point (e.g. `3.14`) literals.
 #'
+#' @param by The amount to subtract. Defaults to `1`.
 #' @return A [Mutator] object.
 #' @export
 #' @examples
 #' numeric_decrement()
-numeric_decrement <- function() {
+#' numeric_decrement(by = 2)
+numeric_decrement <- function(by = 1) {
   numeric_literal_mutator(
-    label = "<n> - 1",
+    label = paste0("<n> - ", by),
     transform = function(text) {
-      as.character(suppressWarnings(as.numeric(text)) - 1)
+      as.character(suppressWarnings(as.numeric(text)) - by)
     }
   )
 }

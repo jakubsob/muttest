@@ -87,3 +87,43 @@ describe("remove_condition_negation", {
     expect_equal(mutations[[1]], c("if (a) 1", "if (b) 2"))
   })
 })
+
+describe("negate_condition with statements filter", {
+  it("should only negate if conditions when statements = 'if'", {
+    mutator <- negate_condition(statements = "if")
+    code <- c("if (a) 1", "while (b) 2")
+    mutations <- mutator$mutate(code)
+    expect_length(mutations, 1)
+    expect_equal(mutations[[1]], c("if (!(a)) 1", "while (b) 2"))
+  })
+
+  it("should only negate while conditions when statements = 'while'", {
+    mutator <- negate_condition(statements = "while")
+    code <- c("if (a) 1", "while (b) 2")
+    mutations <- mutator$mutate(code)
+    expect_length(mutations, 1)
+    expect_equal(mutations[[1]], c("if (a) 1", "while (!(b)) 2"))
+  })
+
+  it("should error on unknown statement type", {
+    expect_error(negate_condition(statements = "for"), "Unknown statement type")
+  })
+})
+
+describe("remove_condition_negation with statements filter", {
+  it("should only remove negation from if conditions when statements = 'if'", {
+    mutator <- remove_condition_negation(statements = "if")
+    code <- c("if (!a) 1", "while (!b) 2")
+    mutations <- mutator$mutate(code)
+    expect_length(mutations, 1)
+    expect_equal(mutations[[1]], c("if (a) 1", "while (!b) 2"))
+  })
+
+  it("should only remove negation from while conditions when statements = 'while'", {
+    mutator <- remove_condition_negation(statements = "while")
+    code <- c("if (!a) 1", "while (!b) 2")
+    mutations <- mutator$mutate(code)
+    expect_length(mutations, 1)
+    expect_equal(mutations[[1]], c("if (!a) 1", "while (b) 2"))
+  })
+})
