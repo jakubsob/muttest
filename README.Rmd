@@ -192,23 +192,30 @@ make_table(
   fn_names = c(
     "operator",
     "boolean_literal",
+    "na_literal",
     "call_name",
     "string_empty", "string_fill",
     "numeric_increment", "numeric_decrement",
+    "index_increment", "index_decrement",
     "negate_condition", "remove_condition_negation",
-    "remove_negation"
+    "remove_negation",
+    "replace_return_value"
   ),
   examples = c(
     "`operator(\"+\", \"-\")`: `a + b` → `a - b`",
     "`boolean_literal(\"TRUE\", \"FALSE\")`: `TRUE` → `FALSE`",
+    "`na_literal(\"NA\", \"NULL\")`: `NA` → `NULL`",
     "`call_name(\"any\", \"all\")`: `any(x)` → `all(x)`",
     "`string_empty()`: `\"hello\"` → `\"\"`",
     "`string_fill()`: `\"\"` → `\"mutant\"`",
     "`numeric_increment()`: `5` → `6`",
     "`numeric_decrement()`: `5` → `4`",
+    "`index_increment()`: `x[i]` → `x[i + 1L]`",
+    "`index_decrement()`: `x[i]` → `x[i - 1L]`",
     "`negate_condition()`: `if (x > 0)` → `if (!(x > 0))`",
     "`remove_condition_negation()`: `if (!done)` → `if (done)`",
-    "`remove_negation()`: `!is.na(x)` → `is.na(x)`"
+    "`remove_negation()`: `!is.na(x)` → `is.na(x)`",
+    "`replace_return_value()`: `return(x)` → `return(NULL)`"
   )
 )
 

@@ -63,14 +63,18 @@ reference:
       - Mutator
       - operator
       - boolean_literal
+      - na_literal
       - call_name
       - string_empty
       - string_fill
       - numeric_increment
       - numeric_decrement
+      - index_increment
+      - index_decrement
       - negate_condition
       - remove_condition_negation
       - remove_negation
+      - replace_return_value
   - title: Mutator presets
     desc: Ready-made collections of related mutators for common bug categories.
     contents:

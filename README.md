@@ -190,14 +190,18 @@ A mutator describes one kind of code change. Pass a list of mutators to
 |:---|:---|:---|
 | `operator()` | Mutate a binary operator | `operator("+", "-")`: `a + b` → `a - b` |
 | `boolean_literal()` | Mutate a boolean literal | `boolean_literal("TRUE", "FALSE")`: `TRUE` → `FALSE` |
+| `na_literal()` | Mutate an NA or NULL literal | `na_literal("NA", "NULL")`: `NA` → `NULL` |
 | `call_name()` | Mutate a function call name | `call_name("any", "all")`: `any(x)` → `all(x)` |
 | `string_empty()` | Mutate non-empty string literals to the empty string | `string_empty()`: `"hello"` → `""` |
 | `string_fill()` | Mutate the empty string literal to a placeholder string | `string_fill()`: `""` → `"mutant"` |
 | `numeric_increment()` | Increment numeric literals | `numeric_increment()`: `5` → `6` |
 | `numeric_decrement()` | Decrement numeric literals | `numeric_decrement()`: `5` → `4` |
+| `index_increment()` | Increment subscript indices | `index_increment()`: `x[i]` → `x[i + 1L]` |
+| `index_decrement()` | Decrement subscript indices | `index_decrement()`: `x[i]` → `x[i - 1L]` |
 | `negate_condition()` | Negate the condition of if/while statements | `negate_condition()`: `if (x > 0)` → `if (!(x > 0))` |
 | `remove_condition_negation()` | Remove negation from the condition of if/while statements | `remove_condition_negation()`: `if (!done)` → `if (done)` |
 | `remove_negation()` | Remove logical negation | `remove_negation()`: `!is.na(x)` → `is.na(x)` |
+| `replace_return_value()` | Replace the value in explicit return() calls | `replace_return_value()`: `return(x)` → `return(NULL)` |
 
 **Preset collections** — return a ready-made list of `operator()`
 mutators

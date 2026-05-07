@@ -289,6 +289,80 @@ call_name("sum", "prod")  # sum(x) → prod(x)
 
 ---
 
+---
+
+## NA and NULL mutators
+
+### `na_literal()` — swap NA/NULL values
+
+```r
+na_literal("NA", "NULL")          # NA → NULL
+na_literal("NULL", "NA")          # NULL → NA
+na_literal("NA", "NA_real_")      # NA → NA_real_
+na_literal("NA_real_", "NA")      # NA_real_ → NA
+```
+
+**When to use:** Functions that accept or return `NA` or `NULL`, especially any
+code with `is.na()`, `is.null()`, or `na.rm` handling. Swapping `NA` for `NULL`
+(and vice versa) reveals whether callers distinguish between "value is missing"
+and "value is absent" — two distinct concepts that R treats very differently.
+
+Swapping between typed NAs (`NA_real_`, `NA_integer_`, `NA_character_`) and
+plain `NA` checks whether type-sensitive downstream code (e.g. `vapply`,
+`dplyr::mutate`) is covered.
+
+---
+
+## Return value mutators
+
+### `replace_return_value()` — replace explicit return values
+
+```r
+replace_return_value()       # return(x) → return(NULL)
+replace_return_value("NA")   # return(x) → return(NA)
+```
+
+**When to use:** Any function with explicit `return()` calls. Tests that only
+check that a function *runs without error* or *returns something* will not kill
+these mutants — only tests that assert the specific value returned will.
+
+A surviving `replace_return_value()` mutant means the caller never checks what
+came back from that branch. This is especially common in functions with multiple
+early-exit `return()` paths where only the happy path is tested.
+
+Only explicit `return(expr)` calls are targeted; implicit returns (the last
+expression of a function body) are not affected.
+
+---
+
+## Index and subscript mutators
+
+### `index_increment()` — shift subscript indices up by one
+
+```r
+index_increment()   # x[i] → x[i + 1L],  x[[i]] → x[[i + 1L]]
+```
+
+### `index_decrement()` — shift subscript indices down by one
+
+```r
+index_decrement()   # x[i] → x[i - 1L],  x[[i]] → x[[i - 1L]]
+```
+
+**When to use:** Functions that index into vectors or lists by position or by a
+computed variable. Off-by-one errors in indexing are among the most common
+silent bugs in R — they produce a different element rather than an error,
+so they pass all tests unless a specific element value is asserted.
+
+Only simple indices are mutated: plain identifiers (`x[i]`) and numeric
+literals (`x[1]`, `x[1L]`). Complex expressions like `x[a + b]` or `x[seq_len(n)]`
+are left untouched, keeping the mutant count focused and the signal-to-noise
+ratio high.
+
+Both single-bracket (`[`) and double-bracket (`[[`) indexing are covered.
+
+---
+
 ## Recommended starting set
 
 If you are unsure where to begin, this combination covers the most common real-world bug categories:
