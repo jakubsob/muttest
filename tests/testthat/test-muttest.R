@@ -19,3 +19,18 @@ test_that("operators", {
     )
   })
 })
+
+test_that("test runner errors are recorded as errors, not propagated", {
+  error_strategy <- R6::R6Class(
+    inherit = TestStrategy,
+    public = list(
+      execute = function(path, plan, reporter) stop("test runner crashed")
+    )
+  )$new()
+
+  .with_example_dir("operators/", {
+    p <- plan(list(operator("+", "-")), fs::dir_ls("R"))
+    score <- test_(p, test_strategy = error_strategy)
+    expect_equal(score, 0)
+  })
+})
