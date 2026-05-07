@@ -69,19 +69,6 @@ mutate_code <- function(code, mutator) {
 
   mutations <- list()
 
-  if (!is.null(mutator$per_match_fn)) {
-    # query_matches returns list[pattern] -> list[match] -> list(name, node)
-    pattern_matches <- treesitter::query_matches(query, root_node)
-    for (pattern in pattern_matches) {
-      for (m in pattern) {
-        mutated <- mutator$per_match_fn(code, m)
-        if (!is.null(mutated)) mutations <- append(mutations, list(mutated))
-      }
-    }
-    if (length(mutations) == 0) return(NULL)
-    return(mutations)
-  }
-
   captures <- treesitter::query_captures(query, root_node)
 
   if (length(captures$node) == 0) {

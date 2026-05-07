@@ -27,9 +27,6 @@ overrides the default \code{node_text == from} equality check.}
 
 \item{\code{replacement_fn}}{Optional \verb{function(node_text)} returning a string;
 overrides the static \code{to} value as the replacement text.}
-
-\item{\code{per_match_fn}}{Optional \verb{function(code, named_captures)} returning
-mutated code or \code{NULL} to skip; used for multi-node mutations.}
 }
 \if{html}{\out{</div>}}
 }
@@ -48,14 +45,7 @@ mutated code or \code{NULL} to skip; used for multi-node mutations.}
 \subsection{Method \code{new()}}{
 Create a new \code{Mutator}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Mutator$new(
-  from,
-  to,
-  query,
-  match_fn = NULL,
-  replacement_fn = NULL,
-  per_match_fn = NULL
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Mutator$new(from, to, query, match_fn = NULL, replacement_fn = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -70,8 +60,6 @@ Create a new \code{Mutator}.
 \item{\code{match_fn}}{Optional custom match function.}
 
 \item{\code{replacement_fn}}{Optional custom replacement function.}
-
-\item{\code{per_match_fn}}{Optional per-match function for multi-node mutations.}
 }
 \if{html}{\out{</div>}}
 }
