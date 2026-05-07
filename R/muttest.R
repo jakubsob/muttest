@@ -56,33 +56,45 @@ muttest <- function(
       dir <- copy_strategy$execute(getwd(), row)
       checkmate::assert_directory_exists(dir)
       on.exit(fs::dir_delete(dir))
-      withr::with_tempdir(tmpdir = dir, pattern = "", {
-        withr::with_dir(dir, {
-          temp_filename <- file.path(dir, filename)
-          writeLines(mutated_code, temp_filename)
 
-          test_results <- test_strategy$execute(
-            path = path,
-            plan = row,
-            reporter = reporter$test_reporter
-          )
-          checkmate::assert_class(test_results, "testthat_results")
-        })
-      })
+      test_results <- tryCatch(
+        withr::with_tempdir(tmpdir = dir, pattern = "", {
+          withr::with_dir(dir, {
+            temp_filename <- file.path(dir, filename)
+            writeLines(mutated_code, temp_filename)
 
-      test_results_tibble <- tibble::as_tibble(test_results)
-      killed <- as.numeric(sum(test_results_tibble$failed) > 0)
-      survived <- as.numeric(sum(test_results_tibble$failed) == 0)
-      errors <- sum(test_results_tibble$error)
-
-      reporter$add_result(
-        row,
-        killed,
-        survived,
-        errors,
-        original_code = row$original_code[[1]],
-        mutated_code  = mutated_code
+            results <- test_strategy$execute(
+              path = path,
+              plan = row,
+              reporter = reporter$test_reporter
+            )
+            checkmate::assert_class(results, "testthat_results")
+            results
+          })
+        }),
+        error = function(e) e
       )
+
+      if (inherits(test_results, "error")) {
+        reporter$add_result(
+          row,
+          killed   = 0,
+          survived = 0,
+          errors   = 1,
+          original_code = row$original_code[[1]],
+          mutated_code  = mutated_code
+        )
+      } else {
+        test_results_tibble <- tibble::as_tibble(test_results)
+        reporter$add_result(
+          row,
+          killed   = as.numeric(sum(test_results_tibble$failed) > 0),
+          survived = as.numeric(sum(test_results_tibble$failed) == 0),
+          errors   = sum(test_results_tibble$error),
+          original_code = row$original_code[[1]],
+          mutated_code  = mutated_code
+        )
+      }
       reporter$end_mutator()
       reporter$end_file()
     })
