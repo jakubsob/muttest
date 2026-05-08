@@ -18,7 +18,6 @@
 #'
 #' @export
 #' @md
-#' @importFrom rlang .data
 muttest <- function(
   plan,
   path = "tests/testthat",
@@ -49,10 +48,9 @@ muttest <- function(
 
   reporter$start_reporter(plan)
 
-  rows <- plan |>
-    dplyr::arrange(.data$filename, .data$mutator) |>
-    dplyr::rowwise() |>
-    dplyr::group_split()
+  mutator_key <- vapply(plan$mutator, function(m) m$from, character(1))
+  plan <- plan[order(plan$filename, mutator_key), ]
+  rows <- lapply(seq_len(nrow(plan)), function(i) plan[i, , drop = FALSE])
 
   mirai::daemons(workers)
   on.exit(mirai::daemons(0), add = TRUE)
@@ -74,9 +72,10 @@ muttest <- function(
     mirai::mirai(
       {
         # Reconstruct a minimal row so strategies can access $filename
-        minimal_row <- tibble::tibble(
+        minimal_row <- data.frame(
           filename = filename,
-          mutated_code = list(mutated_code)
+          mutated_code = I(list(mutated_code)),
+          stringsAsFactors = FALSE
         )
         dir <- copy_strategy$execute(wd, minimal_row)
         on.exit(fs::dir_delete(dir))
@@ -140,12 +139,12 @@ muttest <- function(
       mutated_code = mutated_code
     )
   } else {
-    tib <- tibble::as_tibble(test_results)
+    df <- as.data.frame(test_results)
     reporter$add_result(
       row,
-      killed = as.numeric(sum(tib$failed) > 0),
-      survived = as.numeric(sum(tib$failed) == 0),
-      errors = sum(tib$error),
+      killed = as.numeric(sum(df$failed) > 0),
+      survived = as.numeric(sum(df$failed) == 0),
+      errors = sum(df$error),
       original_code = row$original_code[[1]],
       mutated_code = mutated_code
     )
@@ -180,29 +179,31 @@ plan <- function(
 ) {
   checkmate::assert_file_exists(source_files, extension = c("R", "r"))
   checkmate::assert_list(mutators)
-  map_dfr <- purrr::compose(dplyr::bind_rows, purrr::map)
-  map_dfr(mutators, function(mutator) {
-    map_dfr(source_files, function(filename) {
+  rows <- list()
+  for (mutator in mutators) {
+    for (filename in source_files) {
       code_lines <- readLines(filename)
       mutations <- mutator$mutate(code_lines)
-      if (length(mutations) == 0) {
-        return(
-          tibble::tibble(
-            filename = character(),
-            original_code = list(character()),
-            mutated_code = list(character()),
-            mutator = list(mutator)
-          )
-        )
-      }
-      map_dfr(mutations, function(mutation) {
-        tibble::tibble(
+      for (mutation in mutations) {
+        row <- data.frame(
           filename = filename,
-          original_code = list(code_lines),
-          mutated_code = list(mutation),
-          mutator = list(mutator)
+          original_code = I(list(code_lines)),
+          mutated_code = I(list(mutation)),
+          mutator = I(list(mutator)),
+          stringsAsFactors = FALSE
         )
-      })
-    })
-  })
+        rows <- c(rows, list(row))
+      }
+    }
+  }
+  if (length(rows) == 0) {
+    return(data.frame(
+      filename = character(),
+      original_code = I(list()),
+      mutated_code = I(list()),
+      mutator = I(list()),
+      stringsAsFactors = FALSE
+    ))
+  }
+  do.call(rbind, rows)
 }

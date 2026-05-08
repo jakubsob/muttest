@@ -18,11 +18,11 @@
     Output
       i Mutation Testing
       |   K |   S |   E |   T |   % | Mutator  | File
-      x |   0 |   1 |   0 |   1 |   0 | + > -    | calculate.R
+      v |   1 |   0 |   0 |   1 | 100 | * > /    | calculate.R
+      x |   1 |   1 |   0 |   2 |  50 | + > -    | calculate.R
       Survived: calculate.R  + → -
       2-   (x + y) * 0
       2+   (x - y) * 0
-      v |   1 |   1 |   0 |   2 |  50 | * > /    | calculate.R
       -- Results ---------------------------------------------------------------------
       [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
 
@@ -34,8 +34,8 @@
     Output
       i Mutation Testing
       |   K |   S |   E |   T |   % | Mutator  | File
-      x |   0 |   1 |   0 |   1 |   0 | + > -    | calculate.R
-      v |   1 |   1 |   0 |   2 |  50 | * > /    | calculate.R
+      v |   1 |   0 |   0 |   1 | 100 | * > /    | calculate.R
+      x |   1 |   1 |   0 |   2 |  50 | + > -    | calculate.R
       -- Survived Mutants ------------------------------------------------------------
       Survived: calculate.R  + → -
       2-   (x + y) * 0
@@ -51,11 +51,11 @@
     Output
       i Mutation Testing
       |   K |   S |   E |   T |   % | Mutator  | File
-      x |   0 |   1 |   0 |   1 |   0 | + > -    | calculate.R
+      v |   1 |   0 |   0 |   1 | 100 | * > /    | calculate.R
+      x |   1 |   1 |   0 |   2 |  50 | + > -    | calculate.R
       Survived: calculate.R  + → -
       2-   (x + y) * 0
       2+   (x - y) * 0
-      v |   1 |   1 |   0 |   2 |  50 | * > /    | calculate.R
       -- Survived Mutants ------------------------------------------------------------
       Survived: calculate.R  + → -
       2-   (x + y) * 0
@@ -71,8 +71,8 @@
     Output
       i Mutation Testing
       |   K |   S |   E |   T |   % | Mutator  | File
-      x |   0 |   1 |   0 |   1 |   0 | + > -    | calculate.R
-      v |   1 |   1 |   0 |   2 |  50 | * > /    | calculate.R
+      v |   1 |   0 |   0 |   1 | 100 | * > /    | calculate.R
+      x |   1 |   1 |   0 |   2 |  50 | + > -    | calculate.R
       -- Results ---------------------------------------------------------------------
       [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
 

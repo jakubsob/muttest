@@ -24,14 +24,11 @@ Depends:
 Imports:
     checkmate,
     cli,
-    dplyr,
     fs,
     mirai,
-    purrr,
     R6,
     rlang,
     testthat,
-    tibble,
     treesitter,
     treesitter.r,
     withr
@@ -43,6 +40,7 @@ Suggests:
     cucumber (>= 2.1.0),
     ggplot2,
     knitr,
+    purrr,
     rmarkdown,
     shiny,
     stringr

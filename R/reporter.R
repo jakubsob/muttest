@@ -121,10 +121,9 @@ MutationReporter <- R6::R6Class(
       if (!is.null(error)) {
         self$error_messages <- c(self$error_messages, list(conditionMessage(error)))
       }
-      killed_counts <- purrr::map(self$results, "killed")
-      total_counts <- purrr::map(self$results, "total")
-      self$current_score <- sum(as.numeric(killed_counts)) /
-        sum(as.numeric(total_counts))
+      self$current_score <-
+        sum(vapply(self$results, `[[`, numeric(1), "killed")) /
+        sum(vapply(self$results, `[[`, numeric(1), "total"))
     },
 
     #' @description Update status (no-op in base class)

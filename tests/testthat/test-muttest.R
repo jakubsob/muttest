@@ -6,7 +6,8 @@
 }
 
 test_ <- function(...) {
-  purrr::quietly(muttest)(...)$result
+  capture.output(result <- suppressMessages(suppressWarnings(muttest(...))), type = "output")
+  result
 }
 
 test_that("operators", {
@@ -25,14 +26,14 @@ test_that("timeout on infinite loop is recorded as error", {
   .with_example_dir("operators/", {
     original <- readLines("R/calculate.R")
     mutated <- c("calculate <- function(x, y) {", "  while (TRUE) {}", "}")
-    p <- tibble::tibble(
+    p <- data.frame(
       filename = "R/calculate.R",
-      original_code = list(original),
-      mutated_code = list(mutated),
-      mutator = list(negate_condition("while"))
+      original_code = I(list(original)),
+      mutated_code = I(list(mutated)),
+      mutator = I(list(negate_condition("while")))
     )
     reporter <- MutationReporter$new()
-    purrr::quietly(muttest)(p, reporter = reporter, timeout = 400)
+    capture.output(suppressMessages(suppressWarnings(muttest(p, reporter = reporter, timeout = 400))), type = "output")
     expect_equal(reporter$results[["R/calculate.R"]]$errors, 1)
     expect_equal(reporter$error_messages[[1]], "Timed out")
   })

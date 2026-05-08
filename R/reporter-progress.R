@@ -379,7 +379,7 @@ ProgressMutationReporter <- R6::R6Class(
         }
       }
 
-      results <- dplyr::bind_rows(self$results)
+      results <- do.call(rbind, lapply(self$results, as.data.frame))
       k <- sum(results$killed)
       s <- sum(results$survived)
       t <- sum(results$total)

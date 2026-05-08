@@ -49,7 +49,7 @@ PackageCopyStrategy <- R6::R6Class(
       )
       dirs_to_copy <- dirs_to_copy[!grepl("^\\.|tmp|temp", dirs_to_copy)]
 
-      purrr::walk(dirs_to_copy, function(dir) {
+      lapply(dirs_to_copy, function(dir) {
         src_path <- file.path(original_dir, dir)
         if (dir.exists(src_path)) {
           fs::dir_copy(
@@ -62,7 +62,7 @@ PackageCopyStrategy <- R6::R6Class(
 
       files <- fs::dir_ls(original_dir, type = "file")
       files <- fs::path_rel(files, original_dir)
-      purrr::walk(files, function(x) {
+      lapply(files, function(x) {
         fs::file_copy(
           x,
           file.path(temp_dir, x),
