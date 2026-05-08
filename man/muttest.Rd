@@ -9,7 +9,8 @@ muttest(
   path = "tests/testthat",
   reporter = default_reporter(),
   test_strategy = default_test_strategy(),
-  copy_strategy = default_copy_strategy()
+  copy_strategy = default_copy_strategy(),
+  workers = 1
 )
 }
 \arguments{
@@ -25,6 +26,9 @@ We can run all tests for each mutant, or only tests that are relevant to the mut
 
 \item{copy_strategy}{Strategy for copying the project. See \code{?CopyStrategy}.
 This strategy controls which files are copied to the temporary directory, where the tests are run.}
+
+\item{workers}{Number of parallel workers. When greater than 1, mutants are tested
+concurrently using \code{mirai} daemons. Defaults to 1 (sequential).}
 }
 \value{
 A numeric value representing the mutation score.

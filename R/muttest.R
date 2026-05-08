@@ -8,6 +8,8 @@
 #'   We can run all tests for each mutant, or only tests that are relevant to the mutant.
 #' @param copy_strategy Strategy for copying the project. See `?CopyStrategy`.
 #'   This strategy controls which files are copied to the temporary directory, where the tests are run.
+#' @param workers Number of parallel workers. When greater than 1, mutants are tested
+#'   concurrently using `mirai` daemons. Defaults to 1 (sequential).
 #'
 #' @return A numeric value representing the mutation score.
 #'
@@ -19,7 +21,8 @@ muttest <- function(
   path = "tests/testthat",
   reporter = default_reporter(),
   test_strategy = default_test_strategy(),
-  copy_strategy = default_copy_strategy()
+  copy_strategy = default_copy_strategy(),
+  workers = 1
 ) {
   checkmate::assert_directory_exists(path)
   checkmate::assert(
@@ -33,6 +36,7 @@ muttest <- function(
   checkmate::assert_class(reporter, "MutationReporter")
   checkmate::assert_class(test_strategy, "TestStrategy", null.ok = TRUE)
   checkmate::assert_class(copy_strategy, "CopyStrategy")
+  checkmate::assert_count(workers, positive = TRUE)
 
   if (nrow(plan) == 0) {
     return(invisible(NA_real_))
@@ -40,11 +44,74 @@ muttest <- function(
 
   reporter$start_reporter(plan)
 
-  plan |>
+  rows <- plan |>
     dplyr::arrange(.data$filename, .data$mutator) |>
     dplyr::rowwise() |>
-    dplyr::group_split() |>
-    purrr::walk(\(row) {
+    dplyr::group_split()
+
+  if (workers > 1) {
+    mirai::daemons(workers)
+    on.exit(mirai::daemons(0), add = TRUE)
+
+    wd <- getwd()
+    test_reporter <- reporter$test_reporter
+
+    tasks <- lapply(rows, function(row) {
+      reporter$start_file(row$filename)
+      reporter$start_mutator(row$mutator[[1]])
+      reporter$update(force = TRUE)
+
+      filename <- row$filename
+      mutated_code <- row$mutated_code[[1]]
+
+      # Pass only plain serializable data — row$mutator contains treesitter
+      # C-level objects that cannot cross process boundaries.
+      mirai::mirai(
+        {
+          # Reconstruct a minimal row so strategies can access $filename
+          minimal_row <- tibble::tibble(
+            filename = filename,
+            mutated_code = list(mutated_code)
+          )
+          dir <- copy_strategy$execute(wd, minimal_row)
+          on.exit(fs::dir_delete(dir))
+          test_results <- tryCatch(
+            withr::with_tempdir(tmpdir = dir, pattern = "", {
+              withr::with_dir(dir, {
+                writeLines(mutated_code, file.path(dir, filename))
+                test_strategy$execute(path, minimal_row, test_reporter)
+              })
+            }),
+            error = function(e) e
+          )
+          list(test_results = test_results)
+        },
+        copy_strategy = copy_strategy,
+        test_strategy = test_strategy,
+        wd = wd,
+        filename = filename,
+        mutated_code = mutated_code,
+        path = path,
+        test_reporter = test_reporter
+      )
+    })
+
+    for (i in seq_along(tasks)) {
+      res <- tasks[[i]][] # blocks until the task resolves
+      row <- rows[[i]]
+      if (mirai::is_error_value(res)) {
+        .record_result(
+          reporter,
+          row,
+          simpleError(format(res)),
+          row$mutated_code[[1]]
+        )
+      } else {
+        .record_result(reporter, row, res$test_results, row$mutated_code[[1]])
+      }
+    }
+  } else {
+    purrr::walk(rows, function(row) {
       mutator <- row$mutator[[1]]
       filename <- row$filename
       mutated_code <- row$mutated_code[[1]]
@@ -62,7 +129,6 @@ muttest <- function(
           withr::with_dir(dir, {
             temp_filename <- file.path(dir, filename)
             writeLines(mutated_code, temp_filename)
-
             results <- test_strategy$execute(
               path = path,
               plan = row,
@@ -74,33 +140,37 @@ muttest <- function(
         }),
         error = function(e) e
       )
-
-      if (inherits(test_results, "error")) {
-        reporter$add_result(
-          row,
-          killed   = 0,
-          survived = 0,
-          errors   = 1,
-          original_code = row$original_code[[1]],
-          mutated_code  = mutated_code
-        )
-      } else {
-        test_results_tibble <- tibble::as_tibble(test_results)
-        reporter$add_result(
-          row,
-          killed   = as.numeric(sum(test_results_tibble$failed) > 0),
-          survived = as.numeric(sum(test_results_tibble$failed) == 0),
-          errors   = sum(test_results_tibble$error),
-          original_code = row$original_code[[1]],
-          mutated_code  = mutated_code
-        )
-      }
-      reporter$end_mutator()
-      reporter$end_file()
+      .record_result(reporter, row, test_results, mutated_code)
     })
+  }
 
   reporter$end_reporter()
   invisible(reporter$get_score())
+}
+
+.record_result <- function(reporter, row, test_results, mutated_code) {
+  if (inherits(test_results, "error")) {
+    reporter$add_result(
+      row,
+      killed = 0,
+      survived = 0,
+      errors = 1,
+      original_code = row$original_code[[1]],
+      mutated_code = mutated_code
+    )
+  } else {
+    tib <- tibble::as_tibble(test_results)
+    reporter$add_result(
+      row,
+      killed = as.numeric(sum(tib$failed) > 0),
+      survived = as.numeric(sum(tib$failed) == 0),
+      errors = sum(tib$error),
+      original_code = row$original_code[[1]],
+      mutated_code = mutated_code
+    )
+  }
+  reporter$end_mutator()
+  reporter$end_file()
 }
 
 #' Create a plan for mutation testing
