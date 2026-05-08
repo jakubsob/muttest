@@ -10,7 +10,8 @@ muttest(
   reporter = default_reporter(),
   test_strategy = default_test_strategy(),
   copy_strategy = default_copy_strategy(),
-  workers = 1
+  workers = 1,
+  timeout = 600 * 1000
 )
 }
 \arguments{
@@ -29,6 +30,10 @@ This strategy controls which files are copied to the temporary directory, where 
 
 \item{workers}{Number of parallel workers. When greater than 1, mutants are tested
 concurrently using \code{mirai} daemons. Defaults to 1 (sequential).}
+
+\item{timeout}{Per-mutant timeout in milliseconds. If a mutant's test run exceeds this
+limit the daemon is interrupted and the result is recorded as an error.
+Use \code{Inf} to disable. Defaults to 600000 (10 minutes).}
 }
 \value{
 A numeric value representing the mutation score.

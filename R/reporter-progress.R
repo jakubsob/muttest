@@ -233,6 +233,7 @@ ProgressMutationReporter <- R6::R6Class(
     #' @param killed Whether the mutation was killed by tests
     #' @param survived Number of survived mutations
     #' @param errors Number of errors encountered
+    #' @param error Optional error condition from a failed run
     #' @param original_code Original source lines before mutation
     #' @param mutated_code Mutated source lines
     add_result = function(
@@ -240,10 +241,11 @@ ProgressMutationReporter <- R6::R6Class(
       killed,
       survived,
       errors,
+      error = NULL,
       original_code = NULL,
       mutated_code = NULL
     ) {
-      super$add_result(plan, killed, survived, errors)
+      super$add_result(plan, killed, survived, errors, error)
 
       status_symbol <- if (killed) {
         cli::col_green(cli::symbol$tick)

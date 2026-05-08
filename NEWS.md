@@ -13,6 +13,7 @@
 - ✨ `ProgressMutationReporter` now reports survived mutants.
 - ✨ Expose `Mutator` base class for building custom mutators.
 - ✨ `muttest()` supports parallel execution of mutants.
+- ✨ `muttest()` supports per-mutant timeouts to avoid hanging test runs.
 - 🥅 Improved error handling when test execution fails.
 
 # 0.1.0

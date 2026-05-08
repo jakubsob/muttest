@@ -20,6 +20,24 @@ test_that("operators", {
   })
 })
 
+test_that("timeout on infinite loop is recorded as error", {
+  skip_on_cran()
+  .with_example_dir("operators/", {
+    original <- readLines("R/calculate.R")
+    mutated <- c("calculate <- function(x, y) {", "  while (TRUE) {}", "}")
+    p <- tibble::tibble(
+      filename = "R/calculate.R",
+      original_code = list(original),
+      mutated_code = list(mutated),
+      mutator = list(negate_condition("while"))
+    )
+    reporter <- MutationReporter$new()
+    purrr::quietly(muttest)(p, reporter = reporter, timeout = 400)
+    expect_equal(reporter$results[["R/calculate.R"]]$errors, 1)
+    expect_equal(reporter$error_messages[[1]], "Timed out")
+  })
+})
+
 test_that("test runner errors are recorded as errors, not propagated", {
   error_strategy <- R6::R6Class(
     inherit = TestStrategy,

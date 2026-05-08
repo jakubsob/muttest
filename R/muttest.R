@@ -10,6 +10,9 @@
 #'   This strategy controls which files are copied to the temporary directory, where the tests are run.
 #' @param workers Number of parallel workers. When greater than 1, mutants are tested
 #'   concurrently using `mirai` daemons. Defaults to 1 (sequential).
+#' @param timeout Per-mutant timeout in milliseconds. If a mutant's test run exceeds this
+#'   limit the daemon is interrupted and the result is recorded as an error.
+#'   Use `Inf` to disable. Defaults to 600000 (10 minutes).
 #'
 #' @return A numeric value representing the mutation score.
 #'
@@ -22,7 +25,8 @@ muttest <- function(
   reporter = default_reporter(),
   test_strategy = default_test_strategy(),
   copy_strategy = default_copy_strategy(),
-  workers = 1
+  workers = 1,
+  timeout = 600 * 1000
 ) {
   checkmate::assert_directory_exists(path)
   checkmate::assert(
@@ -37,6 +41,7 @@ muttest <- function(
   checkmate::assert_class(test_strategy, "TestStrategy", null.ok = TRUE)
   checkmate::assert_class(copy_strategy, "CopyStrategy")
   checkmate::assert_count(workers, positive = TRUE)
+  checkmate::assert_number(timeout, lower = 0)
 
   if (nrow(plan) == 0) {
     return(invisible(NA_real_))
@@ -49,99 +54,74 @@ muttest <- function(
     dplyr::rowwise() |>
     dplyr::group_split()
 
-  if (workers > 1) {
-    mirai::daemons(workers)
-    on.exit(mirai::daemons(0), add = TRUE)
+  mirai::daemons(workers)
+  on.exit(mirai::daemons(0), add = TRUE)
 
-    wd <- getwd()
-    test_reporter <- reporter$test_reporter
+  wd <- getwd()
+  test_reporter <- reporter$test_reporter
+  timeout_ms <- if (is.finite(timeout)) as.integer(timeout) else NULL
 
-    tasks <- lapply(rows, function(row) {
-      reporter$start_file(row$filename)
-      reporter$start_mutator(row$mutator[[1]])
-      reporter$update(force = TRUE)
+  tasks <- lapply(rows, function(row) {
+    reporter$start_file(row$filename)
+    reporter$start_mutator(row$mutator[[1]])
+    reporter$update(force = TRUE)
 
-      filename <- row$filename
-      mutated_code <- row$mutated_code[[1]]
+    filename <- row$filename
+    mutated_code <- row$mutated_code[[1]]
 
-      # Pass only plain serializable data — row$mutator contains treesitter
-      # C-level objects that cannot cross process boundaries.
-      mirai::mirai(
-        {
-          # Reconstruct a minimal row so strategies can access $filename
-          minimal_row <- tibble::tibble(
-            filename = filename,
-            mutated_code = list(mutated_code)
-          )
-          dir <- copy_strategy$execute(wd, minimal_row)
-          on.exit(fs::dir_delete(dir))
-          test_results <- tryCatch(
-            withr::with_tempdir(tmpdir = dir, pattern = "", {
-              withr::with_dir(dir, {
-                writeLines(mutated_code, file.path(dir, filename))
-                test_strategy$execute(path, minimal_row, test_reporter)
-              })
-            }),
-            error = function(e) e
-          )
-          list(test_results = test_results)
-        },
-        copy_strategy = copy_strategy,
-        test_strategy = test_strategy,
-        wd = wd,
-        filename = filename,
-        mutated_code = mutated_code,
-        path = path,
-        test_reporter = test_reporter
-      )
-    })
-
-    for (i in seq_along(tasks)) {
-      res <- tasks[[i]][] # blocks until the task resolves
-      row <- rows[[i]]
-      if (mirai::is_error_value(res)) {
-        .record_result(
-          reporter,
-          row,
-          simpleError(format(res)),
-          row$mutated_code[[1]]
+    # Pass only plain serializable data — row$mutator contains treesitter
+    # C-level objects that cannot cross process boundaries.
+    mirai::mirai(
+      {
+        # Reconstruct a minimal row so strategies can access $filename
+        minimal_row <- tibble::tibble(
+          filename = filename,
+          mutated_code = list(mutated_code)
         )
-      } else {
-        .record_result(reporter, row, res$test_results, row$mutated_code[[1]])
-      }
-    }
-  } else {
-    purrr::walk(rows, function(row) {
-      mutator <- row$mutator[[1]]
-      filename <- row$filename
-      mutated_code <- row$mutated_code[[1]]
+        dir <- copy_strategy$execute(wd, minimal_row)
+        on.exit(fs::dir_delete(dir))
+        test_results <- tryCatch(
+          withr::with_tempdir(tmpdir = dir, pattern = "", {
+            withr::with_dir(dir, {
+              writeLines(mutated_code, file.path(dir, filename))
+              test_strategy$execute(path, minimal_row, test_reporter)
+            })
+          }),
+          error = function(e) e
+        )
+        list(test_results = test_results)
+      },
+      copy_strategy = copy_strategy,
+      test_strategy = test_strategy,
+      wd = wd,
+      filename = filename,
+      mutated_code = mutated_code,
+      path = path,
+      test_reporter = test_reporter,
+      .timeout = timeout_ms
+    )
+  })
 
-      reporter$start_file(filename)
-      reporter$start_mutator(mutator)
-      reporter$update(force = TRUE)
-
-      dir <- copy_strategy$execute(getwd(), row)
-      checkmate::assert_directory_exists(dir)
-      on.exit(fs::dir_delete(dir))
-
-      test_results <- tryCatch(
-        withr::with_tempdir(tmpdir = dir, pattern = "", {
-          withr::with_dir(dir, {
-            temp_filename <- file.path(dir, filename)
-            writeLines(mutated_code, temp_filename)
-            results <- test_strategy$execute(
-              path = path,
-              plan = row,
-              reporter = reporter$test_reporter
-            )
-            checkmate::assert_class(results, "testthat_results")
-            results
-          })
-        }),
-        error = function(e) e
+  for (i in seq_along(tasks)) {
+    res <- tasks[[i]][] # blocks until the task resolves
+    row <- rows[[i]]
+    if (mirai::is_error_value(res) && !mirai::is_mirai_error(res)) {
+      .record_result(
+        reporter,
+        row,
+        simpleError("Timed out"),
+        row$mutated_code[[1]]
       )
-      .record_result(reporter, row, test_results, mutated_code)
-    })
+    } else if (mirai::is_error_value(res)) {
+      .record_result(
+        reporter,
+        row,
+        simpleError(format(res)),
+        row$mutated_code[[1]]
+      )
+    } else {
+      .record_result(reporter, row, res$test_results, row$mutated_code[[1]])
+    }
   }
 
   reporter$end_reporter()
@@ -155,6 +135,7 @@ muttest <- function(
       killed = 0,
       survived = 0,
       errors = 1,
+      error = test_results,
       original_code = row$original_code[[1]],
       mutated_code = mutated_code
     )

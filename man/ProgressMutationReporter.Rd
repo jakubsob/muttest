@@ -183,6 +183,7 @@ Add a mutation test result
   killed,
   survived,
   errors,
+  error = NULL,
   original_code = NULL,
   mutated_code = NULL
 )}\if{html}{\out{</div>}}
@@ -198,6 +199,8 @@ Add a mutation test result
 \item{\code{survived}}{Number of survived mutations}
 
 \item{\code{errors}}{Number of errors encountered}
+
+\item{\code{error}}{Optional error condition from a failed run}
 
 \item{\code{original_code}}{Original source lines before mutation}
 

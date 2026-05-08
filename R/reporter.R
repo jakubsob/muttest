@@ -16,6 +16,7 @@
 #' @field plan Complete mutation plan for the test run
 #' @field results List of mutation test results, indexed by file path
 #' @field current_score Current score of the mutation tests
+#' @field error_messages List of error messages from failed mutant runs
 #'
 #' @md
 #' @export
@@ -46,6 +47,7 @@ MutationReporter <- R6::R6Class(
     # Track mutations by file
     results = NULL,
     current_score = NA_real_,
+    error_messages = list(),
 
     #' @description Initialize a new reporter
     #' @param test_reporter Reporter to use for the testthat::test_dir function
@@ -69,6 +71,7 @@ MutationReporter <- R6::R6Class(
       self$plan <- plan
       self$results <- list()
       self$current_score <- NA_real_
+      self$error_messages <- list()
     },
 
     #' @description Start testing a file
@@ -95,6 +98,7 @@ MutationReporter <- R6::R6Class(
     #' @param killed Whether the mutation was killed by tests
     #' @param survived Number of survived mutations
     #' @param errors Number of errors encountered
+    #' @param error Optional error condition from a failed run
     #' @param original_code Original source lines before mutation
     #' @param mutated_code Mutated source lines
     add_result = function(
@@ -102,6 +106,7 @@ MutationReporter <- R6::R6Class(
       killed,
       survived,
       errors,
+      error = NULL,
       original_code = NULL,
       mutated_code = NULL
     ) {
@@ -113,11 +118,18 @@ MutationReporter <- R6::R6Class(
         survived
       self$results[[filename]]$errors <- self$results[[filename]]$errors +
         errors
+      if (!is.null(error)) {
+        self$error_messages <- c(self$error_messages, list(conditionMessage(error)))
+      }
       killed_counts <- purrr::map(self$results, "killed")
       total_counts <- purrr::map(self$results, "total")
       self$current_score <- sum(as.numeric(killed_counts)) /
         sum(as.numeric(total_counts))
     },
+
+    #' @description Update status (no-op in base class)
+    #' @param force Ignored
+    update = function(force = FALSE) {},
 
     #' @description End testing with current mutator
     end_mutator = function() {
@@ -130,8 +142,7 @@ MutationReporter <- R6::R6Class(
     },
 
     #' @description End reporter and show summary
-    end_reporter = function() {
-    },
+    end_reporter = function() {},
 
     #' @description Get the current score
     get_score = function() {

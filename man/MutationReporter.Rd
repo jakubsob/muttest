@@ -39,6 +39,8 @@ Other MutationReporter:
 \item{\code{results}}{List of mutation test results, indexed by file path}
 
 \item{\code{current_score}}{Current score of the mutation tests}
+
+\item{\code{error_messages}}{List of error messages from failed mutant runs}
 }
 \if{html}{\out{</div>}}
 }
@@ -50,6 +52,7 @@ Other MutationReporter:
 \item \href{#method-MutationReporter-start_file}{\code{MutationReporter$start_file()}}
 \item \href{#method-MutationReporter-start_mutator}{\code{MutationReporter$start_mutator()}}
 \item \href{#method-MutationReporter-add_result}{\code{MutationReporter$add_result()}}
+\item \href{#method-MutationReporter-update}{\code{MutationReporter$update()}}
 \item \href{#method-MutationReporter-end_mutator}{\code{MutationReporter$end_mutator()}}
 \item \href{#method-MutationReporter-end_file}{\code{MutationReporter$end_file()}}
 \item \href{#method-MutationReporter-end_reporter}{\code{MutationReporter$end_reporter()}}
@@ -143,6 +146,7 @@ Add a mutation test result
   killed,
   survived,
   errors,
+  error = NULL,
   original_code = NULL,
   mutated_code = NULL
 )}\if{html}{\out{</div>}}
@@ -159,9 +163,28 @@ Add a mutation test result
 
 \item{\code{errors}}{Number of errors encountered}
 
+\item{\code{error}}{Optional error condition from a failed run}
+
 \item{\code{original_code}}{Original source lines before mutation}
 
 \item{\code{mutated_code}}{Mutated source lines}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MutationReporter-update"></a>}}
+\if{latex}{\out{\hypertarget{method-MutationReporter-update}{}}}
+\subsection{Method \code{update()}}{
+Update status (no-op in base class)
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MutationReporter$update(force = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{force}}{Ignored}
 }
 \if{html}{\out{</div>}}
 }
