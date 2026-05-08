@@ -75,6 +75,7 @@ reference:
       - remove_condition_negation
       - remove_negation
       - replace_return_value
+      - delete_statement
   - title: Mutator presets
     desc: Ready-made collections of related mutators for common bug categories.
     contents:

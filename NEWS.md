@@ -9,6 +9,7 @@
   - `call_name` — call name mutator.
   - `remove_negation` — unary negation mutator.
   - `replace_return_value` — return value mutator.
+  - `delete_statement` — removes assignments and standalone calls one at a time to catch untested side effects and dead assignments.
 - ✨ Mutators are now parametrized and accept configuration arguments.
 - ✨ `ProgressMutationReporter` now reports survived mutants.
 - ✨ Expose `Mutator` base class for building custom mutators.

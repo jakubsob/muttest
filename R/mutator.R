@@ -20,6 +20,9 @@ Mutator <- R6::R6Class(
     #' @field replacement_fn Optional `function(node_text)` returning a string;
     #'   overrides the static `to` value as the replacement text.
     replacement_fn = NULL,
+    #' @field mutate_fn Optional `function(code)` that fully replaces the
+    #'   default mutation logic when set.
+    mutate_fn = NULL,
 
     #' @description Create a new `Mutator`.
     #' @param from Token to replace.
@@ -27,14 +30,22 @@ Mutator <- R6::R6Class(
     #' @param query Tree-sitter query string.
     #' @param match_fn Optional custom match function.
     #' @param replacement_fn Optional custom replacement function.
-    initialize = function(from, to, query,
-                          match_fn = NULL,
-                          replacement_fn = NULL) {
+    #' @param mutate_fn Optional `function(code)` that fully overrides the
+    #'   default mutation logic.
+    initialize = function(
+      from,
+      to,
+      query,
+      match_fn = NULL,
+      replacement_fn = NULL,
+      mutate_fn = NULL
+    ) {
       self$from <- from
       self$to <- to
       self$query <- query
       self$match_fn <- match_fn
       self$replacement_fn <- replacement_fn
+      self$mutate_fn <- mutate_fn
     },
 
     #' @description Apply this mutator to a character vector of source lines.
@@ -42,7 +53,11 @@ Mutator <- R6::R6Class(
     #' @return A list of mutated code variants (one per match), or `NULL` if
     #'   the pattern was not found.
     mutate = function(code) {
-      mutate_code(code, self)
+      if (!is.null(self$mutate_fn)) {
+        self$mutate_fn(code)
+      } else {
+        mutate_code(code, self)
+      }
     },
 
     # nocov start
