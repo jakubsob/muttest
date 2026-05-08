@@ -1,3 +1,20 @@
+# 0.2.0
+
+- ✨ Add new built-in mutators:
+  - `arithmetic_operators`, `comparison_operators`, `logical_operators` — operator family mutators.
+  - `boolean_literal`, `na_literal` — literal replacement mutators.
+  - `negate_condition`, `remove_condition_negation` — condition mutators.
+  - `numeric_increment`, `numeric_decrement`, `index_increment`, `index_decrement` — increment/decrement mutators.
+  - `string_empty`, `string_fill` — string mutators.
+  - `call_name` — call name mutator.
+  - `remove_negation` — unary negation mutator.
+  - `replace_return_value` — return value mutator.
+- ✨ Mutators are now parametrized and accept configuration arguments.
+- ✨ `ProgressMutationReporter` now reports survived mutants.
+- ✨ Expose `Mutator` base class for building custom mutators.
+- ✨ `muttest()` supports parallel execution of mutants.
+- 🥅 Improved error handling when test execution fails.
+
 # 0.1.0
 
 - ✨ Create a testing plan with `plan`.
