@@ -1,8 +1,7 @@
 on:
   push:
-    branches:
-      - main
-      - dev
+    branches: [main, master, dev]
+  pull_request:
 
 name: test-mutation.yaml
 permissions: write-all
