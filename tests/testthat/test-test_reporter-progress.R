@@ -1,27 +1,3 @@
-.with_example_dir <- function(path, code) {
-  withr::with_dir(
-    system.file("examples", path, package = "muttest"),
-    code
-  )
-}
-
-test_ <- function(...) {
-  purrr::quietly(test)(...)$result
-}
-
-.expect_snapshot <- purrr::partial(
-  testthat::expect_snapshot,
-  transform = function(lines) {
-    lines |>
-      stringr::str_subset("^[\\|/\\-\\\\] \\|", negate = TRUE) |>
-      stringr::str_subset("^$", negate = TRUE) |>
-      stringr::str_remove_all("\\s\\[\\d+.\\d+s\\]") |>
-      stringr::str_remove_all("Duration:\\s\\d+.\\d+\\ss") |>
-      stringr::str_trim()
-  },
-  variant = ifelse(testthat::is_checking(), "check", "local")
-)
-
 test_that("progress reporter shows all killed", {
   .with_example_dir("operators/", {
     mutators <- list(operator("+", "-"))

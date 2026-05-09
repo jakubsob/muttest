@@ -72,7 +72,7 @@ describe("na_literal: typed NAs", {
 
   it("should replace NA_character_ with NA", {
     mutator <- na_literal("NA_character_", "NA")
-    expect_mutates_to(mutator, c('x <- NA_character_'), list(c('x <- NA')))
+    expect_mutates_to(mutator, c("x <- NA_character_"), list(c("x <- NA")))
   })
 
   it("should not match plain NA when targeting NA_real_", {

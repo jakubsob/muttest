@@ -220,10 +220,7 @@ print.muttest_plan <- function(x, ..., nrows = 10) {
     nrow(x),
     length(unique(x$filename))
   ))
-  display <- head(
-    x[, c("filename", "mutator")],
-    n = nrows
-  )
+  display <- x[seq_len(min(nrows, nrow(x))), c("filename", "mutator")]
   display$mutator <- vapply(
     display$mutator,
     function(m) paste0(m$from, " -> ", m$to),

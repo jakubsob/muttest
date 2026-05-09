@@ -44,7 +44,6 @@ info_oneline <- function(m) {
 
 replace_with <- function(code, node, replacement_text) {
   start_point <- treesitter::node_start_point(node)
-  end_point   <- treesitter::node_end_point(node)
   original_text <- treesitter::node_text(node)
   code[start_point$row + 1] <- paste0(
     substr(code[start_point$row + 1], 1, start_point$column),
