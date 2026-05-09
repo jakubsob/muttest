@@ -18,6 +18,5 @@
       stringr::str_remove_all("\\s\\[\\d+.\\d+s\\]") |>
       stringr::str_remove_all("Duration:\\s\\d+.\\d+\\ss") |>
       stringr::str_trim()
-  },
-  variant = ifelse(testthat::is_checking(), "check", "local")
+  }
 )
