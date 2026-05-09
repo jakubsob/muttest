@@ -1,4 +1,4 @@
-Feature: New mutator types
+Feature: Mutators
 
   Acceptance tests for every mutator family added beyond the basic operator() mutator.
   Each scenario verifies that well-written tests can kill the relevant mutant (score = 1.0).
