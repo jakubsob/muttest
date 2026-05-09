@@ -29,6 +29,7 @@ muttest <- function(
 ) {
   checkmate::assert_directory_exists(path)
   checkmate::assert(
+    checkmate::check_multi_class(plan, "muttest_plan"),
     checkmate::check_data_frame(plan),
     checkmate::check_set_equal(
       c("filename", "original_code", "mutated_code", "mutator"),
@@ -197,13 +198,39 @@ plan <- function(
     }
   }
   if (length(rows) == 0) {
-    return(data.frame(
+    return(muttest_plan(data.frame(
       filename = character(),
       original_code = I(list()),
       mutated_code = I(list()),
       mutator = I(list()),
       stringsAsFactors = FALSE
-    ))
+    )))
   }
-  do.call(rbind, rows)
+  muttest_plan(do.call(rbind, rows))
+}
+
+muttest_plan <- function(x) {
+  structure(x, class = c("muttest_plan", "data.frame"))
+}
+
+#' @export
+print.muttest_plan <- function(x, ..., nrows = 10) {
+  cat(sprintf(
+    "Mutation test plan with %d mutants across %d files:\n",
+    nrow(x),
+    length(unique(x$filename))
+  ))
+  display <- head(
+    x[, c("filename", "mutator")],
+    n = nrows
+  )
+  display$mutator <- vapply(
+    display$mutator,
+    function(m) paste0(m$from, " -> ", m$to),
+    character(1)
+  )
+  print.data.frame(display, row.names = FALSE)
+  if (nrow(x) > nrows) {
+    cat(sprintf("... and %d more mutants\n", nrow(x) - nrows))
+  }
 }

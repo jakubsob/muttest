@@ -1,21 +1,16 @@
-.with_example_dir <- function(path, code) {
-  withr::with_dir(
-    system.file("examples", path, package = "muttest"),
-    code
-  )
-}
-
-test_ <- function(...) {
-  capture.output(result <- suppressMessages(suppressWarnings(muttest(...))), type = "output")
-  result
-}
+test_that("plan returns muttest_plan when no mutations apply", {
+  .with_example_dir("operators/", {
+    p <- plan(list(operator("*", "/")), fs::dir_ls("R"))
+    expect_s3_class(p, "muttest_plan")
+  })
+})
 
 test_that("operators", {
   .with_example_dir("operators/", {
     mutators <- list(operator("+", "-"), operator("*", "/"))
     plan <- plan(mutators, fs::dir_ls("R"))
     expect_equal(
-      test_(plan),
+      .muttest(plan),
       0.5
     )
   })
@@ -26,12 +21,12 @@ test_that("timeout on infinite loop is recorded as error", {
   .with_example_dir("operators/", {
     original <- readLines("R/calculate.R")
     mutated <- c("calculate <- function(x, y) {", "  while (TRUE) {}", "}")
-    p <- data.frame(
+    p <- muttest_plan(data.frame(
       filename = "R/calculate.R",
       original_code = I(list(original)),
       mutated_code = I(list(mutated)),
       mutator = I(list(negate_condition("while")))
-    )
+    ))
     reporter <- MutationReporter$new()
     capture.output(suppressMessages(suppressWarnings(muttest(p, reporter = reporter, timeout = 400))), type = "output")
     expect_equal(reporter$results[["R/calculate.R"]]$errors, 1)
@@ -49,7 +44,39 @@ test_that("test runner errors are recorded as errors, not propagated", {
 
   .with_example_dir("operators/", {
     p <- plan(list(operator("+", "-")), fs::dir_ls("R"))
-    score <- test_(p, test_strategy = error_strategy)
+    score <- .muttest(p, test_strategy = error_strategy)
     expect_equal(score, 0)
   })
+})
+
+test_that("muttest_plan can first n mutants", {
+  p <- muttest_plan(data.frame(
+    filename = c("R/calculate.R", "R/calculate.R"),
+    original_code = I(list(
+      c("calculate <- function(x, y) {", "  x + y", "}"),
+      c("calculate <- function(x, y) {", "  x + y", "}")
+    )),
+    mutated_code = I(list(
+      c("calculate <- function(x, y) {", "  x - y", "}"),
+      c("calculate <- function(x, y) {", "  x - y", "}")
+    )),
+    mutator = I(list(operator("+", "-"), operator("+", "-")))
+  ))
+  .expect_snapshot(print(p, nrows = 1))
+})
+
+test_that("muttest_plan prints all mutants", {
+  p <- muttest_plan(data.frame(
+    filename = c("R/calculate.R", "R/calculate.R"),
+    original_code = I(list(
+      c("calculate <- function(x, y) {", "  x + y", "}"),
+      c("calculate <- function(x, y) {", "  x + y", "}")
+    )),
+    mutated_code = I(list(
+      c("calculate <- function(x, y) {", "  x - y", "}"),
+      c("calculate <- function(x, y) {", "  x - y", "}")
+    )),
+    mutator = I(list(operator("+", "-"), operator("+", "-")))
+  ))
+  .expect_snapshot(print(p, nrows = 2))
 })
