@@ -35,7 +35,7 @@ checks will reach 100% coverage while missing every meaningful failure.
 Mutation testing addresses this gap by asking a harder question: *if
 this code were subtly wrong, would your tests notice?*
 
-## A word on LLM-generated tests
+## The need for mutation testing in the age of LLMs
 
 Many teams now use LLMs to write their tests. LLMs are good at producing
 syntactically correct, passing tests quickly — but they might cover only
