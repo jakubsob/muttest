@@ -14,6 +14,8 @@
 #'
 #' @export
 call_name <- function(from, to) {
+  checkmate::assert_string(from, min.chars = 1)
+  checkmate::assert_string(to, min.chars = 1)
   Mutator$new(
     from = from,
     to = to,

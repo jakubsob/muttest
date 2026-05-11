@@ -10,6 +10,7 @@
 #' numeric_increment()
 #' numeric_increment(by = 2)
 numeric_increment <- function(by = 1) {
+  checkmate::assert_number(by)
   numeric_literal_mutator(
     label = paste0("<n> + ", by),
     transform = function(text) {
@@ -30,6 +31,7 @@ numeric_increment <- function(by = 1) {
 #' numeric_decrement()
 #' numeric_decrement(by = 2)
 numeric_decrement <- function(by = 1) {
+  checkmate::assert_number(by)
   numeric_literal_mutator(
     label = paste0("<n> - ", by),
     transform = function(text) {

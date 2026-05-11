@@ -26,6 +26,8 @@
 #' operator("==", "!=")
 #' operator(">", ">=")  # probe the strict vs. non-strict boundary
 operator <- function(from, to) {
+  checkmate::assert_string(from, min.chars = 1)
+  checkmate::assert_string(to, min.chars = 1)
   Mutator$new(
     from = from,
     to = to,

@@ -17,6 +17,7 @@
 #' replace_return_value()
 #' replace_return_value("NA")
 replace_return_value <- function(replacement = "NULL") {
+  checkmate::assert_string(replacement, min.chars = 1)
   Mutator$new(
     from = "return(<value>)",
     to = paste0("return(", replacement, ")"),

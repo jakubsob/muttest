@@ -13,6 +13,9 @@
 #'
 #' @export
 boolean_literal <- function(from, to) {
+  allowed <- c("TRUE", "FALSE", "T", "F")
+  checkmate::assert_choice(from, allowed)
+  checkmate::assert_choice(to, allowed)
   # TRUE/FALSE are dedicated AST nodes; T/F are plain identifiers in tree-sitter-r
   query <- if (from %in% c("TRUE", "FALSE")) {
     node_type <- if (from == "TRUE") "true" else "false"

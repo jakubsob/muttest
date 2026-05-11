@@ -23,6 +23,7 @@ condition_query <- function(statements) {
 #' negate_condition()
 #' negate_condition(statements = "if")
 negate_condition <- function(statements = c("if", "while")) {
+  checkmate::assert_subset(statements, c("if", "while"), empty.ok = FALSE)
   Mutator$new(
     from = "<condition>",
     to = "!(<condition>)",
@@ -50,6 +51,7 @@ negate_condition <- function(statements = c("if", "while")) {
 #' remove_condition_negation()
 #' remove_condition_negation(statements = "while")
 remove_condition_negation <- function(statements = c("if", "while")) {
+  checkmate::assert_subset(statements, c("if", "while"), empty.ok = FALSE)
   Mutator$new(
     from = "!<condition>",
     to = "<condition>",

@@ -30,6 +30,7 @@ string_empty <- function() {
 #' string_fill()
 #' string_fill(fill = "PLACEHOLDER")
 string_fill <- function(fill = "mutant") {
+  checkmate::assert_string(fill, min.chars = 1)
   quoted <- paste0("\"", fill, "\"")
   Mutator$new(
     from = "\"\"",

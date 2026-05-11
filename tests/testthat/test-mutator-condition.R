@@ -106,7 +106,7 @@ describe("negate_condition with statements filter", {
   })
 
   it("should error on unknown statement type", {
-    expect_error(negate_condition(statements = "for"), "Unknown statement type")
+    expect_error(negate_condition(statements = "for"))
   })
 })
 
