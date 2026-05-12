@@ -7,7 +7,7 @@
 #' @field start_time Time when testing started (for duration calculation)
 #' @field min_time Minimum test duration to display timing information
 #' @field col_config List of column configuration for report formatting
-#' @field survived_detail Controls how survived mutants are reported (summary, inline, both, none)
+#' @field survived_detail Controls how survived mutants are reported (summary, none)
 #' @field survived_mutants List to store details of survived mutants for summary reporting
 #'
 #' @importFrom R6 R6Class
@@ -203,12 +203,12 @@ ProgressMutationReporter <- R6::R6Class(
     #' @param min_time Minimum time to show elapsed time (default: 1s)
     #' @param file Output destination (default: stdout)
     #' @param survived_detail Controls how survived mutants are reported.
-    #'   One of `"none"`, `"inline"`, `"summary"` (default), or `"both"`.
+    #'   One of `"summary"` (default) or `"none"`.
     initialize = function(
       test_reporter = "silent",
       min_time = 1,
       file = stdout(),
-      survived_detail = c("summary", "inline", "both", "none")
+      survived_detail = c("summary", "none")
     ) {
       super$initialize(test_reporter, file)
 
@@ -274,15 +274,7 @@ ProgressMutationReporter <- R6::R6Class(
       ))
 
       if (survived == 1 && !is.null(original_code) && !is.null(mutated_code)) {
-        if (self$survived_detail %in% c("inline", "both")) {
-          private$print_survived_diff(
-            original_code,
-            mutated_code,
-            filename,
-            mutator
-          )
-        }
-        if (self$survived_detail %in% c("summary", "both")) {
+        if (self$survived_detail == "summary") {
           self$survived_mutants <- c(
             self$survived_mutants,
             list(list(
@@ -323,8 +315,7 @@ ProgressMutationReporter <- R6::R6Class(
       }
 
       if (
-        self$survived_detail %in%
-          c("summary", "both") &&
+        self$survived_detail == "summary" &&
           length(self$survived_mutants) > 0
       ) {
         self$cat_line()

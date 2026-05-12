@@ -25,7 +25,7 @@ Other MutationReporter:
 
 \item{\code{col_config}}{List of column configuration for report formatting}
 
-\item{\code{survived_detail}}{Controls how survived mutants are reported (summary, inline, both, none)}
+\item{\code{survived_detail}}{Controls how survived mutants are reported (summary, none)}
 
 \item{\code{survived_mutants}}{List to store details of survived mutants for summary reporting}
 }
@@ -136,7 +136,7 @@ Initialize a new progress reporter
   test_reporter = "silent",
   min_time = 1,
   file = stdout(),
-  survived_detail = c("summary", "inline", "both", "none")
+  survived_detail = c("summary", "none")
 )}\if{html}{\out{</div>}}
 }
 
@@ -150,7 +150,7 @@ Initialize a new progress reporter
 \item{\code{file}}{Output destination (default: stdout)}
 
 \item{\code{survived_detail}}{Controls how survived mutants are reported.
-One of \code{"none"}, \code{"inline"}, \code{"summary"} (default), or \code{"both"}.}
+One of \code{"summary"} (default) or \code{"none"}.}
 }
 \if{html}{\out{</div>}}
 }
