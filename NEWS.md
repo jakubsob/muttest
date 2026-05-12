@@ -1,4 +1,4 @@
-# 0.2.0
+# muttest 0.2.0
 
 - ✨ Add new built-in mutators:
   - `arithmetic_operators`, `comparison_operators`, `logical_operators` — operator family mutators.
@@ -24,7 +24,7 @@
 - ✨ `muttest()` supports per-mutant timeouts to avoid hanging test runs.
 - 🥅 Improved error handling when test execution fails.
 
-# 0.1.0
+# muttest 0.1.0
 
 - ✨ Create a testing plan with `plan`.
 - ✨ Run mutation testing with `muttest`.
