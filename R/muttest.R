@@ -14,7 +14,7 @@
 #'   limit the daemon is interrupted and the result is recorded as an error.
 #'   Use `Inf` to disable. Defaults to 600000 (10 minutes).
 #'
-#' @return A numeric value representing the mutation score.
+#' @return An object of class `muttest_result` containing the overall mutation score.
 #'
 #' @export
 #' @md
@@ -68,7 +68,7 @@ muttest <- function(
     filename <- row$filename
     mutated_code <- row$mutated_code[[1]]
 
-    # Pass only plain serializable data — row$mutator contains treesitter
+    # Pass only plain serializable data - row$mutator contains treesitter
     # C-level objects that cannot cross process boundaries.
     mirai::mirai(
       {
@@ -125,7 +125,21 @@ muttest <- function(
   }
 
   reporter$end_reporter()
-  invisible(reporter$get_score())
+  invisible(muttest_result(reporter))
+}
+
+muttest_result <- function(reporter) {
+  structure(
+    reporter$get_score(),
+    reporter = reporter,
+    class = c("muttest_result", "numeric")
+  )
+}
+
+#' @export
+print.muttest_result <- function(x, ...) {
+  attr(x, "reporter")$print()
+  invisible(x)
 }
 
 .record_result <- function(reporter, row, test_results, mutated_code) {
@@ -215,19 +229,39 @@ muttest_plan <- function(x) {
 
 #' @export
 print.muttest_plan <- function(x, ..., nrows = 10) {
-  cat(sprintf(
-    "Mutation test plan with %d mutants across %d files:\n",
-    nrow(x),
-    length(unique(x$filename))
+  n_mutants <- nrow(x)
+  n_files <- length(unique(x$filename))
+
+  cli::cat_rule(cli::style_bold("Mutation Test Plan"))
+  cli::cat_line(sprintf(
+    "%d %s across %d %s",
+    n_mutants,
+    ngettext(n_mutants, "mutant", "mutants"),
+    n_files,
+    ngettext(n_files, "file", "files")
   ))
-  display <- x[seq_len(min(nrows, nrow(x))), c("filename", "mutator")]
-  display$mutator <- vapply(
-    display$mutator,
-    function(m) paste0(m$from, " -> ", m$to),
-    character(1)
-  )
-  print.data.frame(display, row.names = FALSE)
-  if (nrow(x) > nrows) {
-    cat(sprintf("... and %d more mutants\n", nrow(x) - nrows))
+  cli::cat_line()
+
+  shown <- x[seq_len(min(nrows, n_mutants)), ]
+  for (i in seq_len(nrow(shown))) {
+    m <- shown$mutator[[i]]
+    cli::cat_line(paste0(
+      cli::col_grey(shown$filename[[i]]),
+      "  ",
+      cli::style_bold(m$from),
+      paste0(" ", SYMBOLS$arrow, " "),
+      cli::style_bold(m$to)
+    ))
   }
+
+  if (n_mutants > nrows) {
+    cli::cat_line()
+    cli::cat_line(cli::col_grey(sprintf(
+      "... and %d more %s",
+      n_mutants - nrows,
+      ngettext(n_mutants - nrows, "mutant", "mutants")
+    )))
+  }
+
+  invisible(x)
 }

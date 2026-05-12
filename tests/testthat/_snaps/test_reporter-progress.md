@@ -6,7 +6,7 @@
     Output
       i Mutation Testing
       |   K |   S |   E |   T |   % | Mutator  | File
-      x |   0 |   1 |   0 |   1 |   0 | + > -    | calculate.R
+      x |   0 |   1 |   0 |   1 |   0 | + → -    | calculate.R
       -- Results ---------------------------------------------------------------------
       [ KILLED 0 | SURVIVED 1 | ERRORS 0 | TOTAL 1 | SCORE 0.0% ]
 
@@ -18,9 +18,9 @@
     Output
       i Mutation Testing
       |   K |   S |   E |   T |   % | Mutator  | File
-      v |   1 |   0 |   0 |   1 | 100 | * > /    | calculate.R
-      x |   1 |   1 |   0 |   2 |  50 | + > -    | calculate.R
-      Survived: calculate.R  + → -
+      v |   1 |   0 |   0 |   1 | 100 | * → /    | calculate.R
+      x |   1 |   1 |   0 |   2 |  50 | + → -    | calculate.R
+      calculate.R  + → -
       2-   (x + y) * 0
       2+   (x - y) * 0
       -- Results ---------------------------------------------------------------------
@@ -34,10 +34,10 @@
     Output
       i Mutation Testing
       |   K |   S |   E |   T |   % | Mutator  | File
-      v |   1 |   0 |   0 |   1 | 100 | * > /    | calculate.R
-      x |   1 |   1 |   0 |   2 |  50 | + > -    | calculate.R
+      v |   1 |   0 |   0 |   1 | 100 | * → /    | calculate.R
+      x |   1 |   1 |   0 |   2 |  50 | + → -    | calculate.R
       -- Survived Mutants ------------------------------------------------------------
-      Survived: calculate.R  + → -
+      calculate.R  + → -
       2-   (x + y) * 0
       2+   (x - y) * 0
       -- Results ---------------------------------------------------------------------
@@ -51,13 +51,13 @@
     Output
       i Mutation Testing
       |   K |   S |   E |   T |   % | Mutator  | File
-      v |   1 |   0 |   0 |   1 | 100 | * > /    | calculate.R
-      x |   1 |   1 |   0 |   2 |  50 | + > -    | calculate.R
-      Survived: calculate.R  + → -
+      v |   1 |   0 |   0 |   1 | 100 | * → /    | calculate.R
+      x |   1 |   1 |   0 |   2 |  50 | + → -    | calculate.R
+      calculate.R  + → -
       2-   (x + y) * 0
       2+   (x - y) * 0
       -- Survived Mutants ------------------------------------------------------------
-      Survived: calculate.R  + → -
+      calculate.R  + → -
       2-   (x + y) * 0
       2+   (x - y) * 0
       -- Results ---------------------------------------------------------------------
@@ -71,8 +71,8 @@
     Output
       i Mutation Testing
       |   K |   S |   E |   T |   % | Mutator  | File
-      v |   1 |   0 |   0 |   1 | 100 | * > /    | calculate.R
-      x |   1 |   1 |   0 |   2 |  50 | + > -    | calculate.R
+      v |   1 |   0 |   0 |   1 | 100 | * → /    | calculate.R
+      x |   1 |   1 |   0 |   2 |  50 | + → -    | calculate.R
       -- Results ---------------------------------------------------------------------
       [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
 

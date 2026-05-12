@@ -9,10 +9,8 @@ test_that("operators", {
   .with_example_dir("operators/", {
     mutators <- list(operator("+", "-"), operator("*", "/"))
     plan <- plan(mutators, fs::dir_ls("R"))
-    expect_equal(
-      .muttest(plan),
-      0.5
-    )
+    result <- .muttest(plan)
+    expect_equal(as.numeric(result), 0.5)
   })
 })
 
@@ -44,39 +42,31 @@ test_that("test runner errors are recorded as errors, not propagated", {
 
   .with_example_dir("operators/", {
     p <- plan(list(operator("+", "-")), fs::dir_ls("R"))
-    score <- .muttest(p, test_strategy = error_strategy)
-    expect_equal(score, 0)
+    result <- .muttest(p, test_strategy = error_strategy)
+    expect_equal(as.numeric(result), 0)
   })
 })
 
-test_that("muttest_plan can first n mutants", {
-  p <- muttest_plan(data.frame(
-    filename = c("R/calculate.R", "R/calculate.R"),
-    original_code = I(list(
-      c("calculate <- function(x, y) {", "  x + y", "}"),
-      c("calculate <- function(x, y) {", "  x + y", "}")
-    )),
-    mutated_code = I(list(
-      c("calculate <- function(x, y) {", "  x - y", "}"),
-      c("calculate <- function(x, y) {", "  x - y", "}")
-    )),
-    mutator = I(list(operator("+", "-"), operator("+", "-")))
-  ))
-  .expect_snapshot(print(p, nrows = 1))
-})
 
-test_that("muttest_plan prints all mutants", {
-  p <- muttest_plan(data.frame(
-    filename = c("R/calculate.R", "R/calculate.R"),
-    original_code = I(list(
-      c("calculate <- function(x, y) {", "  x + y", "}"),
-      c("calculate <- function(x, y) {", "  x + y", "}")
-    )),
-    mutated_code = I(list(
-      c("calculate <- function(x, y) {", "  x - y", "}"),
-      c("calculate <- function(x, y) {", "  x - y", "}")
-    )),
-    mutator = I(list(operator("+", "-"), operator("+", "-")))
-  ))
-  .expect_snapshot(print(p, nrows = 2))
-})
+.tests <- list(
+  list(
+    title = "session with ProgressReporter prints results",
+    reporter = function() ProgressMutationReporter$new()
+  )
+)
+
+for (t in .tests) {
+  local({
+    test_that(t$title, {
+      .with_example_dir("operators/", {
+        mutators <- list(operator("+", "-"), operator("*", "/"))
+        p <- plan(mutators, fs::dir_ls("R"))
+        result <- .muttest(p, reporter = t$reporter())
+        expect_snapshot({
+          print(p)
+          print(result)
+        })
+      })
+    })
+  })
+}

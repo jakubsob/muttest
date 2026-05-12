@@ -36,7 +36,7 @@ limit the daemon is interrupted and the result is recorded as an error.
 Use \code{Inf} to disable. Defaults to 600000 (10 minutes).}
 }
 \value{
-A numeric value representing the mutation score.
+An object of class \code{muttest_result} containing the overall mutation score.
 }
 \description{
 Run a mutation test

@@ -4,8 +4,8 @@ test_that("workers = 2 produces the same score as workers = 1", {
     mutators <- list(operator("+", "-"), operator("*", "/"))
     p <- plan(mutators, fs::dir_ls("R"))
     expect_equal(
-      .muttest(p, workers = 2),
-      .muttest(p, workers = 1)
+      as.numeric(.muttest(p, workers = 2)),
+      as.numeric(.muttest(p, workers = 1))
     )
   })
 })

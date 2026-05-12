@@ -40,11 +40,11 @@ Other MutationReporter:
 \item \href{#method-ProgressMutationReporter-new}{\code{ProgressMutationReporter$new()}}
 \item \href{#method-ProgressMutationReporter-start_reporter}{\code{ProgressMutationReporter$start_reporter()}}
 \item \href{#method-ProgressMutationReporter-add_result}{\code{ProgressMutationReporter$add_result()}}
-\item \href{#method-ProgressMutationReporter-print_survived_diff}{\code{ProgressMutationReporter$print_survived_diff()}}
 \item \href{#method-ProgressMutationReporter-update}{\code{ProgressMutationReporter$update()}}
 \item \href{#method-ProgressMutationReporter-end_file}{\code{ProgressMutationReporter$end_file()}}
 \item \href{#method-ProgressMutationReporter-cr}{\code{ProgressMutationReporter$cr()}}
 \item \href{#method-ProgressMutationReporter-end_reporter}{\code{ProgressMutationReporter$end_reporter()}}
+\item \href{#method-ProgressMutationReporter-print}{\code{ProgressMutationReporter$print()}}
 \item \href{#method-ProgressMutationReporter-clone}{\code{ProgressMutationReporter$clone()}}
 }
 }
@@ -210,34 +210,6 @@ Add a mutation test result
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ProgressMutationReporter-print_survived_diff"></a>}}
-\if{latex}{\out{\hypertarget{method-ProgressMutationReporter-print_survived_diff}{}}}
-\subsection{Method \code{print_survived_diff()}}{
-Print a unified diff for a survived mutant
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ProgressMutationReporter$print_survived_diff(
-  original_code,
-  mutated_code,
-  file_path,
-  mutator
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{original_code}}{Original source lines}
-
-\item{\code{mutated_code}}{Mutated source lines}
-
-\item{\code{file_path}}{Path to the mutated file}
-
-\item{\code{mutator}}{The mutator that was applied}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ProgressMutationReporter-update"></a>}}
 \if{latex}{\out{\hypertarget{method-ProgressMutationReporter-update}{}}}
 \subsection{Method \code{update()}}{
@@ -281,6 +253,16 @@ Carriage return if dynamic, newline otherwise
 End reporter with detailed summary
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ProgressMutationReporter$end_reporter()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ProgressMutationReporter-print"></a>}}
+\if{latex}{\out{\hypertarget{method-ProgressMutationReporter-print}{}}}
+\subsection{Method \code{print()}}{
+Print the mutation test result with survived diffs
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ProgressMutationReporter$print()}\if{html}{\out{</div>}}
 }
 
 }

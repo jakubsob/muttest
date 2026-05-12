@@ -275,7 +275,7 @@ ProgressMutationReporter <- R6::R6Class(
 
       if (survived == 1 && !is.null(original_code) && !is.null(mutated_code)) {
         if (self$survived_detail %in% c("inline", "both")) {
-          self$print_survived_diff(
+          private$print_survived_diff(
             original_code,
             mutated_code,
             filename,
@@ -293,46 +293,6 @@ ProgressMutationReporter <- R6::R6Class(
             ))
           )
         }
-      }
-    },
-
-    #' @description Print a unified diff for a survived mutant
-    #' @param original_code Original source lines
-    #' @param mutated_code Mutated source lines
-    #' @param file_path Path to the mutated file
-    #' @param mutator The mutator that was applied
-    print_survived_diff = function(
-      original_code,
-      mutated_code,
-      file_path,
-      mutator
-    ) {
-      changed <- which(original_code != mutated_code)
-      if (length(changed) == 0) {
-        return(invisible(NULL))
-      }
-
-      self$cat_line(cli::col_grey(paste0(
-        "  Survived: ",
-        basename(file_path),
-        "  ",
-        mutator$from,
-        " \u2192 ",
-        mutator$to
-      )))
-      for (i in changed) {
-        self$cat_line(cli::col_red(paste0(
-          "  ",
-          i,
-          "- ",
-          trimws(original_code[[i]], "right")
-        )))
-        self$cat_line(cli::col_green(paste0(
-          "  ",
-          i,
-          "+ ",
-          trimws(mutated_code[[i]], "right")
-        )))
       }
     },
 
@@ -370,7 +330,7 @@ ProgressMutationReporter <- R6::R6Class(
         self$cat_line()
         self$rule(cli::style_bold("Survived Mutants"))
         for (entry in self$survived_mutants) {
-          self$print_survived_diff(
+          private$print_survived_diff(
             entry$original_code,
             entry$mutated_code,
             entry$file_path,
@@ -379,6 +339,66 @@ ProgressMutationReporter <- R6::R6Class(
         }
       }
 
+      private$cat_stats()
+      self$cat_line()
+
+      super$end_reporter()
+    },
+
+    #' @description Print the mutation test result with survived diffs
+    print = function() {
+      private$cat_stats()
+      if (length(self$survived_mutants) > 0) {
+        self$cat_line()
+        self$rule(cli::style_bold("Survived Mutants"))
+        for (entry in self$survived_mutants) {
+          private$print_survived_diff(
+            entry$original_code,
+            entry$mutated_code,
+            entry$file_path,
+            entry$mutator
+          )
+        }
+      }
+      invisible(self)
+    }
+  ),
+  private = list(
+    print_survived_diff = function(
+      original_code,
+      mutated_code,
+      file_path,
+      mutator
+    ) {
+      changed <- which(original_code != mutated_code)
+      if (length(changed) == 0) {
+        return(invisible(NULL))
+      }
+
+      self$cat_line(cli::col_grey(paste0(
+        basename(file_path),
+        "  ",
+        mutator$from,
+        " \u2192 ",
+        mutator$to
+      )))
+      for (i in changed) {
+        self$cat_line(cli::col_red(paste0(
+          "  ",
+          i,
+          "- ",
+          trimws(original_code[[i]], "right")
+        )))
+        self$cat_line(cli::col_green(paste0(
+          "  ",
+          i,
+          "+ ",
+          trimws(mutated_code[[i]], "right")
+        )))
+      }
+    },
+
+    cat_stats = function() {
       results <- do.call(rbind, lapply(self$results, as.data.frame))
       k <- sum(results$killed)
       s <- sum(results$survived)
@@ -404,10 +424,6 @@ ProgressMutationReporter <- R6::R6Class(
         cli::style_bold(cli::col_green(sprintf("SCORE %.1f%%", score * 100))),
         " ]"
       )
-
-      self$cat_line()
-
-      super$end_reporter()
     }
   )
 )

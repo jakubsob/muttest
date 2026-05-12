@@ -63,7 +63,7 @@ Mutator <- R6::R6Class(
     # nocov start
     #' @description Print a short summary of the mutator.
     print = function() {
-      cat(sprintf("Mutator: %s -> %s\n", self$from, self$to))
+      cat(sprintf("Mutator: %s %s %s\n", self$from, SYMBOLS$arrow, self$to))
       cat(sprintf("Query: %s\n", self$query))
     }
     # nocov end

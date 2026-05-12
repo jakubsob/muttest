@@ -41,7 +41,7 @@ operator <- function(from, to) {
 }
 
 info_oneline <- function(m) {
-  paste(m$from, cli::symbol$arrow_right, m$to)
+  paste(m$from, SYMBOLS$arrow, m$to)
 }
 
 replace_with <- function(code, node, replacement_text) {
