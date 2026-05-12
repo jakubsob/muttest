@@ -5,15 +5,6 @@ test_that("plan returns muttest_plan when no mutations apply", {
   })
 })
 
-test_that("operators", {
-  .with_example_dir("operators/", {
-    mutators <- list(operator("+", "-"), operator("*", "/"))
-    plan <- plan(mutators, fs::dir_ls("R"))
-    result <- .muttest(plan)
-    expect_equal(as.numeric(result), 0.5)
-  })
-})
-
 test_that("timeout on infinite loop is recorded as error", {
   skip_on_cran()
   .with_example_dir("operators/", {
@@ -58,8 +49,8 @@ test_that("test runner errors are recorded as errors, not propagated", {
 for (t in .tests) {
   local({
     test_that(t$title, {
-      .with_example_dir("operators/", {
-        mutators <- list(operator("+", "-"), operator("*", "/"))
+      .with_example_dir("shipping/", {
+        mutators <- list(operator(">", "<"), operator(">", ">="))
         p <- plan(mutators, fs::dir_ls("R"))
         result <- .muttest(p, reporter = t$reporter())
         expect_snapshot({

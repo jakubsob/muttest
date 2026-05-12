@@ -12,6 +12,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+source("engine.R")
 ```
 
 This guide walks you through your first mutation test run, from setup to interpreting results.
@@ -34,28 +35,6 @@ pak::pak("jakubsob/muttest")
 
 Start small. Choose one file from `R/` that contains meaningful logic — branching, arithmetic, comparisons. Avoid files that are mostly glue code or just call other functions.
 
-For this guide we use a simple `is_adult` function:
-
-```r
-# R/is_adult.R
-is_adult <- function(age) {
-  age >= 18
-}
-```
-
-And its tests:
-
-```r
-# tests/testthat/test-is_adult.R
-test_that("is_adult returns TRUE for adults", {
-  expect_true(is_adult(25))
-})
-
-test_that("is_adult returns FALSE for minors", {
-  expect_false(is_adult(10))
-})
-```
-
 ## Step 2 — Define a test plan
 
 A test plan describes *what* to mutate and *which* mutations to apply:
@@ -77,17 +56,7 @@ plan <- plan(
 muttest::muttest(plan, "tests/testthat")
 ```
 
-You will see output like this:
-
-```
-ℹ Mutation Testing
-  |   K |   S |   E |   T |   % | Mutator      | File
-✔ |   1 |   1 |   0 |   2 |  50 | >= → >       | is_adult.R
-── Mutation Testing Results ────────────────────────────────────────────────────
-[ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
-```
-
-## Step 4 — Read the output
+## Step 4 — Read the output and improve your tests
 
 Each column in the progress table means:
 
@@ -99,30 +68,13 @@ Each column in the progress table means:
 | T | Total mutants for this mutator/file combination |
 | % | Mutation score for this row |
 
-A `✔` row means at least one mutant was killed. An `x` row means all mutants survived — your tests didn't notice anything changed.
+The **mutation score** is `Killed / Total × 100%`. A `✔` row means at least one mutant was killed; an `x` row means all mutants survived.
 
-The **mutation score** is:
+Here is a complete example showing a weak test, the live output, and the fix:
 
+```{muttest_example}
+boundary
 ```
-Mutation Score = (Killed / Total) × 100%
-```
-
-## Step 5 — Improve a weak test
-
-The `>= → >` mutant survived. That means when we change `age >= 18` to `age > 18`, the tests still pass. Why? The boundary value `18` is never tested, so the test suite cannot tell `>=` from `>`.
-
-- Mutant 2 (`>=` → `<=`) is **killed**: `is_adult(25)` now returns `FALSE`, which fails the first test.
-- Mutant 1 (`>=` → `>`) **survives**: `is_adult(25)` still returns `TRUE` and `is_adult(10)` still returns `FALSE`.
-
-Adding a test at the boundary fixes this:
-
-```r
-test_that("is_adult returns TRUE at the boundary age", {
-  expect_true(is_adult(18))  # kills mutant 1: age > 18 returns FALSE for age = 18
-})
-```
-
-With this test added the score reaches 100%.
 
 ## The feedback loop
 

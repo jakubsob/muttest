@@ -9,14 +9,16 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%",
-  root.dir = system.file("examples", "operators", package = "muttest")
+  out.width = "100%"
 )
 
 include_file <- function(file, filename) {
   code <- readLines(file)
   cat("```r", paste("#'", filename), code, "```", sep = "\n")
 }
+
+engine_path <- if (file.exists("vignettes/engine.R")) "vignettes/engine.R" else "engine.R"
+source(engine_path)
 ```
 # muttest <img src="man/figures/logo.png" align="right" alt="" width="120" />
 
@@ -103,18 +105,17 @@ include_file(
 When running `muttest::muttest()` we'll get a report of the mutation score:
 
 ```{r}
-#| eval: false
-plan <- muttest::plan(
-  source_files = "R/is_adult.R",
-  mutators = muttest::comparison_operators()
+boundary_path <- system.file("examples", "boundary", package = "muttest")
+withr::with_options(
+  list(cli.num_colors = 0),
+  withr::with_dir(boundary_path, {
+    plan <- muttest::plan(
+      source_files = "R/is_adult.R",
+      mutators = muttest::comparison_operators()
+    )
+    muttest::muttest(plan, "tests/testthat")
+  })
 )
-
-muttest::muttest(plan, "tests/testthat")
-#> ℹ Mutation Testing
-#>   |   K |   S |   E |   T |   % | Mutator      | File
-#> ✔ |   1 |   1 |   0 |   2 |  50 | >= → >       | is_adult.R
-#> ── Mutation Testing Results ────────────────────────────────────────────────────
-#> [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
 ```
 
 The mutation score is: $\text{Mutation Score} = \frac{\text{Killed Mutants}}{\text{Total Mutants}} \times 100\%$, where a Mutant is defined as variant of the original code that is used to test the robustness of the test suite.

@@ -109,16 +109,29 @@ When running `muttest::muttest()` we’ll get a report of the mutation
 score:
 
 ``` r
-plan <- muttest::plan(
-  source_files = "R/is_adult.R",
-  mutators = muttest::comparison_operators()
+boundary_path <- system.file("examples", "boundary", package = "muttest")
+withr::with_options(
+  list(cli.num_colors = 0),
+  withr::with_dir(boundary_path, {
+    plan <- muttest::plan(
+      source_files = "R/is_adult.R",
+      mutators = muttest::comparison_operators()
+    )
+    muttest::muttest(plan, "tests/testthat")
+  })
 )
-
-muttest::muttest(plan, "tests/testthat")
 #> ℹ Mutation Testing
-#>   |   K |   S |   E |   T |   % | Mutator      | File
-#> ✔ |   1 |   1 |   0 |   2 |  50 | >= → >       | is_adult.R
-#> ── Mutation Testing Results ────────────────────────────────────────────────────
+#>   |   K |   S |   E |   T |   % | Mutator  | File 
+#> ✔ |   1 |   0 |   0 |   1 | 100 | >= → <=  | is_adult.R 
+#> x |   1 |   1 |   0 |   2 |  50 | >= → >   | is_adult.R 
+#> 
+#> 
+#> ── Survived Mutants ────────────────────────────────────────────────────────────
+#> is_adult.R  >= → >
+#>   2-   age >= 18
+#>   2+   age > 18
+#> 
+#> ── Results ─────────────────────────────────────────────────────────────────────
 #> [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
 ```
 

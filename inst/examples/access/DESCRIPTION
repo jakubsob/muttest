@@ -1,0 +1,6 @@
+Package: access
+Title: Logical Operators Example for muttest
+Version: 0.1.0
+Description: Demonstrates how symmetric test inputs let logical operator mutants survive.
+License: MIT
+Encoding: UTF-8

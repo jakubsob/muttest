@@ -6,8 +6,8 @@
       -- Mutation Test Plan ----------------------------------------------------------
       2 mutants across 1 file
       
-      R/calculate.R  + → -
-      R/calculate.R  * → /
+      R/shipping.R  > → <
+      R/shipping.R  > → >=
     Code
       print(result)
     Output
@@ -16,7 +16,7 @@
       [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
       
       -- Survived Mutants ------------------------------------------------------------
-      calculate.R  + → -
-        2-   (x + y) * 0
-        2+   (x - y) * 0
+      shipping.R  > → >=
+        2-   if (weight_kg > 5) 15.00 else 5.00
+        2+   if (weight_kg >= 5) 15.00 else 5.00
 

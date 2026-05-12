@@ -1,0 +1,6 @@
+Package: mad
+Title: Arithmetic Operators Example for muttest
+Version: 0.1.0
+Description: Demonstrates how direction-insensitive assertions let arithmetic operator mutants survive.
+License: MIT
+Encoding: UTF-8

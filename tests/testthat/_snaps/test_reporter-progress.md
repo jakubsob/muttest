@@ -6,9 +6,9 @@
     Output
       i Mutation Testing
       |   K |   S |   E |   T |   % | Mutator  | File
-      x |   0 |   1 |   0 |   1 |   0 | + → -    | calculate.R
+      v |   1 |   0 |   0 |   1 | 100 | > → <    | shipping.R
       -- Results ---------------------------------------------------------------------
-      [ KILLED 0 | SURVIVED 1 | ERRORS 0 | TOTAL 1 | SCORE 0.0% ]
+      [ KILLED 1 | SURVIVED 0 | ERRORS 0 | TOTAL 1 | SCORE 100.0% ]
 
 # progress reporter shows survived mutants inline
 
@@ -18,11 +18,11 @@
     Output
       i Mutation Testing
       |   K |   S |   E |   T |   % | Mutator  | File
-      v |   1 |   0 |   0 |   1 | 100 | * → /    | calculate.R
-      x |   1 |   1 |   0 |   2 |  50 | + → -    | calculate.R
-      calculate.R  + → -
-      2-   (x + y) * 0
-      2+   (x - y) * 0
+      v |   1 |   0 |   0 |   1 | 100 | > → <    | shipping.R
+      x |   1 |   1 |   0 |   2 |  50 | > → >=   | shipping.R
+      shipping.R  > → >=
+      2-   if (weight_kg > 5) 15.00 else 5.00
+      2+   if (weight_kg >= 5) 15.00 else 5.00
       -- Results ---------------------------------------------------------------------
       [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
 
@@ -34,12 +34,12 @@
     Output
       i Mutation Testing
       |   K |   S |   E |   T |   % | Mutator  | File
-      v |   1 |   0 |   0 |   1 | 100 | * → /    | calculate.R
-      x |   1 |   1 |   0 |   2 |  50 | + → -    | calculate.R
+      v |   1 |   0 |   0 |   1 | 100 | > → <    | shipping.R
+      x |   1 |   1 |   0 |   2 |  50 | > → >=   | shipping.R
       -- Survived Mutants ------------------------------------------------------------
-      calculate.R  + → -
-      2-   (x + y) * 0
-      2+   (x - y) * 0
+      shipping.R  > → >=
+      2-   if (weight_kg > 5) 15.00 else 5.00
+      2+   if (weight_kg >= 5) 15.00 else 5.00
       -- Results ---------------------------------------------------------------------
       [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
 
@@ -51,19 +51,19 @@
     Output
       i Mutation Testing
       |   K |   S |   E |   T |   % | Mutator  | File
-      v |   1 |   0 |   0 |   1 | 100 | * → /    | calculate.R
-      x |   1 |   1 |   0 |   2 |  50 | + → -    | calculate.R
-      calculate.R  + → -
-      2-   (x + y) * 0
-      2+   (x - y) * 0
+      v |   1 |   0 |   0 |   1 | 100 | > → <    | shipping.R
+      x |   1 |   1 |   0 |   2 |  50 | > → >=   | shipping.R
+      shipping.R  > → >=
+      2-   if (weight_kg > 5) 15.00 else 5.00
+      2+   if (weight_kg >= 5) 15.00 else 5.00
       -- Survived Mutants ------------------------------------------------------------
-      calculate.R  + → -
-      2-   (x + y) * 0
-      2+   (x - y) * 0
+      shipping.R  > → >=
+      2-   if (weight_kg > 5) 15.00 else 5.00
+      2+   if (weight_kg >= 5) 15.00 else 5.00
       -- Results ---------------------------------------------------------------------
       [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
 
-# progress reporter shows doesn't show survived mutants
+# progress reporter doesn't show survived mutant details
 
     Code
       muttest(plan, reporter = ProgressMutationReporter$new(min_time = Inf,
@@ -71,8 +71,8 @@
     Output
       i Mutation Testing
       |   K |   S |   E |   T |   % | Mutator  | File
-      v |   1 |   0 |   0 |   1 | 100 | * → /    | calculate.R
-      x |   1 |   1 |   0 |   2 |  50 | + → -    | calculate.R
+      v |   1 |   0 |   0 |   1 | 100 | > → <    | shipping.R
+      x |   1 |   1 |   0 |   2 |  50 | > → >=   | shipping.R
       -- Results ---------------------------------------------------------------------
       [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
 

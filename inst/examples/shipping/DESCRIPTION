@@ -1,0 +1,6 @@
+Package: shipping
+Title: Comparison Operators Example for muttest
+Version: 0.1.0
+Description: Demonstrates how missing boundary tests let comparison operator mutants survive.
+License: MIT
+Encoding: UTF-8
