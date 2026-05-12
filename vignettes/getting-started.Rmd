@@ -19,10 +19,7 @@ This guide walks you through your first mutation test run, from setup to interpr
 
 ## Prerequisites
 
-`muttest` works with packages that use `testthat`. You need:
-
-- An R package with at least one source file in `R/`
-- Tests in `tests/testthat/`
+`muttest` works with R packages with `testthat` tests out of the box. If you're not using a package structure, or not using `testthat`, see `?TestStrategy` for configuration options.
 
 ## Installation
 
