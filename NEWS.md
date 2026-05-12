@@ -10,6 +10,13 @@
   - `remove_negation` — unary negation mutator.
   - `replace_return_value` — return value mutator.
   - `delete_statement` — removes assignments and standalone calls one at a time to catch untested side effects and dead assignments.
+- ✨ Add preset collections for all major mutator groups:
+  - `boolean_literals()` — flips `TRUE`/`FALSE` and `T`/`F`.
+  - `na_literals()` — swaps `NA`, `NULL`, and typed NA variants.
+  - `numeric_literals()` — increments and decrements numeric constants.
+  - `index_mutations()` — shifts subscript indices up and down by one.
+  - `string_literals()` — empties non-empty strings and fills empty ones.
+  - `condition_mutations()` — negates conditions and removes existing negations.
 - ✨ Mutators are now parametrized and accept configuration arguments.
 - ✨ `ProgressMutationReporter` now reports survived mutants.
 - ✨ Expose `Mutator` base class for building custom mutators.

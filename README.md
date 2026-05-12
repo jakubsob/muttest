@@ -203,14 +203,19 @@ A mutator describes one kind of code change. Pass a list of mutators to
 | `remove_negation()` | Remove logical negation | `remove_negation()`: `!is.na(x)` → `is.na(x)` |
 | `replace_return_value()` | Replace the value in explicit return() calls | `replace_return_value()`: `return(x)` → `return(NULL)` |
 
-**Preset collections** — return a ready-made list of `operator()`
-mutators
+**Preset collections** — return a ready-made list of mutators
 
 | Function | Description | Example |
 |:---|:---|:---|
 | `arithmetic_operators()` | Arithmetic operator mutators | `+`↔`-`, `*`↔`/`, `^`→`*`, `%%`→`*`, `%/%`→`/` |
 | `comparison_operators()` | Comparison operator mutators | `<`↔`>`, `==`↔`!=`, `<`→`<=`, `>`→`>=` … |
 | `logical_operators()` | Logical operator mutators | <code>&&</code>↔<code>\|\|</code>, <code>&</code>↔<code>\|</code> |
+| `boolean_literals()` | Boolean literal mutators | `TRUE`↔`FALSE`, `T`↔`F` |
+| `na_literals()` | NA and NULL literal mutators | `NA`↔`NULL`, `NA`↔`NA_real_`, `NA`↔`NA_integer_`, `NA`↔`NA_character_` |
+| `numeric_literals()` | Numeric literal mutators | `5`→`6`, `5`→`4` |
+| `index_mutations()` | Index mutation mutators | `x[i]`→`x[i + 1L]`, `x[i]`→`x[i - 1L]` |
+| `string_literals()` | String literal mutators | `"hello"`→`""`, `""`→`"mutant"` |
+| `condition_mutations()` | Condition mutation mutators | `if (x)`→`if (!(x))`, `if (!x)`→`if (x)` |
 
 # Where to go next
 

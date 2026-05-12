@@ -219,13 +219,27 @@ make_table(
   )
 )
 
-cat("\n**Preset collections** — return a ready-made list of `operator()` mutators\n\n")
+cat("\n**Preset collections** — return a ready-made list of mutators\n\n")
 make_table(
-  fn_names = c("arithmetic_operators", "comparison_operators", "logical_operators"),
+  fn_names = c(
+    "arithmetic_operators", "comparison_operators", "logical_operators",
+    "boolean_literals",
+    "na_literals",
+    "numeric_literals",
+    "index_mutations",
+    "string_literals",
+    "condition_mutations"
+  ),
   examples = c(
     "`+`↔`-`, `*`↔`/`, `^`→`*`, `%%`→`*`, `%/%`→`/`",
     "`<`↔`>`, `==`↔`!=`, `<`→`<=`, `>`→`>=` …",
-    "<code>&&</code>↔<code>&#124;&#124;</code>, <code>&</code>↔<code>&#124;</code>"
+    "<code>&&</code>↔<code>&#124;&#124;</code>, <code>&</code>↔<code>&#124;</code>",
+    "`TRUE`↔`FALSE`, `T`↔`F`",
+    "`NA`↔`NULL`, `NA`↔`NA_real_`, `NA`↔`NA_integer_`, `NA`↔`NA_character_`",
+    "`5`→`6`, `5`→`4`",
+    "`x[i]`→`x[i + 1L]`, `x[i]`→`x[i - 1L]`",
+    "`\"hello\"`→`\"\"`, `\"\"`→`\"mutant\"`",
+    "`if (x)`→`if (!(x))`, `if (!x)`→`if (x)`"
   )
 )
 ```

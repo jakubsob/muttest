@@ -82,6 +82,12 @@ reference:
       - arithmetic_operators
       - comparison_operators
       - logical_operators
+      - boolean_literals
+      - na_literals
+      - numeric_literals
+      - index_mutations
+      - string_literals
+      - condition_mutations
   - title: Reporters
     desc: Control how results are displayed.
     contents:

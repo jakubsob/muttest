@@ -196,7 +196,7 @@ test_that("owner-only access is granted", {
 
 ---
 
-## Boolean literal mutator
+## Boolean literal mutators
 
 ### `boolean_literal()` — flip TRUE/FALSE
 
@@ -206,6 +206,24 @@ boolean_literal("FALSE", "TRUE")  # FALSE → TRUE
 ```
 
 **When to use:** Functions with hard-coded boolean flags or default arguments like `na.rm = TRUE`, `stringsAsFactors = FALSE`. Flipping the default reveals whether tests exercise both states.
+
+### `boolean_literals()` — preset for boolean literals
+
+Returns a ready-made list covering all canonical flips:
+
+| Original | Mutant |
+|----------|--------|
+| `TRUE` | `FALSE` |
+| `FALSE` | `TRUE` |
+| `T` | `F` |
+| `F` | `T` |
+
+```r
+plan <- plan(
+  source_files = "R/flags.R",
+  mutators = boolean_literals()
+)
+```
 
 ---
 
@@ -225,6 +243,17 @@ numeric_decrement()  # 5 → 4, 1 → 0, 100 → 99
 
 **When to use:** Functions where exact numeric constants matter — thresholds, window sizes, counts, index boundaries. Off-by-one errors in constants are common and often untested.
 
+### `numeric_literals()` — preset for numeric constants
+
+Returns `numeric_increment()` and `numeric_decrement()` together.
+
+```r
+plan <- plan(
+  source_files = "R/thresholds.R",
+  mutators = numeric_literals()
+)
+```
+
 ---
 
 ## String mutators
@@ -242,6 +271,17 @@ string_fill()  # "" → "mutant"
 ```
 
 **When to use:** `string_empty()` is useful for functions that return or compare string values — it checks whether your tests would notice a blank output. `string_fill()` tests whether your code handles non-empty strings where empty ones are expected.
+
+### `string_literals()` — preset for string literals
+
+Returns `string_empty()` and `string_fill()` together.
+
+```r
+plan <- plan(
+  source_files = "R/labels.R",
+  mutators = string_literals()
+)
+```
 
 ---
 
@@ -272,6 +312,17 @@ remove_negation()
 ```
 
 **When to use:** Functions with guard clauses and early returns. These mutators reveal whether your tests cover both branches of a condition. A surviving `negate_condition()` mutant means the test inputs never trigger the `FALSE` branch.
+
+### `condition_mutations()` — preset for condition logic
+
+Returns `negate_condition()` and `remove_condition_negation()` together.
+
+```r
+plan <- plan(
+  source_files = "R/validation.R",
+  mutators = condition_mutations()
+)
+```
 
 ---
 
@@ -310,6 +361,28 @@ and "value is absent" — two distinct concepts that R treats very differently.
 Swapping between typed NAs (`NA_real_`, `NA_integer_`, `NA_character_`) and
 plain `NA` checks whether type-sensitive downstream code (e.g. `vapply`,
 `dplyr::mutate`) is covered.
+
+### `na_literals()` — preset for NA and NULL
+
+Returns mutators for all common NA/NULL swaps:
+
+| Original | Mutant |
+|----------|--------|
+| `NA` | `NULL` |
+| `NULL` | `NA` |
+| `NA` | `NA_real_` |
+| `NA_real_` | `NA` |
+| `NA` | `NA_integer_` |
+| `NA_integer_` | `NA` |
+| `NA` | `NA_character_` |
+| `NA_character_` | `NA` |
+
+```r
+plan <- plan(
+  source_files = "R/missing.R",
+  mutators = na_literals()
+)
+```
 
 ---
 
@@ -361,6 +434,17 @@ ratio high.
 
 Both single-bracket (`[`) and double-bracket (`[[`) indexing are covered.
 
+### `index_mutations()` — preset for subscript indices
+
+Returns `index_increment()` and `index_decrement()` together.
+
+```r
+plan <- plan(
+  source_files = "R/selectors.R",
+  mutators = index_mutations()
+)
+```
+
 ---
 
 ## Recommended starting set
@@ -374,12 +458,11 @@ plan <- plan(
     arithmetic_operators(),
     comparison_operators(),
     logical_operators(),
-    list(
-      negate_condition(),
-      remove_negation()
-    )
+    condition_mutations(),
+    numeric_literals(),
+    list(remove_negation())
   )
 )
 ```
 
-Start here, look at the survivors, then add more targeted mutators for the specific patterns in your code.
+Start here, look at the survivors, then layer in `boolean_literals()`, `na_literals()`, `string_literals()`, or `index_mutations()` for the specific patterns in your code.
