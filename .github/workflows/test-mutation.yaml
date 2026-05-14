@@ -53,7 +53,7 @@ jobs:
               )
             )
           )
-          score <- muttest(plan)
+          score <- muttest(plan, workers = 4)
 
           cat(sprintf("score=%s\n", score), file = Sys.getenv("GITHUB_OUTPUT"), append = TRUE)
 
