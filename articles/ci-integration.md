@@ -1,0 +1,118 @@
+# Running muttest in CI
+
+Running mutation tests in CI gives you a persistent, objective record of
+test quality that evolves alongside your codebase. This guide covers
+GitHub Actions setup, badge reporting, and practical tips for keeping CI
+runs fast.
+
+## Why run mutation tests in CI
+
+- **Regression detection** — a drop in mutation score on a PR signals
+  that new code shipped with weak tests.
+- **Visible accountability** — a badge in the README makes test quality
+  a first-class metric alongside coverage.
+- **Automated baseline** — no one has to remember to run `muttest`
+  locally; the score is always up to date.
+
+## GitHub Actions: minimal workflow
+
+Create `.github/workflows/test-mutation.yaml`:
+
+``` yaml
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+name: Mutation Testing
+
+jobs:
+  mutation-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            jakubsob/muttest
+
+      - name: Run mutation tests
+        shell: Rscript {0}
+        run: |
+          plan <- muttest::muttest_plan(c(
+            muttest::arithmetic_operators(),
+            muttest::comparison_operators()
+          ))
+          muttest::muttest(plan)
+```
+
+Adjust `source_files` and `mutators` to match your package.
+
+## Mutation score badge
+
+The `muttest` repository ships a badge workflow that writes a JSON
+endpoint to a `badges` branch and renders it as a shield. See the [badge
+workflow](https://github.com/jakubsob/muttest/blob/main/.github/workflows/test-mutation.yaml)
+in the `muttest` repository for the full implementation pattern.
+
+The badge in your README looks like:
+
+``` markdown
+[![muttest](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/YOUR_ORG/YOUR_REPO/badges/badges/muttest.json)](https://github.com/YOUR_ORG/YOUR_REPO/actions/workflows/test-mutation.yaml)
+```
+
+## Choosing which files to mutate in CI
+
+Mutation testing multiplies your test runtime: running N mutants means
+running your test suite N times. Keep CI fast by being selective:
+
+**Mutate:**
+
+- Files with complex branching or arithmetic logic
+- Critical domain code (validation, calculations, filters)
+- Recently changed files (use `git diff` to scope a PR run)
+
+**Skip:**
+
+- Pure utility files with trivial logic
+- Auto-generated code
+- Files already tested by slow integration tests (run those separately)
+
+A practical approach: define a narrow `source_files` list in your CI
+plan covering only the high-value files, and run the broader set locally
+or on a nightly schedule.
+
+## Failing the build on a low score
+
+To enforce a minimum mutation score, parse the output or use R’s exit
+codes:
+
+``` r
+
+score <- muttest::muttest(plan)
+if (score < 0.7) {
+  message(sprintf("Mutation score %.1f%% is below threshold 70%%", score * 100))
+  quit(status = 1)
+}
+```
+
+Start with a threshold that reflects your current score, then tighten it
+over time as you improve your tests.
+
+## Performance tips
+
+- **Scope `source_files` tightly** — the fewer files, the fewer mutants,
+  the faster the run.
+- **Use fast unit tests** — mutation testing re-runs your test suite for
+  each mutant. If individual tests are slow, the total time scales
+  badly. Prefer tests that mock external dependencies.
+- **Run on PRs to changed files only** — scope the mutation plan to
+  files touched by the PR using
+  `git diff --name-only origin/main...HEAD`.

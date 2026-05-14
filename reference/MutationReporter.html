@@ -15,7 +15,7 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
 
     <a class="navbar-brand me-2" href="../index.html">muttest</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -23,11 +23,15 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item dropdown">
+      <ul class="navbar-nav me-auto"><li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/how-it-works.html">How it works</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started</a></li>
+    <li><a class="dropdown-item" href="../articles/mutation-testing-101.html">What is Mutation Testing?</a></li>
+    <li><a class="dropdown-item" href="../articles/mutators.html">Mutator Reference</a></li>
+    <li><a class="dropdown-item" href="../articles/interpreting-results.html">Reading Results</a></li>
+    <li><a class="dropdown-item" href="../articles/ci-integration.html">CI Integration</a></li>
   </ul></li>
+<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -59,7 +63,7 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other MutationReporter:
 <code><a href="ProgressMutationReporter.html">ProgressMutationReporter</a></code>,
-<code><a href="default_reporter.html">default_reporter</a>()</code></p></div>
+<code><a href="default_reporter.html">default_reporter()</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
@@ -111,6 +115,10 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
 <dd><p>Current score of the mutation tests</p></dd>
 
 
+<dt><code>error_messages</code></dt>
+<dd><p>List of error messages from failed mutant runs</p></dd>
+
+
 </dl><p></p></div>
     </div>
     <div class="section level2">
@@ -124,6 +132,7 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
 <li><p><a href="#method-MutationReporter-start_file"><code>MutationReporter$start_file()</code></a></p></li>
 <li><p><a href="#method-MutationReporter-start_mutator"><code>MutationReporter$start_mutator()</code></a></p></li>
 <li><p><a href="#method-MutationReporter-add_result"><code>MutationReporter$add_result()</code></a></p></li>
+<li><p><a href="#method-MutationReporter-update"><code>MutationReporter$update()</code></a></p></li>
 <li><p><a href="#method-MutationReporter-end_mutator"><code>MutationReporter$end_mutator()</code></a></p></li>
 <li><p><a href="#method-MutationReporter-end_file"><code>MutationReporter$end_file()</code></a></p></li>
 <li><p><a href="#method-MutationReporter-end_reporter"><code>MutationReporter$end_reporter()</code></a></p></li>
@@ -208,13 +217,21 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
 <h3 id="method-add-result-">Method <code>add_result()</code><a class="anchor" aria-label="anchor" href="#method-add-result-"></a></h3>
 <p>Add a mutation test result</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">add_result</span><span class="op">(</span><span class="va">plan</span>, <span class="va">killed</span>, <span class="va">survived</span>, <span class="va">errors</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">add_result</span><span class="op">(</span></span>
+<span>  <span class="va">plan</span>,</span>
+<span>  <span class="va">killed</span>,</span>
+<span>  <span class="va">survived</span>,</span>
+<span>  <span class="va">errors</span>,</span>
+<span>  error <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  original_code <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  mutated_code <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>plan</code></dt>
-<dd><p>Current testing plan. See <code><a href="plan.html">plan()</a></code>.</p></dd>
+<dd><p>Current testing plan. See <code><a href="muttest_plan.html">muttest_plan()</a></code>.</p></dd>
 
 
 <dt><code>killed</code></dt>
@@ -229,13 +246,41 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
 <dd><p>Number of errors encountered</p></dd>
 
 
+<dt><code>error</code></dt>
+<dd><p>Optional error condition from a failed run</p></dd>
+
+
+<dt><code>original_code</code></dt>
+<dd><p>Original source lines before mutation</p></dd>
+
+
+<dt><code>mutated_code</code></dt>
+<dd><p>Mutated source lines</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-MutationReporter-update"></a><div class="section">
+<h3 id="method-update-">Method <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code><a class="anchor" aria-label="anchor" href="#method-update-"></a></h3>
+<p>Update status (no-op in base class)</p><div class="section">
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span>force <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>force</code></dt>
+<dd><p>Ignored</p></dd>
+
+
 </dl><p></p></div>
 </div>
 
 </div><p></p><hr><a id="method-MutationReporter-end_mutator"></a><div class="section">
 <h3 id="method-end-mutator-">Method <code>end_mutator()</code><a class="anchor" aria-label="anchor" href="#method-end-mutator-"></a></h3>
 <p>End testing with current mutator</p><div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">end_mutator</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -243,7 +288,7 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
 </div><p></p><hr><a id="method-MutationReporter-end_file"></a><div class="section">
 <h3 id="method-end-file-">Method <code>end_file()</code><a class="anchor" aria-label="anchor" href="#method-end-file-"></a></h3>
 <p>End testing current file</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">end_file</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -251,7 +296,7 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
 </div><p></p><hr><a id="method-MutationReporter-end_reporter"></a><div class="section">
 <h3 id="method-end-reporter-">Method <code>end_reporter()</code><a class="anchor" aria-label="anchor" href="#method-end-reporter-"></a></h3>
 <p>End reporter and show summary</p><div class="section">
-<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">end_reporter</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -259,7 +304,7 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
 </div><p></p><hr><a id="method-MutationReporter-get_score"></a><div class="section">
 <h3 id="method-get-score-">Method <code>get_score()</code><a class="anchor" aria-label="anchor" href="#method-get-score-"></a></h3>
 <p>Get the current score</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">get_score</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -267,24 +312,8 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
 </div><p></p><hr><a id="method-MutationReporter-cat_tight"></a><div class="section">
 <h3 id="method-cat-tight-">Method <code>cat_tight()</code><a class="anchor" aria-label="anchor" href="#method-cat-tight-"></a></h3>
 <p>Print a message to the output</p><div class="section">
-<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">cat_tight</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
-<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>...</code></dt>
-<dd><p>Message to print</p></dd>
-
-
-</dl><p></p></div>
-</div>
-
-</div><p></p><hr><a id="method-MutationReporter-cat_line"></a><div class="section">
-<h3 id="method-cat-line-">Method <code>cat_line()</code><a class="anchor" aria-label="anchor" href="#method-cat-line-"></a></h3>
-<p>Print a message to the output</p><div class="section">
 <h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">cat_line</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">cat_tight</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -296,11 +325,11 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-MutationReporter-rule"></a><div class="section">
-<h3 id="method-rule-">Method <code>rule()</code><a class="anchor" aria-label="anchor" href="#method-rule-"></a></h3>
-<p>Print a message to the output with a rule</p><div class="section">
+</div><p></p><hr><a id="method-MutationReporter-cat_line"></a><div class="section">
+<h3 id="method-cat-line-">Method <code>cat_line()</code><a class="anchor" aria-label="anchor" href="#method-cat-line-"></a></h3>
+<p>Print a message to the output</p><div class="section">
 <h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">rule</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">cat_line</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -312,15 +341,31 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-MutationReporter-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
-<p>The objects of this class are cloneable with this method.</p><div class="section">
+</div><p></p><hr><a id="method-MutationReporter-rule"></a><div class="section">
+<h3 id="method-rule-">Method <code>rule()</code><a class="anchor" aria-label="anchor" href="#method-rule-"></a></h3>
+<p>Print a message to the output with a rule</p><div class="section">
 <h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">rule</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>...</code></dt>
+<dd><p>Message to print</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-MutationReporter-clone"></a><div class="section">
+<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
+<p>The objects of this class are cloneable with this method.</p><div class="section">
+<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MutationReporter</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
@@ -341,7 +386,7 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">muttest</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,11 +21,15 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item dropdown">
+      <ul class="navbar-nav me-auto"><li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/how-it-works.html">How it works</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started</a></li>
+    <li><a class="dropdown-item" href="../articles/mutation-testing-101.html">What is Mutation Testing?</a></li>
+    <li><a class="dropdown-item" href="../articles/mutators.html">Mutator Reference</a></li>
+    <li><a class="dropdown-item" href="../articles/interpreting-results.html">Reading Results</a></li>
+    <li><a class="dropdown-item" href="../articles/ci-integration.html">CI Integration</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -46,7 +50,76 @@
 
     </div>
 
-  </main></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0" id="muttest-020">muttest 0.2.0<a class="anchor" aria-label="anchor" href="#muttest-020"></a></h2>
+<ul><li>❗️ Renamed <code>plan()</code> to <code><a href="../reference/muttest_plan.html">muttest_plan()</a></code>.</li>
+<li>✨ Add new mutators:
+<ul><li>
+<code><a href="../reference/boolean_literal.html">boolean_literal()</a></code>, <code><a href="../reference/na_literal.html">na_literal()</a></code> — literal replacement mutators.</li>
+<li>
+<code><a href="../reference/negate_condition.html">negate_condition()</a></code>, <code><a href="../reference/remove_condition_negation.html">remove_condition_negation()</a></code> — condition mutators.</li>
+<li>
+<code><a href="../reference/numeric_increment.html">numeric_increment()</a></code>, <code><a href="../reference/numeric_decrement.html">numeric_decrement()</a></code>, <code><a href="../reference/index_increment.html">index_increment()</a></code>, <code><a href="../reference/index_decrement.html">index_decrement()</a></code> — increment/decrement mutators.</li>
+<li>
+<code><a href="../reference/string_empty.html">string_empty()</a></code>, <code><a href="../reference/string_fill.html">string_fill()</a></code> — string mutators.</li>
+<li>
+<code><a href="../reference/call_name.html">call_name()</a></code> — call name mutator.</li>
+<li>
+<code><a href="../reference/remove_negation.html">remove_negation()</a></code> — unary negation mutator.</li>
+<li>
+<code><a href="../reference/replace_return_value.html">replace_return_value()</a></code> — return value mutator.</li>
+<li>
+<code><a href="../reference/delete_statement.html">delete_statement()</a></code> — removes assignments and standalone calls one at a time to catch untested side effects and dead assignments.</li>
+</ul></li>
+<li>✨ Add preset collections for all major mutator groups:
+<ul><li>
+<code><a href="../reference/boolean_literals.html">boolean_literals()</a></code> — flips <code>TRUE</code>/<code>FALSE</code> and <code>T</code>/<code>F</code>.</li>
+<li>
+<code><a href="../reference/na_literals.html">na_literals()</a></code> — swaps <code>NA</code>, <code>NULL</code>, and typed NA variants.</li>
+<li>
+<code><a href="../reference/numeric_literals.html">numeric_literals()</a></code> — increments and decrements numeric constants.</li>
+<li>
+<code><a href="../reference/index_mutations.html">index_mutations()</a></code> — shifts subscript indices up and down by one.</li>
+<li>
+<code><a href="../reference/string_literals.html">string_literals()</a></code> — empties non-empty strings and fills empty ones.</li>
+<li>
+<code><a href="../reference/condition_mutations.html">condition_mutations()</a></code> — negates conditions and removes existing negations.</li>
+<li>
+<code><a href="../reference/arithmetic_operators.html">arithmetic_operators()</a></code> — mutates arithmetic operators (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>^</code>, <code>%%</code>, <code>%/%</code>).</li>
+<li>
+<code><a href="../reference/comparison_operators.html">comparison_operators()</a></code> — mutates comparison operators (<code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code>, <code>==</code>, <code>!=</code>).</li>
+<li>
+<code><a href="../reference/logical_operators.html">logical_operators()</a></code> — mutates logical operators (<code>&amp;</code>, <code>|</code>, <code>&amp;&amp;</code>, <code>||</code>).</li>
+</ul></li>
+<li>✨ Mutators are now parametrized and accept configuration arguments.</li>
+<li>✨ <code>ProgressMutationReporter</code> now reports survived mutants.</li>
+<li>✨ Expose <code>Mutator</code> base class for building custom mutators.</li>
+<li>✨ <code><a href="../reference/muttest.html">muttest()</a></code> supports parallel execution of mutants.</li>
+<li>✨ <code><a href="../reference/muttest.html">muttest()</a></code> supports per-mutant timeouts to avoid hanging test runs.</li>
+<li>🥅 Improved error handling when test execution fails.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0" id="muttest-010">muttest 0.1.0<a class="anchor" aria-label="anchor" href="#muttest-010"></a></h2><p class="text-muted">CRAN release: 2025-05-30</p>
+<ul><li>✨ Create a testing plan with <code>plan</code>.</li>
+<li>✨ Run mutation testing with <code>muttest</code>.</li>
+<li>✨ Support mutating operators with <code>operator</code>.</li>
+<li>✨ Control copying project to temporary directory with <code>CopyStrategy</code>:
+<ul><li>
+<code>PackageCopyStrategy</code> implemented for copying package files.</li>
+</ul></li>
+<li>✨ Control test execution for each mutant with <code>TestStrategy</code>:
+<ul><li>
+<code>FullTestStrategy</code> for running all tests for each mutant.</li>
+<li>
+<code>FileTestStrategy</code> for running only test files matching mutant files.</li>
+</ul></li>
+<li>✨ See test results with <code>MutationReporter</code>.
+<ul><li>
+<code>ProgressMutationReporter</code> for printing progress to the console.</li>
+</ul></li>
+</ul></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
@@ -54,7 +127,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

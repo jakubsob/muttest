@@ -1,0 +1,29 @@
+# Increment subscript indices
+
+Replaces every simple subscript index in `x[i]` or `x[[i]]` with
+`x[i + 1L]` / `x[[i + 1L]]`. Targets identifier and numeric literal
+indices; complex expressions (e.g. `x[a + b]`) are left untouched.
+
+## Usage
+
+``` r
+index_increment()
+```
+
+## Value
+
+A [Mutator](https://jakubsob.github.io/muttest/reference/Mutator.md)
+object.
+
+## Details
+
+Catches off-by-one errors where tests never verify the exact element
+retrieved from a vector or list.
+
+## Examples
+
+``` r
+index_increment()
+#> Mutator: x[<i>] → x[<i> + 1L]
+#> Query: [(subset arguments: (arguments (argument value: [(identifier) (float) (integer)] @index))) (subset2 arguments: (arguments (argument value: [(identifier) (float) (integer)] @index)))]
+```

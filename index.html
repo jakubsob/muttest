@@ -35,7 +35,7 @@
 
     <a class="navbar-brand me-2" href="index.html">muttest</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,13 +44,17 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/how-it-works.html">How it works</a></li>
+<li><a class="dropdown-item" href="articles/getting-started.html">Getting Started</a></li>
+    <li><a class="dropdown-item" href="articles/mutation-testing-101.html">What is Mutation Testing?</a></li>
+    <li><a class="dropdown-item" href="articles/mutators.html">Mutator Reference</a></li>
+    <li><a class="dropdown-item" href="articles/interpreting-results.html">Reading Results</a></li>
+    <li><a class="dropdown-item" href="articles/ci-integration.html">CI Integration</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -79,10 +83,36 @@
 </div>
 <!-- badges: start -->
 
-<p>Measure quality of your tests with <strong>{muttest}</strong>.</p>
-<p><a href="https://github.com/r-lib/covr" class="external-link">covr</a> tells you how much of your code is executed by tests, but it tells you nothing about the quality of those tests.</p>
-<p>In fact, you can have tests with zero assertions and still get 100% coverage. That can give a false sense of security. Mutation testing addresses this gap.</p>
-<p>It works like this:</p>
+<p>Coverage tells you which lines ran. It says nothing about whether your tests would catch a bug. You can delete every assertion, run <code>covr</code>, and still see 100%.</p>
+<p><strong>{muttest}</strong> measures the quality of your tests — not just how much code they execute.</p>
+<div class="section level2">
+<h2 id="the-problem-with-coverage-alone">The problem with coverage alone<a class="anchor" aria-label="anchor" href="#the-problem-with-coverage-alone"></a>
+</h2>
+<p><a href="https://github.com/r-lib/covr" class="external-link">covr</a> tells you which lines were executed. It cannot tell you whether your assertions are strong enough to catch a real bug. A test suite full of <code>expect_true(is.numeric(x))</code> checks will reach 100% coverage while missing every meaningful failure.</p>
+<p>Mutation testing addresses this gap by asking a harder question: <em>if this code were subtly wrong, would your tests notice?</em></p>
+</div>
+<div class="section level2">
+<h2 id="the-need-for-mutation-testing-in-the-age-of-llms">The need for mutation testing in the age of LLMs<a class="anchor" aria-label="anchor" href="#the-need-for-mutation-testing-in-the-age-of-llms"></a>
+</h2>
+<p>Many teams now use LLMs to write their tests. LLMs are good at producing syntactically correct, passing tests quickly — but they might cover only the obvious cases and miss the boundaries:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># What an LLM may write for is_adult():</span></span>
+<span><span class="fu">test_that</span><span class="op">(</span><span class="st">"is_adult works"</span>, <span class="op">{</span></span>
+<span>  <span class="fu">expect_true</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">is.numeric</a></span><span class="op">(</span><span class="fu">is_adult</span><span class="op">(</span><span class="fl">25</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="co"># checks return type, not logic</span></span>
+<span>  <span class="fu">expect_true</span><span class="op">(</span><span class="fu">is_adult</span><span class="op">(</span><span class="fl">25</span><span class="op">)</span><span class="op">)</span>             <span class="co"># clearly an adult</span></span>
+<span>  <span class="fu">expect_false</span><span class="op">(</span><span class="fu">is_adult</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span>            <span class="co"># clearly a minor</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># What actually catches the &gt;= vs &gt; boundary bug:</span></span>
+<span><span class="fu">test_that</span><span class="op">(</span><span class="st">"is_adult handles the boundary age"</span>, <span class="op">{</span></span>
+<span>  <span class="fu">expect_true</span><span class="op">(</span><span class="fu">is_adult</span><span class="op">(</span><span class="fl">18</span><span class="op">)</span><span class="op">)</span>    <span class="co"># kills the &gt;= → &gt; mutant</span></span>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
+<p>Both test suites pass. Both have 100% coverage. Only one would catch a developer accidentally writing <code>age &gt; 18</code> instead of <code>age &gt;= 18</code>.</p>
+<p>Mutation testing gives you a score that reflects <strong>assertion quality</strong>, not just execution. It gives you a concrete way to understand the real strength — and the real gaps — in an LLM-generated test suite.</p>
+</div>
+<div class="section level2">
+<h2 id="how-it-works">How it works<a class="anchor" aria-label="anchor" href="#how-it-works"></a>
+</h2>
 <ul>
 <li>Define a set of code changes (mutations).</li>
 <li>Run your test suite against mutated versions of your source code.</li>
@@ -93,73 +123,295 @@
 <li>0% score → Your tests pass no matter what changes. Your assertions are weak.</li>
 <li>100% score → Every mutation triggers a test failure. Your tests are robust.</li>
 </ul>
-<p>{muttest} not only gives you the score, but it also tells you tests for which files require improved assertions.</p>
+<p>{muttest} not only gives you the score, but it also tells you which files need stronger assertions.</p>
+</div>
 </div>
 <div class="section level1">
 <h1 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h1>
 <p>Given our codebase is:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#' R/calculate.R</span></span>
-<span><span class="va">calculate</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="op">(</span><span class="va">x</span> <span class="op">+</span> <span class="va">y</span><span class="op">)</span> <span class="op">*</span> <span class="fl">0</span></span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#' R/is_adult.R</span></span>
+<span><span class="va">is_adult</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">age</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">age</span> <span class="op">&gt;=</span> <span class="fl">18</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>And our tests are:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#' tests/testthat/test_calculate.R</span></span>
-<span><span class="fu">test_that</span><span class="op">(</span><span class="st">"calculate returns a numeric"</span>, <span class="op">{</span></span>
-<span>  <span class="fu">expect_true</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">is.numeric</a></span><span class="op">(</span><span class="fu">calculate</span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="co"># ❌ This assertion doesn't kill mutants</span></span>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#' tests/testthat/test-is_adult.R</span></span>
+<span><span class="fu">test_that</span><span class="op">(</span><span class="st">"is_adult returns TRUE for adults"</span>, <span class="op">{</span></span>
+<span>  <span class="fu">expect_true</span><span class="op">(</span><span class="fu">is_adult</span><span class="op">(</span><span class="fl">25</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">test_that</span><span class="op">(</span><span class="st">"calculate always returns 0"</span>, <span class="op">{</span></span>
-<span>  <span class="fu">expect_equal</span><span class="op">(</span><span class="fu">calculate</span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fl">0</span><span class="op">)</span> <span class="co"># ✅ This assertion only kills "*" -&gt; "/" mutant</span></span>
+<span><span class="fu">test_that</span><span class="op">(</span><span class="st">"is_adult returns FALSE for minors"</span>, <span class="op">{</span></span>
+<span>  <span class="fu">expect_false</span><span class="op">(</span><span class="fu">is_adult</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <p>When running <code><a href="reference/muttest.html">muttest::muttest()</a></code> we’ll get a report of the mutation score:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu">muttest</span><span class="fu">::</span><span class="fu"><a href="reference/plan.html">plan</a></span><span class="op">(</span></span>
-<span>  source_files <span class="op">=</span> <span class="st">"R/calculate.R"</span>,</span>
-<span>  mutators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu">muttest</span><span class="fu">::</span><span class="fu"><a href="reference/operator.html">operator</a></span><span class="op">(</span><span class="st">"+"</span>, <span class="st">"-"</span><span class="op">)</span>,</span>
-<span>    <span class="fu">muttest</span><span class="fu">::</span><span class="fu"><a href="reference/operator.html">operator</a></span><span class="op">(</span><span class="st">"*"</span>, <span class="st">"/"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">withr</span><span class="fu">::</span><span class="fu"><a href="https://withr.r-lib.org/reference/with_dir.html" class="external-link">with_dir</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"boundary"</span>, package <span class="op">=</span> <span class="st">"muttest"</span><span class="op">)</span>, <span class="op">{</span></span>
+<span>  <span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu">muttest</span><span class="fu">::</span><span class="fu"><a href="reference/muttest_plan.html">muttest_plan</a></span><span class="op">(</span></span>
+<span>    mutators <span class="op">=</span> <span class="fu">muttest</span><span class="fu">::</span><span class="fu"><a href="reference/comparison_operators.html">comparison_operators</a></span><span class="op">(</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">muttest</span><span class="fu">::</span><span class="fu"><a href="reference/muttest.html">muttest</a></span><span class="op">(</span><span class="va">plan</span><span class="op">)</span></span>
+<span>  <span class="fu">muttest</span><span class="fu">::</span><span class="fu"><a href="reference/muttest.html">muttest</a></span><span class="op">(</span><span class="va">plan</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ℹ Mutation Testing</span></span>
-<span><span class="co">#&gt;   |   K |   S |   E |   T |   % | Mutator  | File</span></span>
-<span><span class="co">#&gt; x |   0 |   1 |   0 |   1 |   0 | + → -    | calculate.R</span></span>
-<span><span class="co">#&gt; ✔ |   1 |   1 |   0 |   2 |  50 | * → /    | calculate.R</span></span>
-<span><span class="co">#&gt; ── Mutation Testing Results ────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt;   |   K |   S |   E |   T |   % | Mutator  | File </span></span>
+<span><span class="co">#&gt; ✔ |   1 |   0 |   0 |   1 | 100 | &gt;= → &lt;=  | is_adult.R </span></span>
+<span><span class="co">#&gt; x |   1 |   1 |   0 |   2 |  50 | &gt;= → &gt;   | is_adult.R </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Duration: 1.99 s</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Survived Mutants ────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; is_adult.R  &gt;= → &gt;</span></span>
+<span><span class="co">#&gt;   2-   age &gt;= 18</span></span>
+<span><span class="co">#&gt;   2+   age &gt; 18</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Results ─────────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]</span></span></code></pre></div>
 <p>The mutation score is: <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Mutation Score</mtext><mo>=</mo><mfrac><mtext mathvariant="normal">Killed Mutants</mtext><mtext mathvariant="normal">Total Mutants</mtext></mfrac><mo>×</mo><mn>100</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">\text{Mutation Score} = \frac{\text{Killed Mutants}}{\text{Total Mutants}} \times 100\%</annotation></semantics></math>, where a Mutant is defined as variant of the original code that is used to test the robustness of the test suite.</p>
-<p>In the example there were 2 mutants of the code:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#' R/calculate.R</span></span>
-<span><span class="va">calculate</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="va">y</span><span class="op">)</span> <span class="op">*</span> <span class="fl">0</span> <span class="co"># mutant 1: "+" -&gt; "-"</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+<p><code><a href="reference/comparison_operators.html">comparison_operators()</a></code> generates mutants by swapping each comparison operator for related alternatives. For <code>&gt;=</code> it produces two mutants:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#' R/calculate.R</span></span>
-<span><span class="va">calculate</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="op">(</span><span class="va">x</span> <span class="op">+</span> <span class="va">y</span><span class="op">)</span> <span class="op">/</span> <span class="fl">0</span> <span class="co"># mutant 2: "*" -&gt; "/"</span></span>
+<code class="sourceCode R"><span><span class="co">#' R/is_adult.R — mutant 1: "&gt;=" -&gt; "&gt;"</span></span>
+<span><span class="va">is_adult</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">age</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">age</span> <span class="op">&gt;</span> <span class="fl">18</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p>Tests are run against both variants of the code.</p>
-<p>The first test run against the first mutant will pass, because the result is still 0. The second test run against the second mutant will fail, because the result is Inf.</p>
-<p>The second test will pass against both mutants, because the result is still numeric.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#' tests/testthat/test_calculate.R</span></span>
-<span><span class="fu">test_that</span><span class="op">(</span><span class="st">"calculate always returns 0"</span>, <span class="op">{</span></span>
-<span>  <span class="co"># 🟢 This test doesn't kill "+" -&gt; "-" operator mutant: (2 - 2) * 0 = 0</span></span>
-<span>  <span class="co"># ❌ This test kills "*" -&gt; "/" operator mutant: (2 + 2) / 0 = Inf</span></span>
-<span>  <span class="fu">expect_equal</span><span class="op">(</span><span class="fu">calculate</span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fl">0</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co">#' R/is_adult.R — mutant 2: "&gt;=" -&gt; "&lt;="</span></span>
+<span><span class="va">is_adult</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">age</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">age</span> <span class="op">&lt;=</span> <span class="fl">18</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>Tests are run against both mutants.</p>
+<p>Mutant 2 (<code>&gt;=</code> → <code>&lt;=</code>) is <strong>killed</strong>: <code>is_adult(25)</code> now returns <code>FALSE</code>, which fails the first test.</p>
+<p>Mutant 1 (<code>&gt;=</code> → <code>&gt;</code>) <strong>survives</strong>: <code>is_adult(25)</code> still returns <code>TRUE</code> and <code>is_adult(10)</code> still returns <code>FALSE</code> — the boundary value <code>18</code> is never tested, so the test suite cannot tell <code>&gt;=</code> from <code>&gt;</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#' tests/testthat/test-is_adult.R</span></span>
+<span><span class="fu">test_that</span><span class="op">(</span><span class="st">"is_adult returns TRUE for adults"</span>, <span class="op">{</span></span>
+<span>  <span class="co"># ✔ Kills mutant 2 (&lt;=): is_adult(25) returns FALSE</span></span>
+<span>  <span class="co"># 🟢 Doesn't kill mutant 1 (&gt;): is_adult(25) still returns TRUE</span></span>
+<span>  <span class="fu">expect_true</span><span class="op">(</span><span class="fu">is_adult</span><span class="op">(</span><span class="fl">25</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">test_that</span><span class="op">(</span><span class="st">"calculate returns a numeric"</span>, <span class="op">{</span></span>
-<span>  <span class="co"># 🟢 This test doesn't kill "+" -&gt; "-", (2 - 2) * 0 = 0, is numeric</span></span>
-<span>  <span class="co"># 🟢 This test doesn't kill "*" -&gt; "/", (2 + 2) / 0 = Inf, is numeric</span></span>
-<span>  <span class="fu">expect_true</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">is.numeric</a></span><span class="op">(</span><span class="fu">calculate</span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">test_that</span><span class="op">(</span><span class="st">"is_adult returns FALSE for minors"</span>, <span class="op">{</span></span>
+<span>  <span class="co"># 🟢 Doesn't kill mutant 1 (&gt;): is_adult(10) still returns FALSE</span></span>
+<span>  <span class="co"># 🟢 Doesn't kill mutant 2 (&lt;=): is_adult(10) returns TRUE → killed by first test anyway</span></span>
+<span>  <span class="fu">expect_false</span><span class="op">(</span><span class="fu">is_adult</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<p>We have killed 1 mutant out of 2, so the mutation score is 50%.</p>
+<p>We have killed 1 mutant out of 2, so the mutation score is 50%. The survivor tells us exactly what to fix — add a test at the boundary:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">test_that</span><span class="op">(</span><span class="st">"is_adult returns TRUE at the boundary age"</span>, <span class="op">{</span></span>
+<span>  <span class="fu">expect_true</span><span class="op">(</span><span class="fu">is_adult</span><span class="op">(</span><span class="fl">18</span><span class="op">)</span><span class="op">)</span>  <span class="co"># kills mutant 1: age &gt; 18 returns FALSE for age = 18</span></span>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
+<p>With this test added the score reaches 100%.</p>
+</div>
+<div class="section level1">
+<h1 id="available-mutators">Available mutators<a class="anchor" aria-label="anchor" href="#available-mutators"></a>
+</h1>
+<p>A mutator describes one kind of code change. Pass a list of mutators to <code><a href="reference/muttest_plan.html">muttest_plan()</a></code> to control what gets mutated.</p>
+<p><strong>Individual mutators</strong></p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr>
+<th align="left">Function</th>
+<th align="left">Description</th>
+<th align="left">Example</th>
+</tr></thead>
+<tbody>
+<tr>
+<td align="left"><code><a href="reference/operator.html">operator()</a></code></td>
+<td align="left">Mutate a binary operator</td>
+<td align="left">
+<code>operator("+", "-")</code>: <code>a + b</code> → <code>a - b</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/boolean_literal.html">boolean_literal()</a></code></td>
+<td align="left">Mutate a boolean literal</td>
+<td align="left">
+<code>boolean_literal("TRUE", "FALSE")</code>: <code>TRUE</code> → <code>FALSE</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/na_literal.html">na_literal()</a></code></td>
+<td align="left">Mutate an NA or NULL literal</td>
+<td align="left">
+<code>na_literal("NA", "NULL")</code>: <code>NA</code> → <code>NULL</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/call_name.html">call_name()</a></code></td>
+<td align="left">Mutate a function call name</td>
+<td align="left">
+<code>call_name("any", "all")</code>: <code>any(x)</code> → <code>all(x)</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/string_empty.html">string_empty()</a></code></td>
+<td align="left">Mutate non-empty string literals to the empty string</td>
+<td align="left">
+<code><a href="reference/string_empty.html">string_empty()</a></code>: <code>"hello"</code> → <code>""</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/string_fill.html">string_fill()</a></code></td>
+<td align="left">Mutate the empty string literal to a placeholder string</td>
+<td align="left">
+<code><a href="reference/string_fill.html">string_fill()</a></code>: <code>""</code> → <code>"mutant"</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/numeric_increment.html">numeric_increment()</a></code></td>
+<td align="left">Increment numeric literals</td>
+<td align="left">
+<code><a href="reference/numeric_increment.html">numeric_increment()</a></code>: <code>5</code> → <code>6</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/numeric_decrement.html">numeric_decrement()</a></code></td>
+<td align="left">Decrement numeric literals</td>
+<td align="left">
+<code><a href="reference/numeric_decrement.html">numeric_decrement()</a></code>: <code>5</code> → <code>4</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/index_increment.html">index_increment()</a></code></td>
+<td align="left">Increment subscript indices</td>
+<td align="left">
+<code><a href="reference/index_increment.html">index_increment()</a></code>: <code>x[i]</code> → <code>x[i + 1L]</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/index_decrement.html">index_decrement()</a></code></td>
+<td align="left">Decrement subscript indices</td>
+<td align="left">
+<code><a href="reference/index_decrement.html">index_decrement()</a></code>: <code>x[i]</code> → <code>x[i - 1L]</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/negate_condition.html">negate_condition()</a></code></td>
+<td align="left">Negate the condition of if/while statements</td>
+<td align="left">
+<code><a href="reference/negate_condition.html">negate_condition()</a></code>: <code>if (x &gt; 0)</code> → <code>if (!(x &gt; 0))</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/remove_condition_negation.html">remove_condition_negation()</a></code></td>
+<td align="left">Remove negation from the condition of if/while statements</td>
+<td align="left">
+<code><a href="reference/remove_condition_negation.html">remove_condition_negation()</a></code>: <code>if (!done)</code> → <code>if (done)</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/remove_negation.html">remove_negation()</a></code></td>
+<td align="left">Remove logical negation</td>
+<td align="left">
+<code><a href="reference/remove_negation.html">remove_negation()</a></code>: <code>!is.na(x)</code> → <code>is.na(x)</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/replace_return_value.html">replace_return_value()</a></code></td>
+<td align="left">Replace the value in explicit return() calls</td>
+<td align="left">
+<code><a href="reference/replace_return_value.html">replace_return_value()</a></code>: <code>return(x)</code> → <code>return(NULL)</code>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Preset collections</strong> — return a ready-made list of mutators</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr>
+<th align="left">Function</th>
+<th align="left">Description</th>
+<th align="left">Example</th>
+</tr></thead>
+<tbody>
+<tr>
+<td align="left"><code><a href="reference/arithmetic_operators.html">arithmetic_operators()</a></code></td>
+<td align="left">Arithmetic operator mutators</td>
+<td align="left">
+<code>+</code>↔︎<code>-</code>, <code>*</code>↔︎<code>/</code>, <code>^</code>→<code>*</code>, <code>%%</code>→<code>*</code>, <code>%/%</code>→<code>/</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/comparison_operators.html">comparison_operators()</a></code></td>
+<td align="left">Comparison operator mutators</td>
+<td align="left">
+<code>&lt;</code>↔︎<code>&gt;</code>, <code>==</code>↔︎<code>!=</code>, <code>&lt;</code>→<code>&lt;=</code>, <code>&gt;</code>→<code>&gt;=</code> …</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/logical_operators.html">logical_operators()</a></code></td>
+<td align="left">Logical operator mutators</td>
+<td align="left">
+<code>&amp;&amp;</code>↔︎<code>||</code>, <code>&amp;</code>↔︎<code>|</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/boolean_literals.html">boolean_literals()</a></code></td>
+<td align="left">Boolean literal mutators</td>
+<td align="left">
+<code>TRUE</code>↔︎<code>FALSE</code>, <code>T</code>↔︎<code>F</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/na_literals.html">na_literals()</a></code></td>
+<td align="left">NA and NULL literal mutators</td>
+<td align="left">
+<code>NA</code>↔︎<code>NULL</code>, <code>NA</code>↔︎<code>NA_real_</code>, <code>NA</code>↔︎<code>NA_integer_</code>, <code>NA</code>↔︎<code>NA_character_</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/numeric_literals.html">numeric_literals()</a></code></td>
+<td align="left">Numeric literal mutators</td>
+<td align="left">
+<code>5</code>→<code>6</code>, <code>5</code>→<code>4</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/index_mutations.html">index_mutations()</a></code></td>
+<td align="left">Index mutation mutators</td>
+<td align="left">
+<code>x[i]</code>→<code>x[i + 1L]</code>, <code>x[i]</code>→<code>x[i - 1L]</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/string_literals.html">string_literals()</a></code></td>
+<td align="left">String literal mutators</td>
+<td align="left">
+<code>"hello"</code>→<code>""</code>, <code>""</code>→<code>"mutant"</code>
+</td>
+</tr>
+<tr>
+<td align="left"><code><a href="reference/condition_mutations.html">condition_mutations()</a></code></td>
+<td align="left">Condition mutation mutators</td>
+<td align="left">
+<code>if (x)</code>→<code>if (!(x))</code>, <code>if (!x)</code>→<code>if (x)</code>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level1">
+<h1 id="where-to-go-next">Where to go next<a class="anchor" aria-label="anchor" href="#where-to-go-next"></a>
+</h1>
+<ul>
+<li>
+<code><a href="articles/getting-started.html">vignette("getting-started", package = "muttest")</a></code> — a full worked example from zero to a mutation score, including how to interpret and improve results.</li>
+<li>
+<code><a href="articles/mutation-testing-101.html">vignette("mutation-testing-101", package = "muttest")</a></code> — conceptual background, the LLM-tests problem in depth, and when mutation testing pays off.</li>
+<li>
+<code><a href="articles/mutators.html">vignette("mutators", package = "muttest")</a></code> — all available mutators, when to use each, and how to build custom pairs.</li>
+<li>
+<code><a href="articles/interpreting-results.html">vignette("interpreting-results", package = "muttest")</a></code> — how to read surviving mutants and turn them into stronger tests.</li>
+<li>
+<code><a href="articles/ci-integration.html">vignette("ci-integration", package = "muttest")</a></code> — run mutation tests on every push, add a score badge, and enforce thresholds.</li>
+</ul>
 </div>
 
   </main><aside class="col-md-3"><div class="links">
@@ -199,7 +451,7 @@
 <li><a href="https://github.com/jakubsob/muttest/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/jakubsob/muttest/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 <li><a href="https://app.codecov.io/gh/jakubsob/muttest" class="external-link"><img src="https://codecov.io/gh/jakubsob/muttest/graph/badge.svg" alt="Codecov test coverage"></a></li>
 <li><a href="https://github.com/jakubsob/muttest/actions/workflows/test-acceptance.yaml" class="external-link"><img src="https://img.shields.io/github/actions/workflow/status/jakubsob/muttest/test-acceptance.yaml?branch=main&amp;label=cucumber&amp;logo=cucumber&amp;color=23D96C&amp;labelColor=0f2a13" alt="cucumber"></a></li>
-<li><a href="https://github.com/jakubsob/muttest/actions/workflows/test-mutation.yaml" class="external-link"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jakubsob/muttest/badges/.badges/muttest.json" alt="muttest"></a></li>
+<li><a href="https://github.com/jakubsob/muttest/actions/workflows/test-mutation.yaml" class="external-link"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jakubsob/muttest/badges/.badges/main/muttest.json" alt="muttest"></a></li>
 <li><a href="https://cran.r-project.org/package=muttest" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/grand-total/muttest" alt="Grand total"></a></li>
 <li><a href="https://cran.r-project.org/package=muttest" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/last-month/muttest" alt="Last month"></a></li>
 </ul>
@@ -214,7 +466,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

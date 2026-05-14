@@ -1,0 +1,171 @@
+# What is Mutation Testing and Why Does it Matter?
+
+## Code coverage is not test quality
+
+If you use `covr`, you know that 80% coverage means 80% of your lines
+ran during tests. What it does not mean is that those tests would catch
+a bug.
+
+Here is a concrete example. This function has a subtle operator bug:
+
+``` r
+
+# R/stats.R
+above_threshold <- function(x, threshold) {
+  x > threshold   # should this be >= ?
+}
+```
+
+And this test achieves 100% line coverage:
+
+``` r
+
+test_that("above_threshold works", {
+  result <- above_threshold(c(1, 5, 10), 3)
+  expect_true(is.logical(result))
+  expect_length(result, 3)
+})
+```
+
+The function runs. The test passes. Coverage is 100%. But `>` could be
+replaced with `>=`, `<`, or `==` and this test would still pass —
+because it never checks the actual values, only the type and length.
+
+**Coverage measures execution. Mutation testing measures detection.**
+
+## What a mutant is
+
+A mutant is a copy of your source code with one small, deliberate change
+— an operator swap, a flipped condition, a replaced constant. The idea
+is to simulate the kind of mistake a developer might actually make.
+
+For the function above, `muttest` could generate mutants like:
+
+``` r
+
+# mutant 1: > → >=
+above_threshold <- function(x, threshold) {
+  x >= threshold
+}
+
+# mutant 2: > → <
+above_threshold <- function(x, threshold) {
+  x < threshold
+}
+```
+
+Your test suite runs against each mutant. If the tests fail, the mutant
+is **killed** — your tests noticed the change. If the tests pass, the
+mutant **survived** — your tests are blind to that kind of bug.
+
+## Kill vs survive
+
+| Outcome  | Meaning                                                    |
+|----------|------------------------------------------------------------|
+| Killed   | At least one test failed. Your tests caught this mutation. |
+| Survived | All tests passed. Your tests did not detect this change.   |
+| Error    | The mutated code caused an unexpected runtime error.       |
+
+Survivors are the interesting ones. Each surviving mutant points to a
+specific gap: a mutation your tests cannot distinguish from the original
+code. That is a candidate for a stronger test.
+
+## The mutation score
+
+    Mutation Score = (Killed Mutants / Total Mutants) × 100%
+
+- **0%** — Your tests pass regardless of what the code does. Assertions
+  are missing or trivial.
+- **100%** — Every mutation your tests can detect is detected. Your
+  tests are very specific.
+
+No project needs a perfect score on every file. The goal is to use the
+score directionally: find the files where survivors cluster, and
+strengthen those tests first.
+
+## The LLM-generated tests problem
+
+Many R programmers reach for LLMs (ChatGPT, Claude, Copilot) to write
+tests. This can be a useful shortcut — LLMs write syntactically correct
+tests quickly, and for boilerplate cases they can work well.
+
+LLMs might produce assertions that are easy to satisfy — tests that pass
+but don’t deeply verify correctness:
+
+``` r
+
+# Typical LLM output for above_threshold():
+test_that("above_threshold returns logical vector", {
+  expect_true(is.logical(above_threshold(c(1, 5), 3)))
+})
+
+test_that("above_threshold handles length", {
+  expect_equal(length(above_threshold(1:5, 2)), 5)
+})
+```
+
+Both tests pass. Both would pass against every mutant of
+`above_threshold`. These tests document the shape of the output but say
+nothing about its correctness — a pattern that can appear in
+LLM-generated tests.
+
+This is not a criticism of LLMs. But it means mutation testing is a
+useful way to check how strong those tests actually are:
+
+> **LLM-generated tests need external validation just as much as
+> human-written tests do.**
+
+Mutation testing provides that validation. Run `muttest` on any file
+where the tests were AI-generated. A low score does not mean the LLM did
+a bad job — it means you now know exactly where to add better
+assertions.
+
+## When mutation testing pays off most
+
+Mutation testing is most valuable when:
+
+- **The logic is complex** — branching conditions, arithmetic formulas,
+  comparison chains. These produce many mutants, and survivors are easy
+  to fix with targeted test cases.
+- **The code is critical** — financial calculations, data validation,
+  model thresholds. A bug here has real consequences; extra confidence
+  is worth the investment.
+- **Tests were generated automatically** — by an LLM, a code generator,
+  or a template. These tests are the most likely to have weak
+  assertions.
+- **Coverage is already high but bugs still slip through** — a common
+  symptom of assertion-light test suites.
+
+## When it is less useful
+
+- **Simple functions** — functions that read a file and return its
+  contents, or just call another function. There is little logic to
+  mutate.
+- **Snapshot testing** — in snapshot testing oftentimes every little
+  change in the code breaks the snapshot. It’s very likely that every
+  mutant will be killed, providing little useful feedback.
+- **Very slow test suites** — mutation testing multiplies your test
+  runtime by the number of mutants. Start with fast unit tests before
+  applying it to slower tests.
+
+## How it relates to covr
+
+These tools answer different questions and complement each other:
+
+| Tool      | Question answered                       |
+|-----------|-----------------------------------------|
+| `covr`    | Which lines does my test suite execute? |
+| `muttest` | Which bugs would my test suite detect?  |
+
+A practical workflow: use `covr` to find untested code, then use
+`muttest` on the covered code to find weakly-tested logic. High
+coverage + high mutation score = genuinely robust tests.
+
+## Next steps
+
+- [Getting
+  Started](https://jakubsob.github.io/muttest/articles/getting-started.md)
+  — run your first mutation test in minutes
+- [Mutator
+  Reference](https://jakubsob.github.io/muttest/articles/mutators.md) —
+  which mutations to apply and when
