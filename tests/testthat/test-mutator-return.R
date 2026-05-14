@@ -59,6 +59,24 @@ describe("replace_return_value default (NULL)", {
   })
 })
 
+describe("replace_return_value implicit", {
+  it("should mutate implicit returns", {
+    skip("TODO: Implement implicit return mutation.")
+    mutator <- replace_return_value()
+    expect_mutates_to(mutator, c("f <- function(x) { x }"), list(c("f <- function(x) { NULL }")))
+  })
+
+  it("should mutate the last expression in a function body", {
+    skip("TODO: Implement implicit return mutation.")
+    mutator <- replace_return_value()
+    expect_mutates_to(
+      mutator,
+      c("f <- function(x) {", "  y <- x + 1", "  y <- 2", "}"),
+      list(c("f <- function(x) {", "  y <- x + 1", "  NULL", "}"))
+    )
+  })
+})
+
 describe("replace_return_value with NA replacement", {
   it("should replace the return value with NA", {
     mutator <- replace_return_value("NA")
