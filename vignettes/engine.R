@@ -52,6 +52,8 @@
     raw <- readLines(f, warn = FALSE)
     raw[!grepl("^source\\(file\\.path\\(", raw)]
   }))
+  # Strip only empty lines at start and end, but preserve internal spacing
+  lines <- sub("^[\r\n]+", "", paste(lines, collapse = "\n"))
   paste(lines, collapse = "\n")
 }
 
@@ -92,51 +94,54 @@
 
   section <- function(key) if (is.null(readme[[key]])) "" else readme[[key]]
 
-  paste(c(
-    paste0("## ", readme$title),
-    "",
-    section("What this demonstrates"),
-    "",
-    "### The function",
-    "",
-    "```r",
-    source_code,
-    "```",
-    "",
-    section("The function"),
-    "",
-    "### Weak test",
-    "",
-    "```r",
-    weak_code,
-    "```",
-    "",
-    section("The weak test"),
-    "",
-    "**Mutation testing output:**",
-    "",
-    "```",
-    weak_output,
-    "```",
-    "",
-    section("The surviving mutant"),
-    "",
-    "### The fix",
-    "",
-    "```r",
-    strong_code,
-    "```",
-    "",
-    section("The fix"),
-    "",
-    "**After the fix:**",
-    "",
-    "```",
-    strong_output,
-    "```",
-    "",
-    section("Key rule")
-  ), collapse = "\n")
+  paste(
+    c(
+      paste0("### Example: ", readme$title),
+      "",
+      section("What this demonstrates"),
+      "",
+      "#### The function",
+      "",
+      "```r",
+      source_code,
+      "```",
+      "",
+      section("The function"),
+      "",
+      "#### Weak test",
+      "",
+      "```r",
+      weak_code,
+      "```",
+      "",
+      section("The weak test"),
+      "",
+      "**Mutation testing output:**",
+      "",
+      "```",
+      weak_output,
+      "```",
+      "",
+      section("The surviving mutant"),
+      "",
+      "#### The fix",
+      "",
+      "```r",
+      strong_code,
+      "```",
+      "",
+      section("The fix"),
+      "",
+      "**After the fix:**",
+      "",
+      "```",
+      strong_output,
+      "```",
+      "",
+      section("Key rule")
+    ),
+    collapse = "\n"
+  )
 }
 
 knitr::knit_engines$set(muttest_example = function(options) {

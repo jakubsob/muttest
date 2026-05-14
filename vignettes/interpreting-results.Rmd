@@ -21,23 +21,23 @@ The mutation score is only useful if you know how to read it. This article walks
 
 Every `muttest::muttest()` run produces a table with one row per mutator/file pair:
 
-| Column | Meaning |
-|--------|---------|
-| K | **Killed** — mutants that caused at least one test to fail. Your tests caught the change. |
-| S | **Survived** — mutants that passed all tests. Your tests did not notice the change. |
-| E | **Errors** — mutants that produced a parse or execution error (neither killed nor survived). |
-| T | **Total** — mutants generated for this mutator/file pair. |
-| % | **Score** — `K / (K + S) × 100`. |
+| Column | Meaning                                                                                      |
+| ------ | -------------------------------------------------------------------------------------------- |
+| K      | **Killed** — mutants that caused at least one test to fail. Your tests caught the change.    |
+| S      | **Survived** — mutants that passed all tests. Your tests did not notice the change.          |
+| E      | **Errors** — mutants that produced a parse or execution error (neither killed nor survived). |
+| T      | **Total** — mutants generated for this mutator/file pair.                                    |
+| %      | **Score** — `K / (K + S) × 100`.                                                             |
 
 A `✔` row means at least one mutant was killed. An `x` row means every mutant survived — your tests passed unchanged.
 
 ## What the score tells you
 
-| Score | Signal |
-|-------|--------|
-| 0% | Your assertions do not constrain the outcome. Tests pass no matter what. |
-| 1–99% | Some cases are well-tested; others are not. The survivors point at the gaps. |
-| 100% | Every generated mutant was caught. Your tests are robust against these specific changes. |
+| Score | Signal                                                                                   |
+| ----- | ---------------------------------------------------------------------------------------- |
+| 0%    | Your assertions do not constrain the outcome. Tests pass no matter what.                 |
+| 1–99% | Some cases are well-tested; others are not. The survivors point at the gaps.             |
+| 100%  | Every generated mutant was caught. Your tests are robust against these specific changes. |
 
 A 100% score does not mean there are no bugs — it means there are no untested bugs *of the kinds the mutators probe*. Start with the survivors; they are the actionable signal.
 
@@ -51,16 +51,17 @@ shipping, mad, access # nolint
 
 ## Summary: three patterns, three fixes
 
-| Surviving mutant | Root cause | Fix |
-|-----------------|------------|-----|
-| Comparison (`>=` → `>`) | Boundary value never tested | Add a test that passes the exact threshold value |
-| Arithmetic (`-` → `+`) | Assertion checks direction, not value | Replace `expect_gt/gte` with `expect_equal` and a computed expected value |
-| Logical (`\|\|` → `&&`) | Symmetric inputs (both true or both false) | Add a test with asymmetric inputs (one true, one false) |
+| Surviving mutant        | Root cause                                 | Fix                                                                       |
+| ----------------------- | ------------------------------------------ | ------------------------------------------------------------------------- |
+| Comparison (`>=` → `>`) | Boundary value never tested                | Add a test that passes the exact threshold value                          |
+| Arithmetic (`-` → `+`)  | Assertion checks direction, not value      | Replace `expect_gt/gte` with `expect_equal` and a computed expected value |
+| Logical (`\|\|` → `&&`) | Symmetric inputs (both true or both false) | Add a test with asymmetric inputs (one true, one false)                   |
 
 The feedback loop is:
 
-```
-Run muttest → find survivors → identify the pattern → add the missing test → repeat
-```
+1. Run muttest
+2. Find survivors
+3. Strengthen tests
+4. Repeat
 
-Start with one file and one mutator preset. Look at what survives. The survivor names the exact operator that your tests cannot distinguish — that is your actionable signal.
+Start with one file and one mutator preset. Look at what survives. The survivor names the exact mutant that your tests cannot distinguish — that is your actionable signal.

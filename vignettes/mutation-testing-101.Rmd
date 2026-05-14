@@ -63,11 +63,11 @@ Your test suite runs against each mutant. If the tests fail, the mutant is **kil
 
 ## Kill vs survive
 
-| Outcome | Meaning |
-|---------|---------|
-| Killed | At least one test failed. Your tests caught this mutation. |
-| Survived | All tests passed. Your tests did not detect this change. |
-| Error | The mutated code caused an unexpected runtime error. |
+| Outcome  | Meaning                                                    |
+| -------- | ---------------------------------------------------------- |
+| Killed   | At least one test failed. Your tests caught this mutation. |
+| Survived | All tests passed. Your tests did not detect this change.   |
+| Error    | The mutated code caused an unexpected runtime error.       |
 
 Survivors are the interesting ones. Each surviving mutant points to a specific gap: a mutation your tests cannot distinguish from the original code. That is a candidate for a stronger test.
 
@@ -118,18 +118,18 @@ Mutation testing is most valuable when:
 
 ## When it is less useful
 
-- **Pure I/O and glue code** — functions that read a file and return its contents, or just call another function. There is little logic to mutate.
-- **UI rendering** — hard to assert on rendered output in an automated way; mutation testing does not replace manual review here.
-- **Very slow test suites** — mutation testing multiplies your test runtime by the number of mutants. Start with fast unit tests before applying it to integration tests.
+- **Simple functions** — functions that read a file and return its contents, or just call another function. There is little logic to mutate.
+- **Snapshot testing** — in snapshot testing oftentimes every little change in the code breaks the snapshot. It's very likely that every mutant will be killed, providing little useful feedback.
+- **Very slow test suites** — mutation testing multiplies your test runtime by the number of mutants. Start with fast unit tests before applying it to slower tests.
 
 ## How it relates to covr
 
 These tools answer different questions and complement each other:
 
-| Tool | Question answered |
-|------|-------------------|
-| `covr` | Which lines does my test suite execute? |
-| `muttest` | Which bugs would my test suite detect? |
+| Tool      | Question answered                       |
+| --------- | --------------------------------------- |
+| `covr`    | Which lines does my test suite execute? |
+| `muttest` | Which bugs would my test suite detect?  |
 
 A practical workflow: use `covr` to find untested code, then use `muttest` on the covered code to find weakly-tested logic. High coverage + high mutation score = genuinely robust tests.
 

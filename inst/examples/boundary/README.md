@@ -1,4 +1,4 @@
-# is_adult — Missing Boundary Value
+# `is_adult` — Missing Boundary Value
 
 ## What this demonstrates
 

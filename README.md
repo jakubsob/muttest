@@ -94,8 +94,6 @@ And our tests are:
 
 ``` r
 #' tests/testthat/test-is_adult.R
-source(file.path("..", "..", "R", "is_adult.R"))
-
 test_that("is_adult returns TRUE for adults", {
   expect_true(is_adult(25))
 })
@@ -109,22 +107,18 @@ When running `muttest::muttest()` we’ll get a report of the mutation
 score:
 
 ``` r
-boundary_path <- system.file("examples", "boundary", package = "muttest")
-withr::with_options(
-  list(cli.num_colors = 0),
-  withr::with_dir(boundary_path, {
-    plan <- muttest::plan(
-      source_files = "R/is_adult.R",
-      mutators = muttest::comparison_operators()
-    )
-    muttest::muttest(plan, "tests/testthat")
-  })
-)
+withr::with_dir(system.file("examples", "boundary", package = "muttest"), {
+  plan <- muttest::plan(
+    mutators = muttest::comparison_operators()
+  )
+  muttest::muttest(plan)
+})
 #> ℹ Mutation Testing
 #>   |   K |   S |   E |   T |   % | Mutator  | File 
 #> ✔ |   1 |   0 |   0 |   1 | 100 | >= → <=  | is_adult.R 
 #> x |   1 |   1 |   0 |   2 |  50 | >= → >   | is_adult.R 
 #> 
+#> Duration: 5.02 s
 #> 
 #> ── Survived Mutants ────────────────────────────────────────────────────────────
 #> is_adult.R  >= → >

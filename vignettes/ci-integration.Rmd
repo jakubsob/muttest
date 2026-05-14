@@ -54,14 +54,11 @@ jobs:
       - name: Run mutation tests
         shell: Rscript {0}
         run: |
-          plan <- muttest::plan(
-            source_files = "R/calculate.R",
-            mutators = c(
-              muttest::arithmetic_operators(),
-              muttest::comparison_operators()
-            )
-          )
-          muttest::muttest("tests/testthat", plan)
+          plan <- muttest::plan(c(
+            muttest::arithmetic_operators(),
+            muttest::comparison_operators()
+          ))
+          muttest::muttest(plan)
 ```
 
 Adjust `source_files` and `mutators` to match your package.
@@ -81,11 +78,13 @@ The badge in your README looks like:
 Mutation testing multiplies your test runtime: running N mutants means running your test suite N times. Keep CI fast by being selective:
 
 **Mutate:**
+
 - Files with complex branching or arithmetic logic
 - Critical domain code (validation, calculations, filters)
 - Recently changed files (use `git diff` to scope a PR run)
 
 **Skip:**
+
 - Pure utility files with trivial logic
 - Auto-generated code
 - Files already tested by slow integration tests (run those separately)
@@ -94,12 +93,10 @@ A practical approach: define a narrow `source_files` list in your CI plan coveri
 
 ## Failing the build on a low score
 
-To enforce a minimum mutation score, parse the output or use R's exit codes. A simple approach with `tryCatch`:
+To enforce a minimum mutation score, parse the output or use R's exit codes:
 
 ```r
-results <- muttest::muttest("tests/testthat", plan)
-
-score <- attr(results, "score")  # check actual attribute name in ?test
+score <- muttest::muttest(plan)
 if (score < 0.7) {
   message(sprintf("Mutation score %.1f%% is below threshold 70%%", score * 100))
   quit(status = 1)
@@ -113,4 +110,3 @@ Start with a threshold that reflects your current score, then tighten it over ti
 - **Scope `source_files` tightly** — the fewer files, the fewer mutants, the faster the run.
 - **Use fast unit tests** — mutation testing re-runs your test suite for each mutant. If individual tests are slow, the total time scales badly. Prefer tests that mock external dependencies.
 - **Run on PRs to changed files only** — scope the mutation plan to files touched by the PR using `git diff --name-only origin/main...HEAD`.
-- **Cache R package dependencies** — `r-lib/actions/setup-r-dependencies@v2` caches dependencies automatically; make sure the cache key includes your `DESCRIPTION` file.
