@@ -127,3 +127,13 @@ describe("remove_condition_negation with statements filter", {
     expect_equal(mutations[[1]], c("if (!a) 1", "while (b) 2"))
   })
 })
+
+describe("remove_condition_negation with rlang operators", {
+  it("should NOT match rlang's !! operator in conditions", {
+    skip("TODO: Currently matches on !!.")
+  })
+
+  it("should NOT match rlang's !!! operator in conditions", {
+    skip("TODO: Currently matches on !!!.")
+  })
+})

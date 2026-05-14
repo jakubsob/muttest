@@ -46,4 +46,12 @@ describe("remove_negation", {
     mutator <- remove_negation()
     expect_mutates_to(mutator, c("x = !a"), list(c("x = a")))
   })
+
+  it("should NOT match rlang's !! operator", {
+    skip("TODO: Currently matches on !!.")
+  })
+
+  it("should NOT match rlang's !!! operator", {
+    skip("TODO: Currently matches on !!!.")
+  })
 })
