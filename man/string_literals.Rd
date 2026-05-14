@@ -23,7 +23,7 @@ returned to callers. Surviving mutants reveal tests that only check
 string_literals()
 
 \dontrun{
-plan <- plan(
+plan <- muttest_plan(
   source_files = "R/labels.R",
   mutators = string_literals()
 )

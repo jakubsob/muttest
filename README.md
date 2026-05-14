@@ -108,7 +108,7 @@ score:
 
 ``` r
 withr::with_dir(system.file("examples", "boundary", package = "muttest"), {
-  plan <- muttest::plan(
+  plan <- muttest::muttest_plan(
     mutators = muttest::comparison_operators()
   )
   muttest::muttest(plan)
@@ -118,7 +118,7 @@ withr::with_dir(system.file("examples", "boundary", package = "muttest"), {
 #> ✔ |   1 |   0 |   0 |   1 | 100 | >= → <=  | is_adult.R 
 #> x |   1 |   1 |   0 |   2 |  50 | >= → >   | is_adult.R 
 #> 
-#> Duration: 5.02 s
+#> Duration: 1.99 s
 #> 
 #> ── Survived Mutants ────────────────────────────────────────────────────────────
 #> is_adult.R  >= → >
@@ -189,7 +189,7 @@ With this test added the score reaches 100%.
 # Available mutators
 
 A mutator describes one kind of code change. Pass a list of mutators to
-`plan()` to control what gets mutated.
+`muttest_plan()` to control what gets mutated.
 
 **Individual mutators**
 

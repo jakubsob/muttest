@@ -1,5 +1,6 @@
 # muttest 0.2.0
 
+- ❗️ Renamed `plan()` to `muttest_plan()`.
 - ✨ Add new mutators:
   - `boolean_literal()`, `na_literal()` — literal replacement mutators.
   - `negate_condition()`, `remove_condition_negation()` — condition mutators.

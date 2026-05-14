@@ -24,7 +24,7 @@ check which typed NA is returned — adding \code{expect_true(is.na(x))} and
 na_literals()
 
 \dontrun{
-plan <- plan(
+plan <- muttest_plan(
   source_files = "R/missing.R",
   mutators = na_literals()
 )

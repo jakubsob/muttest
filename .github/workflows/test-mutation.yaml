@@ -42,7 +42,7 @@ jobs:
         run: |
           pkgload::load_all()
 
-          plan <- plan(
+          plan <- muttest_plan(
             mutators = c(
               arithmetic_operators(),
               comparison_operators(),

@@ -22,7 +22,7 @@ asserting the precise numeric result rather than a property (e.g. sign) kills it
 numeric_literals()
 
 \dontrun{
-plan <- plan(
+plan <- muttest_plan(
   source_files = "R/thresholds.R",
   mutators = numeric_literals()
 )

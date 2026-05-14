@@ -1,4 +1,4 @@
-muttest::plan(
+muttest::muttest_plan(
   source_files = "R/aggregate.R",
   mutators = list(
     muttest::call_name("any", "all"),

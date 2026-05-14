@@ -1,6 +1,6 @@
-test_that("plan returns muttest_plan when no mutations apply", {
+test_that("plan returns .muttest_plan when no mutations apply", {
   .with_example_dir("operators/", {
-    p <- plan(list(operator("*", "/")), fs::dir_ls("R"))
+    p <- muttest_plan(list(operator("*", "/")), fs::dir_ls("R"))
     expect_s3_class(p, "muttest_plan")
   })
 })
@@ -10,7 +10,7 @@ test_that("timeout on infinite loop is recorded as error", {
   .with_example_dir("operators/", {
     original <- readLines("R/calculate.R")
     mutated <- c("calculate <- function(x, y) {", "  while (TRUE) {}", "}")
-    p <- muttest_plan(data.frame(
+    p <- .muttest_plan(data.frame(
       filename = "R/calculate.R",
       original_code = I(list(original)),
       mutated_code = I(list(mutated)),
@@ -32,7 +32,7 @@ test_that("test runner errors are recorded as errors, not propagated", {
   )$new()
 
   .with_example_dir("operators/", {
-    p <- plan(list(operator("+", "-")), fs::dir_ls("R"))
+    p <- muttest_plan(list(operator("+", "-")), fs::dir_ls("R"))
     result <- .muttest(p, test_strategy = error_strategy)
     expect_equal(as.numeric(result), 0)
   })
@@ -51,7 +51,7 @@ for (t in .tests) {
     test_that(t$title, {
       .with_example_dir("shipping/", {
         mutators <- list(operator(">", "<"), operator(">", ">="))
-        p <- plan(mutators, fs::dir_ls("R"))
+        p <- muttest_plan(mutators, fs::dir_ls("R"))
         result <- .muttest(p, reporter = t$reporter())
         expect_snapshot({
           print(p)

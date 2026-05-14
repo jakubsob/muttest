@@ -23,7 +23,7 @@ boundary value kills it.
 comparison_operators()
 
 \dontrun{
-plan <- plan(
+plan <- muttest_plan(
   source_files = "R/shipping.R",
   mutators = comparison_operators()
 )

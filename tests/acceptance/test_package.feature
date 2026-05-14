@@ -25,7 +25,7 @@ Feature: Test package
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(
+        plan = muttest_plan(
           mutators = list(
             operator("+", "-")
           )
@@ -56,7 +56,7 @@ Feature: Test package
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(
+        plan = muttest_plan(
           mutators = list(
             operator("+", "-"),
             operator("/", "*")
@@ -100,7 +100,7 @@ Feature: Test package
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(
+        plan = muttest_plan(
           mutators = list(
             operator("+", "-"),
             operator("/", "*")
@@ -135,7 +135,7 @@ Feature: Test package
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(
+        plan = muttest_plan(
           mutators = list(
             operator("*", "/")
           )
@@ -177,7 +177,7 @@ Feature: Test package
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(
+        plan = muttest_plan(
           mutators = list(
             operator("+", "-"),
             operator("+", "*")
@@ -213,7 +213,7 @@ Feature: Test package
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(
+        plan = muttest_plan(
           mutators = list(
             operator("+", "-"),
             operator("+", "*")

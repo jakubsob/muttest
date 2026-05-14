@@ -15,7 +15,7 @@ muttest(
 )
 }
 \arguments{
-\item{plan}{A data frame with the test plan. See \code{plan()}.}
+\item{plan}{A mutation testing plan. See \code{muttest_plan()}.}
 
 \item{path}{Path to the test directory.}
 

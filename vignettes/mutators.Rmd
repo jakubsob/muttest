@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 source("engine.R")
 ```
 
-A mutator defines one kind of code change. When you pass a mutator to `plan()`, muttest finds every matching pattern in your source file and produces one mutant per match.
+A mutator defines one kind of code change. When you pass a mutator to `muttest_plan()`, muttest finds every matching pattern in your source file and produces one mutant per match.
 
 ## Operator mutators
 
@@ -47,7 +47,7 @@ Returns a ready-made list of operator mutators covering common arithmetic mistak
 💡 **When to use:** Any function that performs calculations — finance, statistics, data transformations. Arithmetic operator swaps can happen easily and go unnoticed.
 
 ```r
-plan <- plan(
+plan <- muttest_plan(
   source_files = "R/finance.R",
   mutators = arithmetic_operators()
 )
@@ -118,7 +118,7 @@ Returns a ready-made list covering all canonical flips:
 | `F`      | `T`     |
 
 ```r
-plan <- plan(
+plan <- muttest_plan(
   source_files = "R/flags.R",
   mutators = boolean_literals()
 )
@@ -147,7 +147,7 @@ numeric_decrement()  # 5 → 4, 1 → 0, 100 → 99
 Returns `numeric_increment()` and `numeric_decrement()` together.
 
 ```r
-plan <- plan(
+plan <- muttest_plan(
   source_files = "R/thresholds.R",
   mutators = numeric_literals()
 )
@@ -176,7 +176,7 @@ string_fill()  # "" → "mutant"
 Returns `string_empty()` and `string_fill()` together.
 
 ```r
-plan <- plan(
+plan <- muttest_plan(
   source_files = "R/labels.R",
   mutators = string_literals()
 )
@@ -217,7 +217,7 @@ remove_negation()
 Returns `negate_condition()` and `remove_condition_negation()` together.
 
 ```r
-plan <- plan(
+plan <- muttest_plan(
   source_files = "R/validation.R",
   mutators = condition_mutations()
 )
@@ -277,7 +277,7 @@ Returns mutators for all common NA/NULL swaps:
 | `NA_character_` | `NA`            |
 
 ```r
-plan <- plan(
+plan <- muttest_plan(
   source_files = "R/missing.R",
   mutators = na_literals()
 )
@@ -338,7 +338,7 @@ Both single-bracket (`[`) and double-bracket (`[[`) indexing are covered.
 Returns `index_increment()` and `index_decrement()` together.
 
 ```r
-plan <- plan(
+plan <- muttest_plan(
   source_files = "R/selectors.R",
   mutators = index_mutations()
 )
@@ -351,7 +351,7 @@ plan <- plan(
 If you are unsure where to begin, start here:
 
 ```r
-p <- plan(
+p <- muttest_plan(
   source_files = "R/my_file.R",
   mutators = c(
     arithmetic_operators(),

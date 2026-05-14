@@ -54,7 +54,7 @@ jobs:
       - name: Run mutation tests
         shell: Rscript {0}
         run: |
-          plan <- muttest::plan(c(
+          plan <- muttest::muttest_plan(c(
             muttest::arithmetic_operators(),
             muttest::comparison_operators()
           ))

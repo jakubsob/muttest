@@ -23,7 +23,7 @@ order) rather than a specific value — replacing \code{expect_gte()} with
 arithmetic_operators()
 
 \dontrun{
-plan <- plan(
+plan <- muttest_plan(
   source_files = "R/stats.R",
   mutators = arithmetic_operators()
 )

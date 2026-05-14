@@ -1,6 +1,6 @@
 #' Run a mutation test
 #'
-#' @param plan A data frame with the test plan. See `plan()`.
+#' @param plan A mutation testing plan. See `muttest_plan()`.
 #' @param path Path to the test directory.
 #' @param reporter Reporter to use for mutation testing results. See `?MutationReporter`.
 #' @param test_strategy Strategy for running tests. See `?TestStrategy`.
@@ -188,7 +188,7 @@ print.muttest_result <- function(x, ...) {
 #'
 #' @export
 #' @md
-plan <- function(
+muttest_plan <- function(
   mutators,
   source_files = fs::dir_ls("R", regexp = ".[rR]$")
 ) {
@@ -212,7 +212,7 @@ plan <- function(
     }
   }
   if (length(rows) == 0) {
-    return(muttest_plan(data.frame(
+    return(.muttest_plan(data.frame(
       filename = character(),
       original_code = I(list()),
       mutated_code = I(list()),
@@ -220,11 +220,11 @@ plan <- function(
       stringsAsFactors = FALSE
     )))
   }
-  muttest_plan(do.call(rbind, rows))
+  .muttest_plan(do.call(rbind, rows))
 }
 
-muttest_plan <- function(x) {
-  structure(x, class = c("muttest_plan", "data.frame"))
+.muttest_plan <- function(x) {
+  structure(x, class = c("muttest_plan", class(x)))
 }
 
 #' @export

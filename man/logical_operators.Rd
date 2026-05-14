@@ -23,7 +23,7 @@ from this preset typically means test inputs are symmetric — both flags
 logical_operators()
 
 \dontrun{
-plan <- plan(
+plan <- muttest_plan(
   source_files = "R/access.R",
   mutators = logical_operators()
 )

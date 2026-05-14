@@ -24,7 +24,7 @@ adding a test where the condition flips from \code{TRUE} to \code{FALSE} kills t
 condition_mutations()
 
 \dontrun{
-plan <- plan(
+plan <- muttest_plan(
   source_files = "R/validation.R",
   mutators = condition_mutations()
 )

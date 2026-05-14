@@ -32,7 +32,7 @@ A test plan describes *what* to mutate and *which* mutations to apply:
 ```r
 library(muttest)
 
-plan <- plan(
+plan <- muttest_plan(
   source_files = "R/is_adult.R",
   mutators = comparison_operators()
 )

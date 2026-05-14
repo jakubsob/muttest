@@ -23,7 +23,7 @@ the branch taken) rather than the flag value itself — adding
 boolean_literals()
 
 \dontrun{
-plan <- plan(
+plan <- muttest_plan(
   source_files = "R/flags.R",
   mutators = boolean_literals()
 )

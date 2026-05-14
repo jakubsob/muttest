@@ -25,7 +25,7 @@ Feature: Mutators
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(mutators = list(boolean_literal("TRUE", "FALSE")))
+        plan = muttest_plan(mutators = list(boolean_literal("TRUE", "FALSE")))
       )
       """
     Then the mutation score should be 1.0
@@ -52,7 +52,7 @@ Feature: Mutators
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(mutators = list(boolean_literal("FALSE", "TRUE")))
+        plan = muttest_plan(mutators = list(boolean_literal("FALSE", "TRUE")))
       )
       """
     Then the mutation score should be 1.0
@@ -76,7 +76,7 @@ Feature: Mutators
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(mutators = list(call_name("any", "all")))
+        plan = muttest_plan(mutators = list(call_name("any", "all")))
       )
       """
     Then the mutation score should be 1.0
@@ -99,7 +99,7 @@ Feature: Mutators
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(mutators = list(call_name("min", "max")))
+        plan = muttest_plan(mutators = list(call_name("min", "max")))
       )
       """
     Then the mutation score should be 1.0
@@ -126,7 +126,7 @@ Feature: Mutators
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(mutators = list(string_empty()))
+        plan = muttest_plan(mutators = list(string_empty()))
       )
       """
     Then the mutation score should be 1.0
@@ -152,7 +152,7 @@ Feature: Mutators
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(mutators = list(string_fill()))
+        plan = muttest_plan(mutators = list(string_fill()))
       )
       """
     Then the mutation score should be 1.0
@@ -175,7 +175,7 @@ Feature: Mutators
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(mutators = list(numeric_increment()))
+        plan = muttest_plan(mutators = list(numeric_increment()))
       )
       """
     Then the mutation score should be 1.0
@@ -198,7 +198,7 @@ Feature: Mutators
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(mutators = list(numeric_decrement()))
+        plan = muttest_plan(mutators = list(numeric_decrement()))
       )
       """
     Then the mutation score should be 1.0
@@ -224,7 +224,7 @@ Feature: Mutators
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(mutators = list(negate_condition()))
+        plan = muttest_plan(mutators = list(negate_condition()))
       )
       """
     Then the mutation score should be 1.0
@@ -252,7 +252,7 @@ Feature: Mutators
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(mutators = list(remove_condition_negation()))
+        plan = muttest_plan(mutators = list(remove_condition_negation()))
       )
       """
     Then the mutation score should be 1.0
@@ -276,7 +276,7 @@ Feature: Mutators
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(mutators = list(remove_negation()))
+        plan = muttest_plan(mutators = list(remove_negation()))
       )
       """
     Then the mutation score should be 1.0
@@ -299,7 +299,7 @@ Feature: Mutators
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(mutators = arithmetic_operators())
+        plan = muttest_plan(mutators = arithmetic_operators())
       )
       """
     Then the mutation score should be 1.0
@@ -323,7 +323,7 @@ Feature: Mutators
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(mutators = comparison_operators())
+        plan = muttest_plan(mutators = comparison_operators())
       )
       """
     Then the mutation score should be 1.0
@@ -348,7 +348,7 @@ Feature: Mutators
       """
       muttest(
         path = "tests/testthat",
-        plan = plan(mutators = logical_operators())
+        plan = muttest_plan(mutators = logical_operators())
       )
       """
     Then the mutation score should be 1.0

@@ -56,7 +56,7 @@ reference:
     desc: Run mutation tests and define test plans.
     contents:
       - muttest
-      - plan
+      - muttest_plan
   - title: Mutators
     desc: Individual mutators — each defines one kind of code change.
     contents:

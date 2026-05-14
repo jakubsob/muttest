@@ -20,7 +20,7 @@
 #' arithmetic_operators()
 #'
 #' \dontrun{
-#' plan <- plan(
+#' plan <- muttest_plan(
 #'   source_files = "R/stats.R",
 #'   mutators = arithmetic_operators()
 #' )
@@ -60,7 +60,7 @@ arithmetic_operators <- function() {
 #' comparison_operators()
 #'
 #' \dontrun{
-#' plan <- plan(
+#' plan <- muttest_plan(
 #'   source_files = "R/shipping.R",
 #'   mutators = comparison_operators()
 #' )
@@ -103,7 +103,7 @@ comparison_operators <- function() {
 #' logical_operators()
 #'
 #' \dontrun{
-#' plan <- plan(
+#' plan <- muttest_plan(
 #'   source_files = "R/access.R",
 #'   mutators = logical_operators()
 #' )
@@ -139,7 +139,7 @@ logical_operators <- function() {
 #' boolean_literals()
 #'
 #' \dontrun{
-#' plan <- plan(
+#' plan <- muttest_plan(
 #'   source_files = "R/flags.R",
 #'   mutators = boolean_literals()
 #' )
@@ -176,7 +176,7 @@ boolean_literals <- function() {
 #' na_literals()
 #'
 #' \dontrun{
-#' plan <- plan(
+#' plan <- muttest_plan(
 #'   source_files = "R/missing.R",
 #'   mutators = na_literals()
 #' )
@@ -215,7 +215,7 @@ na_literals <- function() {
 #' numeric_literals()
 #'
 #' \dontrun{
-#' plan <- plan(
+#' plan <- muttest_plan(
 #'   source_files = "R/thresholds.R",
 #'   mutators = numeric_literals()
 #' )
@@ -249,7 +249,7 @@ numeric_literals <- function() {
 #' index_mutations()
 #'
 #' \dontrun{
-#' plan <- plan(
+#' plan <- muttest_plan(
 #'   source_files = "R/selectors.R",
 #'   mutators = index_mutations()
 #' )
@@ -283,7 +283,7 @@ index_mutations <- function() {
 #' string_literals()
 #'
 #' \dontrun{
-#' plan <- plan(
+#' plan <- muttest_plan(
 #'   source_files = "R/labels.R",
 #'   mutators = string_literals()
 #' )
@@ -318,7 +318,7 @@ string_literals <- function() {
 #' condition_mutations()
 #'
 #' \dontrun{
-#' plan <- plan(
+#' plan <- muttest_plan(
 #'   source_files = "R/validation.R",
 #'   mutators = condition_mutations()
 #' )

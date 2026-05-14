@@ -6,7 +6,7 @@ Feature: Test real R package
     Given I clone a repository from "https://github.com/tidyverse/dplyr/archive/main.zip"
     When I run mutation tests with
       """
-      plan <- plan(
+      plan <- muttest_plan(
         mutators = list(
           operator("+", "-")
         )
@@ -23,7 +23,7 @@ Feature: Test real R package
     Given I clone a repository from "https://github.com/tidyverse/ggplot2/archive/main.zip"
     When I run mutation tests with
       """
-      plan <- plan(
+      plan <- muttest_plan(
         mutators = list(
           operator("+", "-")
         )
@@ -40,7 +40,7 @@ Feature: Test real R package
     Given I clone a repository from "https://github.com/rstudio/shiny/archive/main.zip"
     When I run mutation tests with
       """
-      plan <- plan(
+      plan <- muttest_plan(
         mutators = list(
           operator("==", "!=")
         )

@@ -21,7 +21,7 @@ Feature: Test klmr::box project
     When I run mutation tests with
       """
       muttest(
-        plan = plan(
+        plan = muttest_plan(
           mutators = list(
             operator("+", "-")
           ),
@@ -66,7 +66,7 @@ Feature: Test klmr::box project
       """
     When I run mutation tests with
       """
-      plan <- plan(
+      plan <- muttest_plan(
         mutators = list(
           operator("+", "-"),
           operator("*", "/")

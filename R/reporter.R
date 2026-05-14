@@ -94,7 +94,7 @@ MutationReporter <- R6::R6Class(
     },
 
     #' @description Add a mutation test result
-    #' @param plan Current testing plan. See `plan()`.
+    #' @param plan Current testing plan. See `muttest_plan()`.
     #' @param killed Whether the mutation was killed by tests
     #' @param survived Number of survived mutations
     #' @param errors Number of errors encountered
@@ -119,7 +119,10 @@ MutationReporter <- R6::R6Class(
       self$results[[filename]]$errors <- self$results[[filename]]$errors +
         errors
       if (!is.null(error)) {
-        self$error_messages <- c(self$error_messages, list(conditionMessage(error)))
+        self$error_messages <- c(
+          self$error_messages,
+          list(conditionMessage(error))
+        )
       }
       self$current_score <-
         sum(vapply(self$results, `[[`, numeric(1), "killed")) /

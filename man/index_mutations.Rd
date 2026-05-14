@@ -23,7 +23,7 @@ of the extracted element kills them.
 index_mutations()
 
 \dontrun{
-plan <- plan(
+plan <- muttest_plan(
   source_files = "R/selectors.R",
   mutators = index_mutations()
 )

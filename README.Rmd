@@ -106,7 +106,7 @@ When running `muttest::muttest()` we'll get a report of the mutation score:
 
 ```{r}
 withr::with_dir(system.file("examples", "boundary", package = "muttest"), {
-  plan <- muttest::plan(
+  plan <- muttest::muttest_plan(
     mutators = muttest::comparison_operators()
   )
   muttest::muttest(plan)
@@ -164,7 +164,7 @@ With this test added the score reaches 100%.
 
 # Available mutators
 
-A mutator describes one kind of code change. Pass a list of mutators to `plan()` to control what gets mutated.
+A mutator describes one kind of code change. Pass a list of mutators to `muttest_plan()` to control what gets mutated.
 
 ```{r mutator-table, echo=FALSE, results='asis'}
 rd_title <- function(fn_name) {
