@@ -11,7 +11,7 @@ remove_negation <- function() {
   Mutator$new(
     from = "!<expr>",
     to = "<expr>",
-    query = "(unary_operator) @whole",
+    query = "(unary_operator) @target",
     match_fn = function(text) startsWith(text, "!"),
     replacement_fn = function(text) substring(text, 2)
   )

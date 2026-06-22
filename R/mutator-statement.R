@@ -17,7 +17,7 @@ delete_statements <- function(code, query_str, match_fn) {
   if (length(captures$node) == 0) return(NULL)
   mutations <- list()
   for (i in seq_along(captures$node)) {
-    if (captures$name[[i]] != "stmt") next
+    if (captures$name[[i]] != "target") next
     node      <- captures$node[[i]]
     node_text <- treesitter::node_text(node)
     if (!match_fn(node_text)) next
@@ -43,11 +43,11 @@ delete_statements <- function(code, query_str, match_fn) {
 delete_statement <- function() {
   query_str <- paste(
     "[(program (binary_operator operator: _ @op",
-    "    (#match? @op \"^(<-|<<-|=)$\")) @stmt)",
+    "    (#match? @op \"^(<-|<<-|=)$\")) @target)",
     " (braced_expression (binary_operator operator: _ @op",
-    "    (#match? @op \"^(<-|<<-|=)$\")) @stmt)",
-    " (program (call) @stmt)",
-    " (braced_expression (call) @stmt)]"
+    "    (#match? @op \"^(<-|<<-|=)$\")) @target)",
+    " (program (call) @target)",
+    " (braced_expression (call) @target)]"
   )
   match_fn <- function(text) {
     !grepl("^\\s*\\S+\\s*(<-|<<-|=)\\s*function\\s*\\(", text, perl = TRUE)

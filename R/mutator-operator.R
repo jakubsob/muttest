@@ -33,9 +33,9 @@ operator <- function(from, to) {
     to = to,
     query = sprintf("(binary_operator
       lhs: (_) @lhs
-      operator: _ @operator
+      operator: _ @target
       rhs: (_) @rhs
-      (#eq? @operator \"%s\")
+      (#eq? @target \"%s\")
     )", from)
   )
 }
@@ -77,6 +77,10 @@ mutate_code <- function(code, mutator) {
   }
 
   for (i in seq_along(captures$node)) {
+    # By convention all queries name the node to mutate @target. Structural
+    # captures (e.g. @lhs, @rhs, @keyword) are present only for predicate
+    # filtering and must be skipped here to avoid spurious mutants.
+    if (captures$name[[i]] != "target") next
     node <- captures$node[[i]]
     node_text <- treesitter::node_text(node)
 

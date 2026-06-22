@@ -19,9 +19,9 @@ boolean_literal <- function(from, to) {
   # TRUE/FALSE are dedicated AST nodes; T/F are plain identifiers in tree-sitter-r
   query <- if (from %in% c("TRUE", "FALSE")) {
     node_type <- if (from == "TRUE") "true" else "false"
-    sprintf("(%s) @value", node_type)
+    sprintf("(%s) @target", node_type)
   } else {
-    sprintf("(identifier) @value (#eq? @value \"%s\")", from)
+    sprintf("(identifier) @target (#eq? @target \"%s\")", from)
   }
   Mutator$new(from = from, to = to, query = query)
 }

@@ -21,7 +21,7 @@ na_literal <- function(from, to) {
   allowed <- c("NA", "NULL", "NA_real_", "NA_integer_", "NA_complex_", "NA_character_")
   checkmate::assert_choice(from, allowed)
   checkmate::assert_string(to, min.chars = 1)
-  query <- if (from == "NULL") "(null) @value" else "(na) @value"
+  query <- if (from == "NULL") "(null) @target" else "(na) @target"
   Mutator$new(
     from = from,
     to = to,

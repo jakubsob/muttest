@@ -34,8 +34,8 @@ index_mutator <- function(label, transform) {
     from = "x[<i>]",
     to = paste0("x[", label, "]"),
     query = paste0(
-      "[(subset arguments: (arguments (argument value: [(identifier) (float) (integer)] @index)))",
-      " (subset2 arguments: (arguments (argument value: [(identifier) (float) (integer)] @index)))]"
+      "[(subset arguments: (arguments (argument value: [(identifier) (float) (integer)] @target)))",
+      " (subset2 arguments: (arguments (argument value: [(identifier) (float) (integer)] @target)))]"
     ),
     match_fn = function(text) TRUE,
     replacement_fn = transform

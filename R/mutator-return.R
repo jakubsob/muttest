@@ -21,7 +21,10 @@ replace_return_value <- function(replacement = "NULL") {
   Mutator$new(
     from = "return(<value>)",
     to = paste0("return(", replacement, ")"),
-    query = "(call function: (return) arguments: (arguments (argument value: (_) @value)))",
+    query = "(
+      call function: (identifier) @keyword arguments: (arguments (argument value: (_) @target))
+      (#eq? @keyword \"return\")
+    )",
     match_fn = function(text) text != replacement,
     replacement_fn = function(text) replacement
   )

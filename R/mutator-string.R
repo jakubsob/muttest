@@ -11,7 +11,7 @@ string_empty <- function() {
   Mutator$new(
     from = "<non-empty string>",
     to = "\"\"",
-    query = "(string) @value",
+    query = "(string) @target",
     match_fn = function(text) nchar(text) > 2,
     replacement_fn = function(text) "\"\""
   )
@@ -35,7 +35,7 @@ string_fill <- function(fill = "mutant") {
   Mutator$new(
     from = "\"\"",
     to = quoted,
-    query = "(string) @value",
+    query = "(string) @target",
     match_fn = function(text) text == "\"\"",
     replacement_fn = function(text) quoted
   )

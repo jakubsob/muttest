@@ -5,7 +5,7 @@ condition_query <- function(statements) {
       "while" = "while_statement",
       stop("Unknown statement type: ", s, ". Must be 'if' or 'while'.")
     )
-    sprintf("(%s condition: (_) @cond)", node)
+    sprintf("(%s condition: (_) @target)", node)
   }, character(1))
   if (length(parts) == 1) parts else paste0("[", paste(parts, collapse = " "), "]")
 }

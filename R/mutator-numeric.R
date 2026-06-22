@@ -46,7 +46,7 @@ numeric_literal_mutator <- function(label, transform) {
     to = label,
     # Matches both `float` (e.g. 1.5) and `integer` (e.g. 5L) nodes.
     # The predicate (#match?) is not used here; match_fn handles filtering.
-    query = "[(float) (integer)] @value",
+    query = "[(float) (integer)] @target",
     match_fn = function(text) {
       !is.na(suppressWarnings(as.numeric(text)))
     },

@@ -20,7 +20,7 @@ call_name <- function(from, to) {
     from = from,
     to = to,
     query = sprintf(
-      "(call function: (identifier) @name (#eq? @name \"%s\"))",
+      "(call function: (identifier) @target (#eq? @target \"%s\"))",
       from
     )
   )

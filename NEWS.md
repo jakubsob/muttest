@@ -1,3 +1,7 @@
+# muttest 0.2.1
+
+- Update treesitter queries to work with treesitter >= 1.3.0.
+
 # muttest 0.2.0
 
 - ❗️ Renamed `plan()` to `muttest_plan()`.
