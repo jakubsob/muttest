@@ -37,19 +37,19 @@ for how to diagnose survivors and fix the underlying test weakness.
 boolean_literals()
 #> [[1]]
 #> Mutator: TRUE → FALSE
-#> Query: (true) @value
+#> Query: (true) @target
 #> 
 #> [[2]]
 #> Mutator: FALSE → TRUE
-#> Query: (false) @value
+#> Query: (false) @target
 #> 
 #> [[3]]
 #> Mutator: T → F
-#> Query: (identifier) @value (#eq? @value "T")
+#> Query: (identifier) @target (#eq? @target "T")
 #> 
 #> [[4]]
 #> Mutator: F → T
-#> Query: (identifier) @value (#eq? @value "F")
+#> Query: (identifier) @target (#eq? @target "F")
 #> 
 
 if (FALSE) { # \dontrun{

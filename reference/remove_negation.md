@@ -19,5 +19,5 @@ object.
 ``` r
 remove_negation()
 #> Mutator: !<expr> → <expr>
-#> Query: (unary_operator) @whole
+#> Query: (unary_operator) @target
 ```

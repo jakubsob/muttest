@@ -37,11 +37,11 @@ for how to diagnose survivors and fix the underlying test weakness.
 string_literals()
 #> [[1]]
 #> Mutator: <non-empty string> → ""
-#> Query: (string) @value
+#> Query: (string) @target
 #> 
 #> [[2]]
 #> Mutator: "" → "mutant"
-#> Query: (string) @value
+#> Query: (string) @target
 #> 
 
 if (FALSE) { # \dontrun{

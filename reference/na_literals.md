@@ -39,35 +39,35 @@ for how to diagnose survivors and fix the underlying test weakness.
 na_literals()
 #> [[1]]
 #> Mutator: NA → NULL
-#> Query: (na) @value
+#> Query: (na) @target
 #> 
 #> [[2]]
 #> Mutator: NULL → NA
-#> Query: (null) @value
+#> Query: (null) @target
 #> 
 #> [[3]]
 #> Mutator: NA → NA_real_
-#> Query: (na) @value
+#> Query: (na) @target
 #> 
 #> [[4]]
 #> Mutator: NA_real_ → NA
-#> Query: (na) @value
+#> Query: (na) @target
 #> 
 #> [[5]]
 #> Mutator: NA → NA_integer_
-#> Query: (na) @value
+#> Query: (na) @target
 #> 
 #> [[6]]
 #> Mutator: NA_integer_ → NA
-#> Query: (na) @value
+#> Query: (na) @target
 #> 
 #> [[7]]
 #> Mutator: NA → NA_character_
-#> Query: (na) @value
+#> Query: (na) @target
 #> 
 #> [[8]]
 #> Mutator: NA_character_ → NA
-#> Query: (na) @value
+#> Query: (na) @target
 #> 
 
 if (FALSE) { # \dontrun{

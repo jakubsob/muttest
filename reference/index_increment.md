@@ -25,5 +25,5 @@ retrieved from a vector or list.
 ``` r
 index_increment()
 #> Mutator: x[<i>] → x[<i> + 1L]
-#> Query: [(subset arguments: (arguments (argument value: [(identifier) (float) (integer)] @index))) (subset2 arguments: (arguments (argument value: [(identifier) (float) (integer)] @index)))]
+#> Query: [(subset arguments: (arguments (argument value: [(identifier) (float) (integer)] @target))) (subset2 arguments: (arguments (argument value: [(identifier) (float) (integer)] @target)))]
 ```

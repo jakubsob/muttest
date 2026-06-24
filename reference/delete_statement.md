@@ -25,5 +25,5 @@ to avoid producing structurally broken mutants.
 ``` r
 delete_statement()
 #> Mutator: <statement> → 
-#> Query: [(program (binary_operator operator: _ @op     (#match? @op "^(<-|<<-|=)$")) @stmt)  (braced_expression (binary_operator operator: _ @op     (#match? @op "^(<-|<<-|=)$")) @stmt)  (program (call) @stmt)  (braced_expression (call) @stmt)]
+#> Query: [(program (binary_operator operator: _ @op     (#match? @op "^(<-|<<-|=)$")) @target)  (braced_expression (binary_operator operator: _ @op     (#match? @op "^(<-|<<-|=)$")) @target)  (program (call) @target)  (braced_expression (call) @target)]
 ```

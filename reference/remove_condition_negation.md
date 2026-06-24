@@ -36,8 +36,8 @@ other positions (assignments, return values, etc.) untouched.
 ``` r
 remove_condition_negation()
 #> Mutator: !<condition> → <condition>
-#> Query: [(if_statement condition: (_) @cond) (while_statement condition: (_) @cond)]
+#> Query: [(if_statement condition: (_) @target) (while_statement condition: (_) @target)]
 remove_condition_negation(statements = "while")
 #> Mutator: !<condition> → <condition>
-#> Query: (while_statement condition: (_) @cond)
+#> Query: (while_statement condition: (_) @target)
 ```

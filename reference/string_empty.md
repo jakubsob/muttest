@@ -21,5 +21,5 @@ object.
 ``` r
 string_empty()
 #> Mutator: <non-empty string> → ""
-#> Query: (string) @value
+#> Query: (string) @target
 ```

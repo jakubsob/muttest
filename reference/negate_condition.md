@@ -26,8 +26,8 @@ object.
 ``` r
 negate_condition()
 #> Mutator: <condition> → !(<condition>)
-#> Query: [(if_statement condition: (_) @cond) (while_statement condition: (_) @cond)]
+#> Query: [(if_statement condition: (_) @target) (while_statement condition: (_) @target)]
 negate_condition(statements = "if")
 #> Mutator: <condition> → !(<condition>)
-#> Query: (if_statement condition: (_) @cond)
+#> Query: (if_statement condition: (_) @target)
 ```

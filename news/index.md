@@ -1,6 +1,12 @@
 # Changelog
 
+## muttest 0.2.1
+
+- Update treesitter queries to work with treesitter \>= 1.3.0.
+
 ## muttest 0.2.0
+
+CRAN release: 2026-05-14
 
 - ❗️ Renamed `plan()` to
   [`muttest_plan()`](https://jakubsob.github.io/muttest/reference/muttest_plan.md).

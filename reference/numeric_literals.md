@@ -37,11 +37,11 @@ for how to diagnose survivors and fix the underlying test weakness.
 numeric_literals()
 #> [[1]]
 #> Mutator: <n> + 1 → <n> + 1
-#> Query: [(float) (integer)] @value
+#> Query: [(float) (integer)] @target
 #> 
 #> [[2]]
 #> Mutator: <n> - 1 → <n> - 1
-#> Query: [(float) (integer)] @value
+#> Query: [(float) (integer)] @target
 #> 
 
 if (FALSE) { # \dontrun{

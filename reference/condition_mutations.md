@@ -39,11 +39,11 @@ for how to diagnose survivors and fix the underlying test weakness.
 condition_mutations()
 #> [[1]]
 #> Mutator: <condition> → !(<condition>)
-#> Query: [(if_statement condition: (_) @cond) (while_statement condition: (_) @cond)]
+#> Query: [(if_statement condition: (_) @target) (while_statement condition: (_) @target)]
 #> 
 #> [[2]]
 #> Mutator: !<condition> → <condition>
-#> Query: [(if_statement condition: (_) @cond) (while_statement condition: (_) @cond)]
+#> Query: [(if_statement condition: (_) @target) (while_statement condition: (_) @target)]
 #> 
 
 if (FALSE) { # \dontrun{

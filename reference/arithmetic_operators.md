@@ -41,63 +41,63 @@ arithmetic_operators()
 #> Mutator: + → -
 #> Query: (binary_operator
 #>       lhs: (_) @lhs
-#>       operator: _ @operator
+#>       operator: _ @target
 #>       rhs: (_) @rhs
-#>       (#eq? @operator "+")
+#>       (#eq? @target "+")
 #>     )
 #> 
 #> [[2]]
 #> Mutator: - → +
 #> Query: (binary_operator
 #>       lhs: (_) @lhs
-#>       operator: _ @operator
+#>       operator: _ @target
 #>       rhs: (_) @rhs
-#>       (#eq? @operator "-")
+#>       (#eq? @target "-")
 #>     )
 #> 
 #> [[3]]
 #> Mutator: * → /
 #> Query: (binary_operator
 #>       lhs: (_) @lhs
-#>       operator: _ @operator
+#>       operator: _ @target
 #>       rhs: (_) @rhs
-#>       (#eq? @operator "*")
+#>       (#eq? @target "*")
 #>     )
 #> 
 #> [[4]]
 #> Mutator: / → *
 #> Query: (binary_operator
 #>       lhs: (_) @lhs
-#>       operator: _ @operator
+#>       operator: _ @target
 #>       rhs: (_) @rhs
-#>       (#eq? @operator "/")
+#>       (#eq? @target "/")
 #>     )
 #> 
 #> [[5]]
 #> Mutator: ^ → *
 #> Query: (binary_operator
 #>       lhs: (_) @lhs
-#>       operator: _ @operator
+#>       operator: _ @target
 #>       rhs: (_) @rhs
-#>       (#eq? @operator "^")
+#>       (#eq? @target "^")
 #>     )
 #> 
 #> [[6]]
 #> Mutator: %% → *
 #> Query: (binary_operator
 #>       lhs: (_) @lhs
-#>       operator: _ @operator
+#>       operator: _ @target
 #>       rhs: (_) @rhs
-#>       (#eq? @operator "%%")
+#>       (#eq? @target "%%")
 #>     )
 #> 
 #> [[7]]
 #> Mutator: %/% → /
 #> Query: (binary_operator
 #>       lhs: (_) @lhs
-#>       operator: _ @operator
+#>       operator: _ @target
 #>       rhs: (_) @rhs
-#>       (#eq? @operator "%/%")
+#>       (#eq? @target "%/%")
 #>     )
 #> 
 

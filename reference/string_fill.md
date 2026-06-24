@@ -26,8 +26,8 @@ object.
 ``` r
 string_fill()
 #> Mutator: "" → "mutant"
-#> Query: (string) @value
+#> Query: (string) @target
 string_fill(fill = "PLACEHOLDER")
 #> Mutator: "" → "PLACEHOLDER"
-#> Query: (string) @value
+#> Query: (string) @target
 ```

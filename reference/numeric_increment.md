@@ -25,8 +25,8 @@ object.
 ``` r
 numeric_increment()
 #> Mutator: <n> + 1 → <n> + 1
-#> Query: [(float) (integer)] @value
+#> Query: [(float) (integer)] @target
 numeric_increment(by = 2)
 #> Mutator: <n> + 2 → <n> + 2
-#> Query: [(float) (integer)] @value
+#> Query: [(float) (integer)] @target
 ```

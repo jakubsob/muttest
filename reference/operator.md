@@ -56,24 +56,24 @@ operator("+", "-")
 #> Mutator: + → -
 #> Query: (binary_operator
 #>       lhs: (_) @lhs
-#>       operator: _ @operator
+#>       operator: _ @target
 #>       rhs: (_) @rhs
-#>       (#eq? @operator "+")
+#>       (#eq? @target "+")
 #>     )
 operator("==", "!=")
 #> Mutator: == → !=
 #> Query: (binary_operator
 #>       lhs: (_) @lhs
-#>       operator: _ @operator
+#>       operator: _ @target
 #>       rhs: (_) @rhs
-#>       (#eq? @operator "==")
+#>       (#eq? @target "==")
 #>     )
 operator(">", ">=")  # probe the strict vs. non-strict boundary
 #> Mutator: > → >=
 #> Query: (binary_operator
 #>       lhs: (_) @lhs
-#>       operator: _ @operator
+#>       operator: _ @target
 #>       rhs: (_) @rhs
-#>       (#eq? @operator ">")
+#>       (#eq? @target ">")
 #>     )
 ```

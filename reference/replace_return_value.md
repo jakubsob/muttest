@@ -35,8 +35,14 @@ are not affected.
 ``` r
 replace_return_value()
 #> Mutator: return(<value>) → return(NULL)
-#> Query: (call function: (return) arguments: (arguments (argument value: (_) @value)))
+#> Query: (
+#>       call function: (identifier) @keyword arguments: (arguments (argument value: (_) @target))
+#>       (#eq? @keyword "return")
+#>     )
 replace_return_value("NA")
 #> Mutator: return(<value>) → return(NA)
-#> Query: (call function: (return) arguments: (arguments (argument value: (_) @value)))
+#> Query: (
+#>       call function: (identifier) @keyword arguments: (arguments (argument value: (_) @target))
+#>       (#eq? @keyword "return")
+#>     )
 ```

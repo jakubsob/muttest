@@ -36,14 +36,14 @@ distinguishes between them by comparing the literal text.
 ``` r
 na_literal("NULL", "NA")
 #> Mutator: NULL → NA
-#> Query: (null) @value
+#> Query: (null) @target
 na_literal("NA", "NULL")
 #> Mutator: NA → NULL
-#> Query: (na) @value
+#> Query: (na) @target
 na_literal("NA", "NA_real_")
 #> Mutator: NA → NA_real_
-#> Query: (na) @value
+#> Query: (na) @target
 na_literal("NA_real_", "NA")
 #> Mutator: NA_real_ → NA
-#> Query: (na) @value
+#> Query: (na) @target
 ```

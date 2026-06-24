@@ -25,11 +25,11 @@ call_name(from, to)
 ``` r
 call_name("any", "all")
 #> Mutator: any → all
-#> Query: (call function: (identifier) @name (#eq? @name "any"))
+#> Query: (call function: (identifier) @target (#eq? @target "any"))
 call_name("min", "max")
 #> Mutator: min → max
-#> Query: (call function: (identifier) @name (#eq? @name "min"))
+#> Query: (call function: (identifier) @target (#eq? @target "min"))
 call_name("sum", "prod")
 #> Mutator: sum → prod
-#> Query: (call function: (identifier) @name (#eq? @name "sum"))
+#> Query: (call function: (identifier) @target (#eq? @target "sum"))
 ```

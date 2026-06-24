@@ -24,14 +24,14 @@ boolean_literal(from, to)
 ``` r
 boolean_literal("TRUE", "FALSE")
 #> Mutator: TRUE → FALSE
-#> Query: (true) @value
+#> Query: (true) @target
 boolean_literal("FALSE", "TRUE")
 #> Mutator: FALSE → TRUE
-#> Query: (false) @value
+#> Query: (false) @target
 boolean_literal("T", "F")
 #> Mutator: T → F
-#> Query: (identifier) @value (#eq? @value "T")
+#> Query: (identifier) @target (#eq? @target "T")
 boolean_literal("F", "T")
 #> Mutator: F → T
-#> Query: (identifier) @value (#eq? @value "F")
+#> Query: (identifier) @target (#eq? @target "F")
 ```

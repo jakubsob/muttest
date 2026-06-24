@@ -37,11 +37,11 @@ for how to diagnose survivors and fix the underlying test weakness.
 index_mutations()
 #> [[1]]
 #> Mutator: x[<i>] → x[<i> + 1L]
-#> Query: [(subset arguments: (arguments (argument value: [(identifier) (float) (integer)] @index))) (subset2 arguments: (arguments (argument value: [(identifier) (float) (integer)] @index)))]
+#> Query: [(subset arguments: (arguments (argument value: [(identifier) (float) (integer)] @target))) (subset2 arguments: (arguments (argument value: [(identifier) (float) (integer)] @target)))]
 #> 
 #> [[2]]
 #> Mutator: x[<i>] → x[<i> - 1L]
-#> Query: [(subset arguments: (arguments (argument value: [(identifier) (float) (integer)] @index))) (subset2 arguments: (arguments (argument value: [(identifier) (float) (integer)] @index)))]
+#> Query: [(subset arguments: (arguments (argument value: [(identifier) (float) (integer)] @target))) (subset2 arguments: (arguments (argument value: [(identifier) (float) (integer)] @target)))]
 #> 
 
 if (FALSE) { # \dontrun{
