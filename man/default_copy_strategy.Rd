@@ -16,7 +16,7 @@ A \code{?CopyStrategy} object
 Create a default project copy strategy
 }
 \seealso{
-Other CopyStrategy: 
+Other CopyStrategy:
 \code{\link{CopyStrategy}},
 \code{\link{PackageCopyStrategy}}
 }

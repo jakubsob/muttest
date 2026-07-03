@@ -7,55 +7,58 @@
 Extend this class to implement a custom copy strategy.
 }
 \seealso{
-Other CopyStrategy: 
+Other CopyStrategy:
 \code{\link{PackageCopyStrategy}},
-\code{\link{default_copy_strategy}()}
+\code{\link[=default_copy_strategy]{default_copy_strategy()}}
 }
 \concept{CopyStrategy}
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-CopyStrategy-execute}{\code{CopyStrategy$execute()}}
-\item \href{#method-CopyStrategy-clone}{\code{CopyStrategy$clone()}}
-}
+  \itemize{
+    \item \href{#method-CopyStrategy-execute}{\code{CopyStrategy$execute()}}
+    \item \href{#method-CopyStrategy-clone}{\code{CopyStrategy$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-CopyStrategy-execute"></a>}}
 \if{latex}{\out{\hypertarget{method-CopyStrategy-execute}{}}}
-\subsection{Method \code{execute()}}{
-Copy project files according to the strategy
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CopyStrategy$execute(original_dir)}\if{html}{\out{</div>}}
+\subsection{\code{CopyStrategy$execute()}}{
+  Copy project files according to the strategy
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{CopyStrategy$execute(original_dir)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{original_dir}}{The original directory to copy from}
+      \item{\code{plan}}{The current test plan}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The path to the temporary directory
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{original_dir}}{The original directory to copy from}
-
-\item{\code{plan}}{The current test plan}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The path to the temporary directory
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-CopyStrategy-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-CopyStrategy-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CopyStrategy$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{CopyStrategy$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{CopyStrategy$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

@@ -17,7 +17,6 @@ Description: Measure quality of your tests.
     'muttest' gives you percent score of how often your tests catch the changes.
 License: MIT + file LICENSE
 Encoding: UTF-8
-RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
 Depends:
   R (>= 4.1.0)
@@ -45,3 +44,4 @@ Suggests:
     shiny,
     stringr
 VignetteBuilder: knitr
+Config/roxygen2/version: 8.0.0

@@ -13,7 +13,7 @@ default_reporter(...)
 Create a default reporter
 }
 \seealso{
-Other MutationReporter: 
+Other MutationReporter:
 \code{\link{MutationReporter}},
 \code{\link{ProgressMutationReporter}}
 }

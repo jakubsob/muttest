@@ -7,58 +7,60 @@
 Extend this class to implement a custom test strategy.
 }
 \seealso{
-Other TestStrategy: 
+Other TestStrategy:
 \code{\link{FileTestStrategy}},
 \code{\link{FullTestStrategy}},
-\code{\link{default_test_strategy}()}
+\code{\link[=default_test_strategy]{default_test_strategy()}}
 }
 \concept{TestStrategy}
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-TestStrategy-execute}{\code{TestStrategy$execute()}}
-\item \href{#method-TestStrategy-clone}{\code{TestStrategy$clone()}}
-}
+  \itemize{
+    \item \href{#method-TestStrategy-execute}{\code{TestStrategy$execute()}}
+    \item \href{#method-TestStrategy-clone}{\code{TestStrategy$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TestStrategy-execute"></a>}}
 \if{latex}{\out{\hypertarget{method-TestStrategy-execute}{}}}
-\subsection{Method \code{execute()}}{
-Execute the test strategy
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TestStrategy$execute(path, plan, reporter)}\if{html}{\out{</div>}}
+\subsection{\code{TestStrategy$execute()}}{
+  Execute the test strategy
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{TestStrategy$execute(path, plan, reporter)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{path}}{The path to the test directory}
+      \item{\code{plan}}{The current mutation plan. See \code{muttest_plan()}.}
+      \item{\code{reporter}}{The reporter to use for test results}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The test result
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{path}}{The path to the test directory}
-
-\item{\code{plan}}{The current mutation plan. See \code{muttest_plan()}.}
-
-\item{\code{reporter}}{The reporter to use for test results}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The test result
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TestStrategy-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-TestStrategy-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TestStrategy$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{TestStrategy$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{TestStrategy$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

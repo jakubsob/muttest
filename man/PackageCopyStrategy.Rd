@@ -7,58 +7,61 @@
 It copies all files and directories from the original directory to a temporary directory.
 }
 \seealso{
-Other CopyStrategy: 
+Other CopyStrategy:
 \code{\link{CopyStrategy}},
-\code{\link{default_copy_strategy}()}
+\code{\link[=default_copy_strategy]{default_copy_strategy()}}
 }
 \concept{CopyStrategy}
 \section{Super class}{
-\code{\link[muttest:CopyStrategy]{muttest::CopyStrategy}} -> \code{PackageCopyStrategy}
+\code{\link[muttest:CopyStrategy]{CopyStrategy}} -> \code{PackageCopyStrategy}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-PackageCopyStrategy-execute}{\code{PackageCopyStrategy$execute()}}
-\item \href{#method-PackageCopyStrategy-clone}{\code{PackageCopyStrategy$clone()}}
-}
+  \itemize{
+    \item \href{#method-PackageCopyStrategy-execute}{\code{PackageCopyStrategy$execute()}}
+    \item \href{#method-PackageCopyStrategy-clone}{\code{PackageCopyStrategy$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PackageCopyStrategy-execute"></a>}}
 \if{latex}{\out{\hypertarget{method-PackageCopyStrategy-execute}{}}}
-\subsection{Method \code{execute()}}{
-Copy project files, excluding hidden and temp directories
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PackageCopyStrategy$execute(original_dir, plan)}\if{html}{\out{</div>}}
+\subsection{\code{PackageCopyStrategy$execute()}}{
+  Copy project files, excluding hidden and temp directories
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{PackageCopyStrategy$execute(original_dir, plan)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{original_dir}}{The original directory to copy from}
+      \item{\code{plan}}{The current test plan}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The path to the temporary directory
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{original_dir}}{The original directory to copy from}
-
-\item{\code{plan}}{The current test plan}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The path to the temporary directory
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PackageCopyStrategy-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-PackageCopyStrategy-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PackageCopyStrategy$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{PackageCopyStrategy$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{PackageCopyStrategy$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

@@ -4,125 +4,123 @@
 \alias{Mutator}
 \title{Mutator}
 \description{
-Mutator
-
-Mutator
-}
-\details{
 Represents a single code mutation — a pattern to find and a replacement to
 apply. Every mutator function (\code{\link[=operator]{operator()}}, \code{\link[=boolean_literal]{boolean_literal()}}, etc.)
 returns an instance of this class.
 }
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{from}}{The token or operator to replace.}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{from}}{The token or operator to replace.}
 
-\item{\code{to}}{The replacement token or operator.}
+    \item{\code{to}}{The replacement token or operator.}
 
-\item{\code{query}}{Tree-sitter query used to locate candidate nodes.}
+    \item{\code{query}}{Tree-sitter query used to locate candidate nodes.}
 
-\item{\code{match_fn}}{Optional \verb{function(node_text)} returning \code{logical};
+    \item{\code{match_fn}}{Optional \verb{function(node_text)} returning \code{logical};
 overrides the default \code{node_text == from} equality check.}
 
-\item{\code{replacement_fn}}{Optional \verb{function(node_text)} returning a string;
+    \item{\code{replacement_fn}}{Optional \verb{function(node_text)} returning a string;
 overrides the static \code{to} value as the replacement text.}
 
-\item{\code{mutate_fn}}{Optional \verb{function(code)} that fully replaces the
+    \item{\code{mutate_fn}}{Optional \verb{function(code)} that fully replaces the
 default mutation logic when set.}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-Mutator-new}{\code{Mutator$new()}}
-\item \href{#method-Mutator-mutate}{\code{Mutator$mutate()}}
-\item \href{#method-Mutator-print}{\code{Mutator$print()}}
-\item \href{#method-Mutator-clone}{\code{Mutator$clone()}}
-}
+  \itemize{
+    \item \href{#method-Mutator-initialize}{\code{Mutator$new()}}
+    \item \href{#method-Mutator-mutate}{\code{Mutator$mutate()}}
+    \item \href{#method-Mutator-print}{\code{Mutator$print()}}
+    \item \href{#method-Mutator-clone}{\code{Mutator$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Mutator-new"></a>}}
-\if{latex}{\out{\hypertarget{method-Mutator-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new \code{Mutator}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Mutator$new(
+\if{html}{\out{<a id="method-Mutator-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-Mutator-initialize}{}}}
+\subsection{\code{Mutator$new()}}{
+  Create a new \code{Mutator}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Mutator$new(
   from,
   to,
   query,
   match_fn = NULL,
   replacement_fn = NULL,
   mutate_fn = NULL
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{from}}{Token to replace.}
-
-\item{\code{to}}{Replacement token.}
-
-\item{\code{query}}{Tree-sitter query string.}
-
-\item{\code{match_fn}}{Optional custom match function.}
-
-\item{\code{replacement_fn}}{Optional custom replacement function.}
-
-\item{\code{mutate_fn}}{Optional \verb{function(code)} that fully overrides the
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{from}}{Token to replace.}
+      \item{\code{to}}{Replacement token.}
+      \item{\code{query}}{Tree-sitter query string.}
+      \item{\code{match_fn}}{Optional custom match function.}
+      \item{\code{replacement_fn}}{Optional custom replacement function.}
+      \item{\code{mutate_fn}}{Optional \verb{function(code)} that fully overrides the
 default mutation logic.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Mutator-mutate"></a>}}
 \if{latex}{\out{\hypertarget{method-Mutator-mutate}{}}}
-\subsection{Method \code{mutate()}}{
-Apply this mutator to a character vector of source lines.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Mutator$mutate(code)}\if{html}{\out{</div>}}
+\subsection{\code{Mutator$mutate()}}{
+  Apply this mutator to a character vector of source lines.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Mutator$mutate(code)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{code}}{Character vector of source lines.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A list of mutated code variants (one per match), or \code{NULL} if
+the pattern was not found.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{code}}{Character vector of source lines.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A list of mutated code variants (one per match), or \code{NULL} if
-the pattern was not found.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Mutator-print"></a>}}
 \if{latex}{\out{\hypertarget{method-Mutator-print}{}}}
-\subsection{Method \code{print()}}{
-Print a short summary of the mutator.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Mutator$print()}\if{html}{\out{</div>}}
+\subsection{\code{Mutator$print()}}{
+  Print a short summary of the mutator.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Mutator$print()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Mutator-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-Mutator-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Mutator$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{Mutator$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{Mutator$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

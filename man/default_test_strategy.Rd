@@ -16,7 +16,7 @@ A \code{?TestStrategy} object
 Create a default run strategy
 }
 \seealso{
-Other TestStrategy: 
+Other TestStrategy:
 \code{\link{FileTestStrategy}},
 \code{\link{FullTestStrategy}},
 \code{\link{TestStrategy}}
