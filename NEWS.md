@@ -1,6 +1,6 @@
 # muttest 0.2.2
 
-- In the documentation, linked to referenced documentation
+- In the documentation, linked to referenced documentation (@BrentWHR).
 
 # muttest 0.2.1
 
