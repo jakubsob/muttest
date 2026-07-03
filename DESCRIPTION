@@ -1,7 +1,7 @@
 Package: muttest
 Type: Package
 Title: Mutation Testing
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: c(
     person(
       "Jakub", "Sobolewski",
