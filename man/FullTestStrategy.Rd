@@ -9,84 +9,87 @@ This test strategy tells if a mutant is caught by any test.
 To get faster results, especially for big codebases, use \code{?FileTestStrategy} instead.
 }
 \seealso{
-Other TestStrategy: 
+Other TestStrategy:
 \code{\link{FileTestStrategy}},
 \code{\link{TestStrategy}},
-\code{\link{default_test_strategy}()}
+\code{\link[=default_test_strategy]{default_test_strategy()}}
 }
 \concept{TestStrategy}
 \section{Super class}{
-\code{\link[muttest:TestStrategy]{muttest::TestStrategy}} -> \code{FullTestStrategy}
+\code{\link[muttest:TestStrategy]{TestStrategy}} -> \code{FullTestStrategy}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-FullTestStrategy-new}{\code{FullTestStrategy$new()}}
-\item \href{#method-FullTestStrategy-execute}{\code{FullTestStrategy$execute()}}
-\item \href{#method-FullTestStrategy-clone}{\code{FullTestStrategy$clone()}}
-}
+  \itemize{
+    \item \href{#method-FullTestStrategy-initialize}{\code{FullTestStrategy$new()}}
+    \item \href{#method-FullTestStrategy-execute}{\code{FullTestStrategy$execute()}}
+    \item \href{#method-FullTestStrategy-clone}{\code{FullTestStrategy$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-FullTestStrategy-new"></a>}}
-\if{latex}{\out{\hypertarget{method-FullTestStrategy-new}{}}}
-\subsection{Method \code{new()}}{
-Initialize
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FullTestStrategy$new(
+\if{html}{\out{<a id="method-FullTestStrategy-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-FullTestStrategy-initialize}{}}}
+\subsection{\code{FullTestStrategy$new()}}{
+  Initialize
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FullTestStrategy$new(
   load_helpers = TRUE,
   load_package = c("source", "none", "installed")
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{load_helpers}}{Whether to load test helpers}
+      \item{\code{load_package}}{The package loading strategy}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{load_helpers}}{Whether to load test helpers}
-
-\item{\code{load_package}}{The package loading strategy}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FullTestStrategy-execute"></a>}}
 \if{latex}{\out{\hypertarget{method-FullTestStrategy-execute}{}}}
-\subsection{Method \code{execute()}}{
-Execute the test strategy
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FullTestStrategy$execute(path, plan, reporter)}\if{html}{\out{</div>}}
+\subsection{\code{FullTestStrategy$execute()}}{
+  Execute the test strategy
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FullTestStrategy$execute(path, plan, reporter)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{path}}{The path to the test directory}
+      \item{\code{plan}}{The current mutation plan. See \code{muttest_plan()}.}
+      \item{\code{reporter}}{The reporter to use for test results}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The test results
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{path}}{The path to the test directory}
-
-\item{\code{plan}}{The current mutation plan. See \code{muttest_plan()}.}
-
-\item{\code{reporter}}{The reporter to use for test results}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The test results
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FullTestStrategy-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-FullTestStrategy-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FullTestStrategy$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{FullTestStrategy$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FullTestStrategy$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

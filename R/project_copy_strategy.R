@@ -77,8 +77,8 @@ PackageCopyStrategy <- R6::R6Class(
 
 #' Create a default project copy strategy
 #'
-#' @param ... Arguments passed to the `?PackageCopyStrategy` constructor.
-#' @return A `?CopyStrategy` object
+#' @param ... Arguments passed to the [PackageCopyStrategy] constructor.
+#' @return A [CopyStrategy] object
 #' @md
 #' @export
 #' @family CopyStrategy

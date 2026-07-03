@@ -28,5 +28,5 @@ mutants in one go. This function allows you to create a plan for selected source
 \details{
 The plan is in a data frame format, where each row represents a mutant.
 
-You can subset the plan before passing it to the \code{muttest()} function.
+You can subset the plan before passing it to the \code{\link[=muttest]{muttest()}} function.
 }

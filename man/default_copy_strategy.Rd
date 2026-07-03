@@ -7,16 +7,16 @@
 default_copy_strategy(...)
 }
 \arguments{
-\item{...}{Arguments passed to the \code{?PackageCopyStrategy} constructor.}
+\item{...}{Arguments passed to the \link{PackageCopyStrategy} constructor.}
 }
 \value{
-A \code{?CopyStrategy} object
+A \link{CopyStrategy} object
 }
 \description{
 Create a default project copy strategy
 }
 \seealso{
-Other CopyStrategy: 
+Other CopyStrategy:
 \code{\link{CopyStrategy}},
 \code{\link{PackageCopyStrategy}}
 }
