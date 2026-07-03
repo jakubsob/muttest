@@ -9,7 +9,7 @@ This strategy tells if a mutant is caught by a test matching the source file nam
 For example, if the source file name is \code{foo.R}, and there are test files named \code{test-foo.R} or \code{test-bar.R},
 only \code{test-foo.R} will be run.
 
-This strategy should give faster results than \code{?FullTestStrategy}, especially for big codebases,
+This strategy should give faster results than \link{FullTestStrategy}, especially for big codebases,
 but the score might be less accurate.
 }
 \seealso{

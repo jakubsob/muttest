@@ -162,7 +162,7 @@ Other MutationReporter:
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
-      \item{\code{plan}}{Current testing plan. See \code{muttest_plan()}.}
+      \item{\code{plan}}{Current testing plan. See \code{\link[=muttest_plan]{muttest_plan()}}.}
       \item{\code{killed}}{Whether the mutation was killed by tests}
       \item{\code{survived}}{Number of survived mutations}
       \item{\code{errors}}{Number of errors encountered}

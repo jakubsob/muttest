@@ -1,12 +1,12 @@
 #' Run a mutation test
 #'
-#' @param plan A mutation testing plan. See `muttest_plan()`.
+#' @param plan A mutation testing plan. See [muttest_plan()].
 #' @param path Path to the test directory.
-#' @param reporter Reporter to use for mutation testing results. See `?MutationReporter`.
-#' @param test_strategy Strategy for running tests. See `?TestStrategy`.
+#' @param reporter Reporter to use for mutation testing results. See [MutationReporter].
+#' @param test_strategy Strategy for running tests. See [TestStrategy].
 #'   The purpose of test strategy is to control how tests are executed.
 #'   We can run all tests for each mutant, or only tests that are relevant to the mutant.
-#' @param copy_strategy Strategy for copying the project. See `?CopyStrategy`.
+#' @param copy_strategy Strategy for copying the project. See [CopyStrategy].
 #'   This strategy controls which files are copied to the temporary directory, where the tests are run.
 #' @param workers Number of parallel workers. When greater than 1, mutants are tested
 #'   concurrently using `mirai` daemons. Defaults to 1 (sequential).
@@ -175,7 +175,7 @@ print.muttest_result <- function(x, ...) {
 #'
 #' The plan is in a data frame format, where each row represents a mutant.
 #'
-#' You can subset the plan before passing it to the `muttest()` function.
+#' You can subset the plan before passing it to the [muttest()] function.
 #'
 #' @param mutators A list of mutators to use. See [operator()].
 #' @param source_files A vector of file paths to the source files.

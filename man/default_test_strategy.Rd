@@ -7,10 +7,10 @@
 default_test_strategy(...)
 }
 \arguments{
-\item{...}{Arguments passed to the \code{?FullTestStrategy} constructor.}
+\item{...}{Arguments passed to the \link{FullTestStrategy} constructor.}
 }
 \value{
-A \code{?TestStrategy} object
+A \link{TestStrategy} object
 }
 \description{
 Create a default run strategy

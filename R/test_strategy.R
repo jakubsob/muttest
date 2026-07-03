@@ -77,7 +77,7 @@ FullTestStrategy <- R6::R6Class(
 #' For example, if the source file name is `foo.R`, and there are test files named `test-foo.R` or `test-bar.R`,
 #' only `test-foo.R` will be run.
 #'
-#' This strategy should give faster results than `?FullTestStrategy`, especially for big codebases,
+#' This strategy should give faster results than [FullTestStrategy], especially for big codebases,
 #' but the score might be less accurate.
 #'
 #' @export
@@ -126,8 +126,8 @@ FileTestStrategy <- R6::R6Class(
 
 #' @title Create a default run strategy
 #'
-#' @param ... Arguments passed to the `?FullTestStrategy` constructor.
-#' @return A `?TestStrategy` object
+#' @param ... Arguments passed to the [FullTestStrategy] constructor.
+#' @return A [TestStrategy] object
 #'
 #' @export
 #' @md

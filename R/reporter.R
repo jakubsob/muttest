@@ -94,7 +94,7 @@ MutationReporter <- R6::R6Class(
     },
 
     #' @description Add a mutation test result
-    #' @param plan Current testing plan. See `muttest_plan()`.
+    #' @param plan Current testing plan. See [muttest_plan()].
     #' @param killed Whether the mutation was killed by tests
     #' @param survived Number of survived mutations
     #' @param errors Number of errors encountered
@@ -175,7 +175,7 @@ MutationReporter <- R6::R6Class(
 
 #' Create a default reporter
 #'
-#' @param ... Arguments passed to the `?ProgressMutationReporter` constructor.
+#' @param ... Arguments passed to the [ProgressMutationReporter] constructor.
 #' @md
 #' @export
 #' @family MutationReporter
