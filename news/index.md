@@ -1,5 +1,9 @@
 # Changelog
 
+## muttest 0.3.0
+
+- 🐛 Added missing `digest` and `tools` to Imports.
+
 ## muttest 0.2.1
 
 CRAN release: 2026-06-24
