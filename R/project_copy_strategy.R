@@ -29,6 +29,7 @@ CopyStrategy <- R6::R6Class(
 #' @md
 #' @export
 #' @family CopyStrategy
+#' @importFrom digest digest
 PackageCopyStrategy <- R6::R6Class(
   classname = "PackageCopyStrategy",
   inherit = CopyStrategy,

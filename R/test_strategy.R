@@ -83,6 +83,7 @@ FullTestStrategy <- R6::R6Class(
 #' @export
 #' @md
 #' @family TestStrategy
+#' @importFrom tools file_path_sans_ext
 FileTestStrategy <- R6::R6Class(
   classname = "FileTestStrategy",
   inherit = TestStrategy,

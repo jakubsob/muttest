@@ -1,3 +1,7 @@
+# muttest 0.3.0
+
+- 🐛 Added missing `digest` and `tools` to Imports.
+
 # muttest 0.2.1
 
 - Update treesitter queries to work with treesitter >= 1.3.0.
