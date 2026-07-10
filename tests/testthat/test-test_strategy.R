@@ -59,6 +59,50 @@ describe("FileTestStrategy", {
     expect_equal(sum(as.data.frame(result)$passed), 1)
   })
 
+  it("doesn't match a source name as a substring of another test file", {
+    # Arrange: `mod` must not match `test-model.R` (unanchored regex bug).
+    temp_dir <- withr::local_tempdir()
+    test_dir <- file.path(temp_dir, "tests/testthat")
+    dir.create(test_dir, recursive = TRUE)
+
+    test1 <- 'test_that("test1", { expect_true(TRUE) })'
+    writeLines(test1, file.path(test_dir, "test-model.R"))
+    strategy <- FileTestStrategy$new(load_package = "none")
+
+    # Act
+    result <- strategy$execute(
+      path = test_dir,
+      plan = data.frame(filename = "mod.R"),
+      reporter = testthat::SilentReporter$new()
+    )
+
+    # Assert
+    expect_equal(length(result), 0)
+  })
+
+  it("treats regex metacharacters in the source name literally", {
+    # Arrange: `f.o` must run only `test-f.o.R`, not `test-fxo.R`.
+    temp_dir <- withr::local_tempdir()
+    test_dir <- file.path(temp_dir, "tests/testthat")
+    dir.create(test_dir, recursive = TRUE)
+
+    test1 <- 'test_that("test1", { expect_true(TRUE) })'
+    test2 <- 'test_that("test2", { expect_true(TRUE) })'
+    writeLines(test1, file.path(test_dir, "test-f.o.R"))
+    writeLines(test2, file.path(test_dir, "test-fxo.R"))
+    strategy <- FileTestStrategy$new(load_package = "none")
+
+    # Act
+    result <- strategy$execute(
+      path = test_dir,
+      plan = data.frame(filename = "f.o.R"),
+      reporter = testthat::SilentReporter$new()
+    )
+
+    # Assert
+    expect_equal(sum(as.data.frame(result)$passed), 1)
+  })
+
   it("doesn't run test files if source file name doesn't match", {
     # Arrange
     temp_dir <- withr::local_tempdir()

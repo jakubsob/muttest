@@ -1,5 +1,6 @@
 # muttest 0.3.0
 
+- 🐛 `FileTestStrategy` now matches test files by exact name instead of an unanchored regex, so a source file like `mod.R` no longer runs `test-model.R` and filenames with regex metacharacters are handled correctly.
 - 🐛 Added missing `digest` and `tools` to Imports.
 
 # muttest 0.2.1

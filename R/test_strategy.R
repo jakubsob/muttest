@@ -110,12 +110,14 @@ FileTestStrategy <- R6::R6Class(
     #' @return The test results
     execute = function(path, plan, reporter) {
       file_name <- tools::file_path_sans_ext(basename(plan$filename))
-      if (!any(grepl(file_name, list.files(path)))) {
+      test_files <- list.files(path, pattern = "^test.*\\.[rR]$")
+      test_names <- sub("^test[-_]", "", tools::file_path_sans_ext(test_files))
+      if (!file_name %in% test_names) {
         return(.empty_test_result())
       }
       testthat::test_dir(
         path = path,
-        filter = file_name,
+        filter = paste0("^", .escape_regex(file_name), "$"),
         stop_on_failure = FALSE,
         reporter = reporter,
         load_helpers = private$args$load_helpers,
@@ -142,4 +144,9 @@ default_test_strategy <- function(...) {
     list(),
     class = c("testthat_results")
   )
+}
+
+# Escape regex metacharacters so a filename is matched literally, not as a pattern.
+.escape_regex <- function(x) {
+  gsub("([][{}()^$.|*+?\\\\])", "\\\\\\1", x)
 }
