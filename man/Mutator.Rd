@@ -94,8 +94,10 @@ Apply this mutator to a character vector of source lines.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A list of mutated code variants (one per match), or \code{NULL} if
-the pattern was not found.
+A list of mutation records (one per match), each a list with
+\code{code} (mutated source lines), \code{location} (1-based \code{start}/\code{end}
+line/column), and \code{replacement} (the inserted text), or \code{NULL} if the
+pattern was not found.
 }
 }
 \if{html}{\out{<hr>}}

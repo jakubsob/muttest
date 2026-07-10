@@ -27,7 +27,7 @@ describe("boolean_literal", {
   it("should generate one mutation per occurrence", {
     mutator <- boolean_literal("TRUE", "FALSE")
     expect_mutation_count(mutator, c("f(TRUE, TRUE)"), 2)
-    mutations <- mutator$mutate(c("f(TRUE, TRUE)"))
+    mutations <- mutate_codes(mutator, c("f(TRUE, TRUE)"))
     expect_equal(mutations[[1]], c("f(FALSE, TRUE)"))
     expect_equal(mutations[[2]], c("f(TRUE, FALSE)"))
   })
@@ -35,7 +35,7 @@ describe("boolean_literal", {
   it("should handle multiline code", {
     mutator <- boolean_literal("TRUE", "FALSE")
     code <- c("x <- TRUE", "y <- TRUE")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c("x <- FALSE", "y <- TRUE"))
     expect_equal(mutations[[2]], c("x <- TRUE",  "y <- FALSE"))

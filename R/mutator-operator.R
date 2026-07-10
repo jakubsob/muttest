@@ -44,6 +44,16 @@ info_oneline <- function(m) {
   paste(m$from, SYMBOLS$arrow, m$to)
 }
 
+# 1-based, end-exclusive location of a treesitter node (points are 0-based).
+node_location <- function(node) {
+  s <- treesitter::node_start_point(node)
+  e <- treesitter::node_end_point(node)
+  list(
+    start = list(line = s$row + 1L, column = s$column + 1L),
+    end = list(line = e$row + 1L, column = e$column + 1L)
+  )
+}
+
 replace_with <- function(code, node, replacement_text) {
   start_point <- treesitter::node_start_point(node)
   original_text <- treesitter::node_text(node)
@@ -56,7 +66,7 @@ replace_with <- function(code, node, replacement_text) {
       nchar(code[start_point$row + 1])
     )
   )
-  code
+  list(code = code, location = node_location(node), replacement = replacement_text)
 }
 
 mutate_code <- function(code, mutator) {

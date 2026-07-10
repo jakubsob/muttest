@@ -9,6 +9,8 @@ It provides real-time feedback on which mutants are being tested and whether the
 }
 \seealso{
 Other MutationReporter: 
+\code{\link{JSONMutationReporter}},
+\code{\link{MultiReporter}},
 \code{\link{MutationReporter}},
 \code{\link{default_reporter}()}
 }

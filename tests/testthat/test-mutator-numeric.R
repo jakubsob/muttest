@@ -22,7 +22,7 @@ describe("numeric_increment", {
   it("should generate one mutation per literal occurrence", {
     mutator <- numeric_increment()
     code <- c("f(1, 2)")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c("f(2, 2)"))
     expect_equal(mutations[[2]], c("f(1, 3)"))
@@ -31,7 +31,7 @@ describe("numeric_increment", {
   it("should work across multiple lines", {
     mutator <- numeric_increment()
     code <- c("a <- 10", "b <- 20")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c("a <- 11", "b <- 20"))
     expect_equal(mutations[[2]], c("a <- 10", "b <- 21"))
@@ -62,7 +62,7 @@ describe("numeric_decrement", {
   it("should generate one mutation per literal occurrence", {
     mutator <- numeric_decrement()
     code <- c("f(3, 7)")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c("f(2, 7)"))
     expect_equal(mutations[[2]], c("f(3, 6)"))

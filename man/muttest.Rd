@@ -15,17 +15,17 @@ muttest(
 )
 }
 \arguments{
-\item{plan}{A mutation testing plan. See \code{muttest_plan()}.}
+\item{plan}{A mutation testing plan. See \code{\link[=muttest_plan]{muttest_plan()}}.}
 
 \item{path}{Path to the test directory.}
 
-\item{reporter}{Reporter to use for mutation testing results. See \code{?MutationReporter}.}
+\item{reporter}{Reporter to use for mutation testing results. See \link{MutationReporter}.}
 
-\item{test_strategy}{Strategy for running tests. See \code{?TestStrategy}.
+\item{test_strategy}{Strategy for running tests. See \link{TestStrategy}.
 The purpose of test strategy is to control how tests are executed.
 We can run all tests for each mutant, or only tests that are relevant to the mutant.}
 
-\item{copy_strategy}{Strategy for copying the project. See \code{?CopyStrategy}.
+\item{copy_strategy}{Strategy for copying the project. See \link{CopyStrategy}.
 This strategy controls which files are copied to the temporary directory, where the tests are run.}
 
 \item{workers}{Number of parallel workers. When greater than 1, mutants are tested

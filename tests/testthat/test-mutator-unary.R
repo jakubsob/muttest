@@ -27,7 +27,7 @@ describe("remove_negation", {
   it("should generate one mutation per negation occurrence", {
     mutator <- remove_negation()
     code <- c("!a && !b")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c("a && !b"))
     expect_equal(mutations[[2]], c("!a && b"))
@@ -36,7 +36,7 @@ describe("remove_negation", {
   it("should handle negation on multiple lines independently", {
     mutator <- remove_negation()
     code <- c("x <- !a", "y <- !b")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c("x <- a", "y <- !b"))
     expect_equal(mutations[[2]], c("x <- !a", "y <- b"))

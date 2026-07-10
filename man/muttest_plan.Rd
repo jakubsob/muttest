@@ -19,6 +19,8 @@ The data frame has the following columns:
 \item \code{original_code}: The original code of the source file.
 \item \code{mutated_code}: The mutated code of the source file.
 \item \code{mutator}: The mutator that was applied.
+\item \code{mutation}: A list with the mutant's \code{location} (1-based \code{start}/\code{end}
+line/column) and \code{replacement} text.
 }
 }
 \description{
@@ -28,5 +30,5 @@ mutants in one go. This function allows you to create a plan for selected source
 \details{
 The plan is in a data frame format, where each row represents a mutant.
 
-You can subset the plan before passing it to the \code{muttest()} function.
+You can subset the plan before passing it to the \code{\link[=muttest]{muttest()}} function.
 }

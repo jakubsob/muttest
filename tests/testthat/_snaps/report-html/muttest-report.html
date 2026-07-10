@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>muttest report</title>
+<link rel="stylesheet" href="../../../../inst/report/muttest.css">
+</head>
+<body data-f="survived">
+<div class="wrap">
+  <div class="mast">
+    <h1>muttest report</h1>
+    <div class="score error">50%</div>
+  </div>
+  <div class="toolbar">
+    <button class="chip all" data-f="all" aria-pressed="false">
+      All 
+      <b>2</b>
+    </button>
+    <button class="chip survived" data-f="survived" aria-pressed="false">
+      Survived 
+      <b>1</b>
+    </button>
+    <button class="chip killed" data-f="killed" aria-pressed="false">
+      Killed 
+      <b>1</b>
+    </button>
+    <button class="chip no_coverage" data-f="no_coverage" aria-pressed="false" disabled>
+      No coverage 
+      <b>0</b>
+    </button>
+    <button class="chip error" data-f="error" aria-pressed="false" disabled>
+      Errors 
+      <b>0</b>
+    </button>
+    <span class="hint">
+      <kbd>n</kbd>
+       / 
+      <kbd>p</kbd>
+       to jump between mutants
+    </span>
+    <div class="tools">
+      <button class="tbtn" data-open="1">Expand all</button>
+      <button class="tbtn" data-open="0">Collapse all</button>
+      <button class="tbtn" id="theme">Theme: auto</button>
+    </div>
+  </div>
+  <details class="file has-killed has-survived">
+    <summary>
+      <span class="fname">R/shipping.R</span>
+      <span class="fmeta">
+        <span class="ct">
+          <b class="survived">1</b>
+           survived
+        </span>
+        <span class="ct">
+          <b class="killed">1</b>
+           killed
+        </span>
+        <span class="fscore">
+          score 
+          <b>50%</b>
+        </span>
+      </span>
+    </summary>
+    <div class="src">
+      <div class="ln">
+        <span class="no">1</span>
+        <span class="txt">shipping_cost &lt;- function(weight_kg) {</span>
+      </div>
+      <details class="ln hit b-survived has-killed has-survived">
+        <summary>
+          <span class="no">2</span>
+          <span class="txt">  if (weight_kg &gt; 5) 15.00 else 5.00</span>
+          <span class="badge">2 mutants</span>
+        </summary>
+        <div class="muts">
+          <div class="mut m-killed">
+            <div class="head">
+              <span class="st killed">killed</span>
+              <span class="rule">&gt; → &lt;</span>
+            </div>
+            <code>
+              <span class="del">-   if (weight_kg &gt; 5) 15.00 else 5.00</span>
+              <span class="add">+   if (weight_kg &lt; 5) 15.00 else 5.00</span>
+            </code>
+          </div>
+          <div class="mut m-survived">
+            <div class="head">
+              <span class="st survived">survived</span>
+              <span class="rule">&gt; → &gt;=</span>
+            </div>
+            <code>
+              <span class="del">-   if (weight_kg &gt; 5) 15.00 else 5.00</span>
+              <span class="add">+   if (weight_kg &gt;= 5) 15.00 else 5.00</span>
+            </code>
+          </div>
+        </div>
+      </details>
+      <div class="ln">
+        <span class="no">3</span>
+        <span class="txt">}</span>
+      </div>
+    </div>
+  </details>
+</div>
+<script src="../../../../inst/report/muttest.js"></script>
+<script type="module" src="../../../../inst/report/muttest-shiki.mjs"></script>
+</body>
+</html>

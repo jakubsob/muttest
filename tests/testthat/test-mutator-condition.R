@@ -25,7 +25,7 @@ describe("negate_condition", {
   it("should generate one mutation per condition", {
     mutator <- negate_condition()
     code <- c("if (a) 1", "if (b) 2")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c("if (!(a)) 1", "if (b) 2"))
     expect_equal(mutations[[2]], c("if (a) 1",    "if (!(b)) 2"))
@@ -73,7 +73,7 @@ describe("remove_condition_negation", {
   it("should generate one mutation per negated condition", {
     mutator <- remove_condition_negation()
     code <- c("if (!a) 1", "if (!b) 2")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c("if (a) 1",  "if (!b) 2"))
     expect_equal(mutations[[2]], c("if (!a) 1", "if (b) 2"))
@@ -82,7 +82,7 @@ describe("remove_condition_negation", {
   it("should leave non-negated conditions untouched", {
     mutator <- remove_condition_negation()
     code <- c("if (!a) 1", "if (b) 2")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 1)
     expect_equal(mutations[[1]], c("if (a) 1", "if (b) 2"))
   })
@@ -92,7 +92,7 @@ describe("negate_condition with statements filter", {
   it("should only negate if conditions when statements = 'if'", {
     mutator <- negate_condition(statements = "if")
     code <- c("if (a) 1", "while (b) 2")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 1)
     expect_equal(mutations[[1]], c("if (!(a)) 1", "while (b) 2"))
   })
@@ -100,7 +100,7 @@ describe("negate_condition with statements filter", {
   it("should only negate while conditions when statements = 'while'", {
     mutator <- negate_condition(statements = "while")
     code <- c("if (a) 1", "while (b) 2")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 1)
     expect_equal(mutations[[1]], c("if (a) 1", "while (!(b)) 2"))
   })
@@ -114,7 +114,7 @@ describe("remove_condition_negation with statements filter", {
   it("should only remove negation from if conditions when statements = 'if'", {
     mutator <- remove_condition_negation(statements = "if")
     code <- c("if (!a) 1", "while (!b) 2")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 1)
     expect_equal(mutations[[1]], c("if (a) 1", "while (!b) 2"))
   })
@@ -122,7 +122,7 @@ describe("remove_condition_negation with statements filter", {
   it("should only remove negation from while conditions when statements = 'while'", {
     mutator <- remove_condition_negation(statements = "while")
     code <- c("if (!a) 1", "while (!b) 2")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 1)
     expect_equal(mutations[[1]], c("if (!a) 1", "while (b) 2"))
   })

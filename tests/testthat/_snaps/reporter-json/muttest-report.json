@@ -1,0 +1,48 @@
+{
+  "$schema": "https://raw.githubusercontent.com/stryker-mutator/mutation-testing-elements/master/packages/report-schema/src/mutation-testing-report-schema.json",
+  "schemaVersion": "1.0",
+  "thresholds": {
+    "high": 80,
+    "low": 50
+  },
+  "files": {
+    "R/shipping.R": {
+      "language": "r",
+      "source": "shipping_cost <- function(weight_kg) {\n  if (weight_kg > 5) 15.00 else 5.00\n}",
+      "mutants": [
+        {
+          "id": "2:17:> → <",
+          "mutatorName": "> → <",
+          "replacement": "<",
+          "location": {
+            "start": {
+              "line": 2,
+              "column": 17
+            },
+            "end": {
+              "line": 2,
+              "column": 18
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "2:17:> → >=",
+          "mutatorName": "> → >=",
+          "replacement": ">=",
+          "location": {
+            "start": {
+              "line": 2,
+              "column": 17
+            },
+            "end": {
+              "line": 2,
+              "column": 18
+            }
+          },
+          "status": "Survived"
+        }
+      ]
+    }
+  }
+}

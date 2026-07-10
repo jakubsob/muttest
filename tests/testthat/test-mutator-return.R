@@ -34,7 +34,7 @@ describe("replace_return_value default (NULL)", {
   it("should generate one mutation per return call", {
     mutator <- replace_return_value()
     code <- c("if (x) return(a)", "return(b)")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c("if (x) return(NULL)", "return(b)"))
     expect_equal(mutations[[2]], c("if (x) return(a)",    "return(NULL)"))
@@ -43,7 +43,7 @@ describe("replace_return_value default (NULL)", {
   it("should work across multiple lines", {
     mutator <- replace_return_value()
     code <- c("f <- function(x) {", "  return(x)", "}")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 1)
     expect_equal(mutations[[1]], c("f <- function(x) {", "  return(NULL)", "}"))
   })

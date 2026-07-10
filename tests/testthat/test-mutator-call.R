@@ -12,7 +12,7 @@ describe("call_name", {
   it("should mutate each occurrence independently", {
     mutator <- call_name("min", "max")
     code <- c("min(a, min(b))")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c("max(a, min(b))"))
     expect_equal(mutations[[2]], c("min(a, max(b))"))
@@ -21,7 +21,7 @@ describe("call_name", {
   it("should work across multiple lines", {
     mutator <- call_name("sum", "prod")
     code <- c("a <- sum(x)", "b <- sum(y)")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c("a <- prod(x)", "b <- sum(y)"))
     expect_equal(mutations[[2]], c("a <- sum(x)", "b <- prod(y)"))

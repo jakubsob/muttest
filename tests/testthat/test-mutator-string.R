@@ -17,7 +17,7 @@ describe("string_empty", {
   it("should generate one mutation per non-empty string occurrence", {
     mutator <- string_empty()
     code <- c('paste("foo", "bar")')
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c('paste("", "bar")'))
     expect_equal(mutations[[2]], c('paste("foo", "")'))
@@ -26,7 +26,7 @@ describe("string_empty", {
   it("should work across multiple lines", {
     mutator <- string_empty()
     code <- c('a <- "first"', 'b <- "second"')
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c('a <- ""', 'b <- "second"'))
     expect_equal(mutations[[2]], c('a <- "first"', 'b <- ""'))
@@ -52,7 +52,7 @@ describe("string_fill", {
   it("should generate one mutation per empty string occurrence", {
     mutator <- string_fill()
     code <- c('f("", "")')
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c('f("mutant", "")'))
     expect_equal(mutations[[2]], c('f("", "mutant")'))

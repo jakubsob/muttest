@@ -13,7 +13,7 @@ describe("delete_statement", {
     mutator <- delete_statement()
     code <- c("x <- 5", 'cat("hi")')
     expect_mutation_count(mutator, code, 2)
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_equal(mutations[[1]], c('cat("hi")'))
     expect_equal(mutations[[2]], c("x <- 5"))
   })
@@ -61,7 +61,7 @@ describe("delete_statement", {
   it("should delete a call inside a function body", {
     mutator <- delete_statement()
     code <- c("f <- function() {", '  cat("hi")', "  invisible(NULL)", "}")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c("f <- function() {", "  invisible(NULL)", "}"))
     expect_equal(mutations[[2]], c("f <- function() {", '  cat("hi")', "}"))
@@ -76,7 +76,7 @@ describe("delete_statement", {
       ")",
       "cat(x)"
     )
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c("cat(x)"))
     expect_equal(mutations[[2]], c(

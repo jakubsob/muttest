@@ -3,7 +3,7 @@ delete_node <- function(code, node) {
   end_row   <- treesitter::node_end_point(node)$row + 1L
   before    <- if (start_row > 1L) code[seq_len(start_row - 1L)] else character(0)
   after     <- if (end_row < length(code)) code[(end_row + 1L):length(code)] else character(0)
-  c(before, after)
+  list(code = c(before, after), location = node_location(node), replacement = "")
 }
 
 delete_statements <- function(code, query_str, match_fn) {

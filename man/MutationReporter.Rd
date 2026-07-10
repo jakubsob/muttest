@@ -9,6 +9,8 @@ It tracks each mutation attempt, reporting on whether the tests killed the mutat
 }
 \seealso{
 Other MutationReporter: 
+\code{\link{JSONMutationReporter}},
+\code{\link{MultiReporter}},
 \code{\link{ProgressMutationReporter}},
 \code{\link{default_reporter}()}
 }

@@ -14,7 +14,9 @@ test_that("timeout on infinite loop is recorded as error", {
       filename = "R/calculate.R",
       original_code = I(list(original)),
       mutated_code = I(list(mutated)),
-      mutator = I(list(negate_condition("while")))
+      mutator = I(list(negate_condition("while"))),
+      # unused by the base reporter; present only to satisfy the plan contract
+      mutation = I(list(NULL))
     ))
     reporter <- MutationReporter$new()
     capture.output(suppressMessages(suppressWarnings(muttest(p, reporter = reporter, timeout = 400))), type = "output")

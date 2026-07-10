@@ -1,12 +1,12 @@
 #' Run a mutation test
 #'
-#' @param plan A mutation testing plan. See `muttest_plan()`.
+#' @param plan A mutation testing plan. See [muttest_plan()].
 #' @param path Path to the test directory.
-#' @param reporter Reporter to use for mutation testing results. See `?MutationReporter`.
-#' @param test_strategy Strategy for running tests. See `?TestStrategy`.
+#' @param reporter Reporter to use for mutation testing results. See [MutationReporter].
+#' @param test_strategy Strategy for running tests. See [TestStrategy].
 #'   The purpose of test strategy is to control how tests are executed.
 #'   We can run all tests for each mutant, or only tests that are relevant to the mutant.
-#' @param copy_strategy Strategy for copying the project. See `?CopyStrategy`.
+#' @param copy_strategy Strategy for copying the project. See [CopyStrategy].
 #'   This strategy controls which files are copied to the temporary directory, where the tests are run.
 #' @param workers Number of parallel workers. When greater than 1, mutants are tested
 #'   concurrently using `mirai` daemons. Defaults to 1 (sequential).
@@ -32,7 +32,7 @@ muttest <- function(
     checkmate::check_multi_class(plan, "muttest_plan"),
     checkmate::check_data_frame(plan),
     checkmate::check_set_equal(
-      c("filename", "original_code", "mutated_code", "mutator"),
+      c("filename", "original_code", "mutated_code", "mutator", "mutation"),
       names(plan)
     ),
     combine = "and"
@@ -193,7 +193,7 @@ print.muttest_result <- function(x, ...) {
 #'
 #' The plan is in a data frame format, where each row represents a mutant.
 #'
-#' You can subset the plan before passing it to the `muttest()` function.
+#' You can subset the plan before passing it to the [muttest()] function.
 #'
 #' @param mutators A list of mutators to use. See [operator()].
 #' @param source_files A vector of file paths to the source files.
@@ -203,6 +203,8 @@ print.muttest_result <- function(x, ...) {
 #'   - `original_code`: The original code of the source file.
 #'   - `mutated_code`: The mutated code of the source file.
 #'   - `mutator`: The mutator that was applied.
+#'   - `mutation`: A list with the mutant's `location` (1-based `start`/`end`
+#'     line/column) and `replacement` text.
 #'
 #' @export
 #' @md
@@ -221,8 +223,9 @@ muttest_plan <- function(
         row <- data.frame(
           filename = filename,
           original_code = I(list(code_lines)),
-          mutated_code = I(list(mutation)),
+          mutated_code = I(list(mutation$code)),
           mutator = I(list(mutator)),
+          mutation = I(list(mutation[c("location", "replacement")])),
           stringsAsFactors = FALSE
         )
         rows <- c(rows, list(row))
@@ -235,6 +238,7 @@ muttest_plan <- function(
       original_code = I(list()),
       mutated_code = I(list()),
       mutator = I(list()),
+      mutation = I(list()),
       stringsAsFactors = FALSE
     )))
   }

@@ -93,7 +93,10 @@ reference:
     contents:
       - MutationReporter
       - ProgressMutationReporter
+      - JSONMutationReporter
+      - MultiReporter
       - default_reporter
+      - report
   - title: Strategies
     desc: Control how tests are run and source files are copied.
     contents:

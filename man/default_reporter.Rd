@@ -14,6 +14,8 @@ Create a default reporter
 }
 \seealso{
 Other MutationReporter: 
+\code{\link{JSONMutationReporter}},
+\code{\link{MultiReporter}},
 \code{\link{MutationReporter}},
 \code{\link{ProgressMutationReporter}}
 }

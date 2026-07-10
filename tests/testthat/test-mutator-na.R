@@ -17,7 +17,7 @@ describe("na_literal: NA → NULL", {
   it("should generate one mutation per occurrence", {
     mutator <- na_literal("NA", "NULL")
     code <- c("f(NA, NA)")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c("f(NULL, NA)"))
     expect_equal(mutations[[2]], c("f(NA, NULL)"))
@@ -26,7 +26,7 @@ describe("na_literal: NA → NULL", {
   it("should work across multiple lines", {
     mutator <- na_literal("NA", "NULL")
     code <- c("a <- NA", "b <- NA")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c("a <- NULL", "b <- NA"))
     expect_equal(mutations[[2]], c("a <- NA",   "b <- NULL"))
@@ -52,7 +52,7 @@ describe("na_literal: NULL → NA", {
   it("should generate one mutation per occurrence", {
     mutator <- na_literal("NULL", "NA")
     code <- c("f(NULL, NULL)")
-    mutations <- mutator$mutate(code)
+    mutations <- mutate_codes(mutator, code)
     expect_length(mutations, 2)
     expect_equal(mutations[[1]], c("f(NA, NULL)"))
     expect_equal(mutations[[2]], c("f(NULL, NA)"))
