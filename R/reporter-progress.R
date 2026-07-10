@@ -314,21 +314,7 @@ ProgressMutationReporter <- R6::R6Class(
         )))
       }
 
-      if (
-        self$survived_detail == "summary" &&
-          length(self$survived_mutants) > 0
-      ) {
-        self$cat_line()
-        self$rule(cli::style_bold("Survived Mutants"))
-        for (entry in self$survived_mutants) {
-          private$print_survived_diff(
-            entry$original_code,
-            entry$mutated_code,
-            entry$file_path,
-            entry$mutator
-          )
-        }
-      }
+      private$cat_survived_mutants()
 
       private$cat_stats()
       self$cat_line()
@@ -339,22 +325,27 @@ ProgressMutationReporter <- R6::R6Class(
     #' @description Print the mutation test result with survived diffs
     print = function() {
       private$cat_stats()
-      if (length(self$survived_mutants) > 0) {
-        self$cat_line()
-        self$rule(cli::style_bold("Survived Mutants"))
-        for (entry in self$survived_mutants) {
-          private$print_survived_diff(
-            entry$original_code,
-            entry$mutated_code,
-            entry$file_path,
-            entry$mutator
-          )
-        }
-      }
+      private$cat_survived_mutants()
       invisible(self)
     }
   ),
   private = list(
+    cat_survived_mutants = function() {
+      if (length(self$survived_mutants) == 0) {
+        return(invisible(NULL))
+      }
+      self$cat_line()
+      self$rule(cli::style_bold("Survived Mutants"))
+      for (entry in self$survived_mutants) {
+        private$print_survived_diff(
+          entry$original_code,
+          entry$mutated_code,
+          entry$file_path,
+          entry$mutator
+        )
+      }
+    },
+
     print_survived_diff = function(
       original_code,
       mutated_code,
