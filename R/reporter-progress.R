@@ -297,11 +297,6 @@ ProgressMutationReporter <- R6::R6Class(
       super$end_file()
     },
 
-    #' @description Carriage return if dynamic, newline otherwise
-    # nocov start
-    cr = function() {},
-    # nocov end
-
     #' @description End reporter with detailed summary
     end_reporter = function() {
       self$cat_line()

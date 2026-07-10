@@ -153,14 +153,6 @@ MutationReporter <- R6::R6Class(
 
     #' @description Print a message to the output
     #' @param ... Message to print
-    # nocov start
-    cat_tight = function(...) {
-      cat(..., sep = "", file = self$out, append = TRUE)
-    },
-    # nocov end
-
-    #' @description Print a message to the output
-    #' @param ... Message to print
     cat_line = function(...) {
       cli::cat_line(..., file = self$out)
     },

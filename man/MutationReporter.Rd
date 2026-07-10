@@ -57,7 +57,6 @@ Other MutationReporter:
 \item \href{#method-MutationReporter-end_file}{\code{MutationReporter$end_file()}}
 \item \href{#method-MutationReporter-end_reporter}{\code{MutationReporter$end_reporter()}}
 \item \href{#method-MutationReporter-get_score}{\code{MutationReporter$get_score()}}
-\item \href{#method-MutationReporter-cat_tight}{\code{MutationReporter$cat_tight()}}
 \item \href{#method-MutationReporter-cat_line}{\code{MutationReporter$cat_line()}}
 \item \href{#method-MutationReporter-rule}{\code{MutationReporter$rule()}}
 \item \href{#method-MutationReporter-clone}{\code{MutationReporter$clone()}}
@@ -228,23 +227,6 @@ Get the current score
 \if{html}{\out{<div class="r">}}\preformatted{MutationReporter$get_score()}\if{html}{\out{</div>}}
 }
 
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MutationReporter-cat_tight"></a>}}
-\if{latex}{\out{\hypertarget{method-MutationReporter-cat_tight}{}}}
-\subsection{Method \code{cat_tight()}}{
-Print a message to the output
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MutationReporter$cat_tight(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Message to print}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MutationReporter-cat_line"></a>}}
