@@ -5,6 +5,14 @@
 \title{Package copy strategy}
 \description{
 It copies all files and directories from the original directory to a temporary directory.
+
+When \code{symlink = TRUE}, only the top-level directory holding the mutated file
+(e.g. \verb{R/}) is copied; every other top-level directory and root file is
+symlinked to the original. For N mutants this avoids N full copies, which
+matters when the project carries large \verb{inst/}/\verb{data/} directories. Tests
+only read the symlinked files, so this is safe as long as the test suite
+does not write into the package's own directories (writes through a symlink
+would modify the original).
 }
 \seealso{
 Other CopyStrategy: 
@@ -18,8 +26,26 @@ Other CopyStrategy:
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-PackageCopyStrategy-new}{\code{PackageCopyStrategy$new()}}
 \item \href{#method-PackageCopyStrategy-execute}{\code{PackageCopyStrategy$execute()}}
 \item \href{#method-PackageCopyStrategy-clone}{\code{PackageCopyStrategy$clone()}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PackageCopyStrategy-new"></a>}}
+\if{latex}{\out{\hypertarget{method-PackageCopyStrategy-new}{}}}
+\subsection{Method \code{new()}}{
+Create a package copy strategy
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PackageCopyStrategy$new(symlink = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{symlink}}{If \code{TRUE}, symlink unchanged files instead of copying them.}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
