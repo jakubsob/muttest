@@ -1,5 +1,7 @@
 # muttest 0.3.0
 
+- ❗️ A mutant that makes tests *error* (rather than fail an expectation) is now scored as killed, matching PIT/Stryker/mutmut. Previously it was counted as survived.
+- ❗️ Mutants with no test coverage (no matching test file under `FileTestStrategy`) are now reported as a separate `no coverage` category and excluded from the score, so untested code no longer looks like escaped mutants. The score is now `killed / (killed + survived + errors)`. `FullTestStrategy` scores are unaffected.
 - 🐛 `FileTestStrategy` now matches test files by exact name instead of an unanchored regex, so a source file like `mod.R` no longer runs `test-model.R` and filenames with regex metacharacters are handled correctly.
 - 🐛 Added missing `digest` and `tools` to Imports.
 

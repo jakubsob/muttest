@@ -96,7 +96,7 @@ Format the header of the report
 \subsection{Method \code{fmt_r()}}{
 Format a row of the report
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ProgressMutationReporter$fmt_r(status, k, s, e, t, score, mutator, file)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ProgressMutationReporter$fmt_r(status, k, s, n, e, t, score, mutator, file)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -107,6 +107,8 @@ Format a row of the report
 \item{\code{k}}{Number of killed mutations}
 
 \item{\code{s}}{Number of survived mutations}
+
+\item{\code{n}}{Number of mutations with no test coverage}
 
 \item{\code{e}}{Number of errors}
 
@@ -180,6 +182,7 @@ Add a mutation test result
   plan,
   killed,
   survived,
+  no_coverage,
   errors,
   error = NULL,
   original_code = NULL,
@@ -195,6 +198,8 @@ Add a mutation test result
 \item{\code{killed}}{Whether the mutation was killed by tests}
 
 \item{\code{survived}}{Number of survived mutations}
+
+\item{\code{no_coverage}}{Number of mutants with no test coverage}
 
 \item{\code{errors}}{Number of errors encountered}
 

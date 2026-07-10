@@ -83,6 +83,7 @@ MutationReporter <- R6::R6Class(
           total = 0,
           killed = 0,
           survived = 0,
+          no_coverage = 0,
           errors = 0
         )
     },
@@ -97,6 +98,7 @@ MutationReporter <- R6::R6Class(
     #' @param plan Current testing plan. See `muttest_plan()`.
     #' @param killed Whether the mutation was killed by tests
     #' @param survived Number of survived mutations
+    #' @param no_coverage Number of mutants with no test coverage
     #' @param errors Number of errors encountered
     #' @param error Optional error condition from a failed run
     #' @param original_code Original source lines before mutation
@@ -105,6 +107,7 @@ MutationReporter <- R6::R6Class(
       plan,
       killed,
       survived,
+      no_coverage,
       errors,
       error = NULL,
       original_code = NULL,
@@ -116,6 +119,10 @@ MutationReporter <- R6::R6Class(
         killed
       self$results[[filename]]$survived <- self$results[[filename]]$survived +
         survived
+      self$results[[filename]]$no_coverage <- self$results[[
+        filename
+      ]]$no_coverage +
+        no_coverage
       self$results[[filename]]$errors <- self$results[[filename]]$errors +
         errors
       if (!is.null(error)) {
@@ -124,9 +131,17 @@ MutationReporter <- R6::R6Class(
           list(conditionMessage(error))
         )
       }
-      self$current_score <-
-        sum(vapply(self$results, `[[`, numeric(1), "killed")) /
-        sum(vapply(self$results, `[[`, numeric(1), "total"))
+      # No-coverage mutants are excluded from the score: an untested mutant says
+      # nothing about test quality. Denominator = killed + survived + errors.
+      killed_total <- sum(vapply(self$results, `[[`, numeric(1), "killed"))
+      scored_total <- killed_total +
+        sum(vapply(self$results, `[[`, numeric(1), "survived")) +
+        sum(vapply(self$results, `[[`, numeric(1), "errors"))
+      self$current_score <- if (scored_total > 0) {
+        killed_total / scored_total
+      } else {
+        NA_real_
+      }
     },
 
     #' @description Update status (no-op in base class)

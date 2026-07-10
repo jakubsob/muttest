@@ -144,6 +144,7 @@ Add a mutation test result
   plan,
   killed,
   survived,
+  no_coverage,
   errors,
   error = NULL,
   original_code = NULL,
@@ -159,6 +160,8 @@ Add a mutation test result
 \item{\code{killed}}{Whether the mutation was killed by tests}
 
 \item{\code{survived}}{Number of survived mutations}
+
+\item{\code{no_coverage}}{Number of mutants with no test coverage}
 
 \item{\code{errors}}{Number of errors encountered}
 

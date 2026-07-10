@@ -42,7 +42,20 @@ test_that("test runner errors are recorded as errors, not propagated", {
 .tests <- list(
   list(
     title = "session with ProgressReporter prints results",
-    reporter = function() ProgressMutationReporter$new()
+    reporter = function() ProgressMutationReporter$new(),
+    mutators = list(operator(">", "<"), operator(">", ">=")),
+    test_strategy = function() default_test_strategy()
+  ),
+  list(
+    title = "no-coverage mutants are reported and excluded from the score",
+    reporter = function() {
+      ProgressMutationReporter$new(survived_detail = "none")
+    },
+    # discount.R has no matching test file -> no coverage; shipping.R is killed.
+    mutators = list(operator(">", "<"), operator("-", "+")),
+    test_strategy = function() {
+      FileTestStrategy$new(load_helpers = FALSE, load_package = "none")
+    }
   )
 )
 
@@ -50,9 +63,12 @@ for (t in .tests) {
   local({
     test_that(t$title, {
       .with_example_dir("shipping/", {
-        mutators <- list(operator(">", "<"), operator(">", ">="))
-        p <- muttest_plan(mutators, fs::dir_ls("R"))
-        result <- .muttest(p, reporter = t$reporter())
+        p <- muttest_plan(t$mutators, fs::dir_ls("R"))
+        result <- .muttest(
+          p,
+          reporter = t$reporter(),
+          test_strategy = t$test_strategy()
+        )
         expect_snapshot({
           print(p)
           print(result)

@@ -142,28 +142,46 @@ print.muttest_result <- function(x, ...) {
   invisible(x)
 }
 
+#' Record a single mutant's outcome with the reporter
+#'
+#' Outcomes are mutually exclusive per mutant: `killed + survived + no_coverage
+#' + errors == 1`. A run-level crash or timeout is an error; an empty result
+#' means no test exercised the mutant (no coverage); otherwise a test failure
+#' OR a test error means the mutation was detected (killed).
+#'
+#' @param reporter The mutation reporter to record the result with.
+#' @param row The plan row for the current mutant.
+#' @param test_results Test results, an error condition, or an empty result.
+#' @param mutated_code The mutated source lines.
+#' @noRd
 .record_result <- function(reporter, row, test_results, mutated_code) {
   if (inherits(test_results, "error")) {
-    reporter$add_result(
-      row,
-      killed = 0,
-      survived = 0,
-      errors = 1,
-      error = test_results,
-      original_code = row$original_code[[1]],
-      mutated_code = mutated_code
-    )
+    outcome <- list(killed = 0, survived = 0, no_coverage = 0, errors = 1)
+    error <- test_results
+  } else if (length(test_results) == 0) {
+    outcome <- list(killed = 0, survived = 0, no_coverage = 1, errors = 0)
+    error <- NULL
   } else {
     df <- as.data.frame(test_results)
-    reporter$add_result(
-      row,
-      killed = as.numeric(sum(df$failed) > 0),
-      survived = as.numeric(sum(df$failed) == 0),
-      errors = sum(df$error),
-      original_code = row$original_code[[1]],
-      mutated_code = mutated_code
+    detected <- sum(df$failed) > 0 || sum(df$error) > 0
+    outcome <- list(
+      killed = as.numeric(detected),
+      survived = as.numeric(!detected),
+      no_coverage = 0,
+      errors = 0
     )
+    error <- NULL
   }
+  reporter$add_result(
+    row,
+    killed = outcome$killed,
+    survived = outcome$survived,
+    no_coverage = outcome$no_coverage,
+    errors = outcome$errors,
+    error = error,
+    original_code = row$original_code[[1]],
+    mutated_code = mutated_code
+  )
   reporter$end_mutator()
   reporter$end_file()
 }
