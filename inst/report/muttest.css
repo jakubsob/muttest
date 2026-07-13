@@ -78,6 +78,18 @@ h1 {
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
+.score.band-good {
+  color: var(--killed);
+}
+.score.band-mid {
+  color: var(--error);
+}
+.score.band-low {
+  color: var(--survived);
+}
+.score.band-none {
+  color: var(--nocov);
+}
 
 .killed {
   color: var(--killed);
@@ -149,6 +161,7 @@ h1 {
 .tools {
   margin-left: auto;
   display: flex;
+  align-items: center;
   gap: 2px;
 }
 .tbtn {
@@ -165,13 +178,74 @@ h1 {
   background: color-mix(in srgb, var(--fg) 7%, transparent);
   color: var(--fg);
 }
+.fjump {
+  max-width: 140px;
+}
+/* icon-only tools: square, centered glyph/svg, no relayout on state change */
+.ibtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  padding: 6px 0;
+  font-size: 15px;
+  line-height: 1;
+}
+
+/* Instant CSS tooltip: absolutely positioned so it never relayouts siblings,
+   and shown without the multi-second delay a native title= carries. Placed
+   below the trigger because the toolbar sticks to the viewport top. */
+[data-tip] {
+  position: relative;
+}
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--fg);
+  color: var(--bg);
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+[data-tip]:hover::after,
+[data-tip]:focus-visible::after {
+  opacity: 1;
+}
+[data-tip]:disabled::after {
+  display: none;
+}
+.fcount {
+  flex-basis: 100%;
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.fcount:empty {
+  display: none;
+}
+
+/* Recolor the keyboard focus ring off the browser default (blue). Inset so it
+   is never clipped by the rounded file/line cards. Only shows for keyboard and
+   n/p navigation, not mouse clicks. */
+:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: -1px;
+}
 
 details.file {
   border: 1px solid var(--border);
   border-radius: 10px;
   margin: 12px 0;
   overflow: hidden;
-  background: var(--panel);
 }
 details.file > summary {
   cursor: pointer;
@@ -218,6 +292,48 @@ details.file[open] > summary::before {
 }
 .fscore b {
   color: var(--fg);
+}
+
+details.plan {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: color-mix(in srgb, var(--accent) 5%, var(--panel));
+}
+details.plan > summary .fname {
+  color: var(--accent);
+}
+
+.plan-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+.plan-tbl th,
+.plan-tbl td {
+  padding: 7px 16px;
+  text-align: right;
+  border-top: 1px solid var(--border);
+}
+.plan-tbl th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.plan-tbl th:first-child,
+.plan-tbl td.mname {
+  text-align: left;
+}
+.plan-tbl td.mname {
+  font-family: var(--mono);
+}
+.plan-tbl td.z {
+  color: var(--muted);
+  opacity: 0.4;
+}
+.plan-tbl tbody tr:hover {
+  background: color-mix(in srgb, var(--fg) 4%, transparent);
 }
 
 .src {
@@ -417,6 +533,7 @@ body[data-f="error"] details.ln:not(.has-error) .badge {
 .hint {
   color: var(--muted);
   font-size: 12px;
+  margin-right: 8px;
 }
 /* shiki dual-theme: inline styles carry light color + --shiki-dark variable */
 @media (prefers-color-scheme: dark) {

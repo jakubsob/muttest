@@ -33,7 +33,10 @@ report <- function(
   body <- htmltools::div(
     class = "wrap",
     .report_header(counts, thresholds),
-    lapply(names(doc$files), function(path) .report_file(path, doc$files[[path]]))
+    .report_plan(doc),
+    lapply(names(doc$files), function(path) {
+      .report_file(path, doc$files[[path]])
+    })
   )
 
   # The report opens filtered to survived mutants (the actionable ones);
@@ -99,21 +102,28 @@ report <- function(
 
 .report_header <- function(counts, thresholds) {
   score <- .score(counts)
-  pct <- if (is.null(score)) htmltools::HTML("&ndash;") else paste0(floor(score * 100), "%")
-  score_class <- if (is.null(score)) {
-    "no_coverage"
-  } else if (score >= thresholds$high / 100) {
-    "killed"
-  } else if (score >= thresholds$low / 100) {
-    "error"
+  pct <- if (is.null(score)) {
+    htmltools::HTML("&ndash;")
   } else {
-    "survived"
+    paste0(floor(score * 100), "%")
   }
-  chip <- function(f, label, n) {
+  # Score bands get their own classes so the grade palette (green/amber/red) is
+  # decoupled from the per-mutant status colors it happens to share the hue with.
+  score_class <- if (is.null(score)) {
+    "band-none"
+  } else if (score >= thresholds$high / 100) {
+    "band-good"
+  } else if (score >= thresholds$low / 100) {
+    "band-mid"
+  } else {
+    "band-low"
+  }
+  chip <- function(f, label, n, hint) {
     htmltools::tags$button(
       class = paste("chip", f),
       `data-f` = f,
       `aria-pressed` = "false",
+      `data-tip` = hint,
       disabled = if (n == 0) NA,
       paste0(label, " "),
       htmltools::tags$b(n)
@@ -127,22 +137,143 @@ report <- function(
     ),
     htmltools::div(
       class = "toolbar",
-      chip("all", "All", counts$total),
-      chip("survived", "Survived", counts$survived),
-      chip("killed", "Killed", counts$killed),
-      chip("no_coverage", "No coverage", counts$no_coverage),
-      chip("error", "Errors", counts$error),
-      htmltools::tags$span(
-        class = "hint",
-        htmltools::tags$kbd("n"), " / ", htmltools::tags$kbd("p"),
-        " to jump between mutants"
+      chip("all", "All", counts$total, "show every mutant"),
+      chip(
+        "survived",
+        "Survived",
+        counts$survived,
+        "tests missed these: start here"
       ),
+      chip(
+        "killed",
+        "Killed",
+        counts$killed,
+        "tests caught these: no action needed"
+      ),
+      chip(
+        "no_coverage",
+        "No coverage",
+        counts$no_coverage,
+        "no test exercised this code"
+      ),
+      chip("error", "Errors", counts$error, "mutant failed to run"),
       htmltools::div(
         class = "tools",
-        htmltools::tags$button(class = "tbtn", `data-open` = "1", "Expand all"),
-        htmltools::tags$button(class = "tbtn", `data-open` = "0", "Collapse all"),
-        htmltools::tags$button(class = "tbtn", id = "theme", "Theme: auto")
+        htmltools::tags$span(
+          class = "hint",
+          htmltools::tags$kbd("n"),
+          " / ",
+          htmltools::tags$kbd("p"),
+          " to jump between mutants"
+        ),
+        htmltools::tags$select(
+          class = "tbtn fjump",
+          id = "filejump",
+          `aria-label` = "Jump to file",
+          htmltools::tags$option(value = "", "Jump to file")
+        ),
+        htmltools::tags$button(
+          class = "tbtn ibtn",
+          `data-open` = "1",
+          `data-tip` = "Expand all",
+          `aria-label` = "Expand all",
+          htmltools::HTML(
+            '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4-4 4 4"/><path d="M4 10l4 4 4-4"/></svg>'
+          )
+        ),
+        htmltools::tags$button(
+          class = "tbtn ibtn",
+          `data-open` = "0",
+          `data-tip` = "Collapse all",
+          `aria-label` = "Collapse all",
+          htmltools::HTML(
+            '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2l4 4 4-4"/><path d="M4 14l4-4 4 4"/></svg>'
+          )
+        ),
+        htmltools::tags$button(
+          class = "tbtn ibtn",
+          id = "theme",
+          `aria-label` = "Theme"
+        )
+      ),
+      # Filter scope indicator; JS fills it and it wraps to its own row below
+      # the chips (flex-basis:100%), keeping the chips coupled to what they hide.
+      htmltools::tags$span(class = "fcount", id = "fcount")
+    )
+  )
+}
+
+# The executed plan: every mutator that was applied, grouped by name, with its
+# kill breakdown and score. All derivable from the mutants already in `doc`.
+.report_plan <- function(doc) {
+  mutants <- unlist(lapply(doc$files, function(f) f$mutants), recursive = FALSE)
+  names <- vapply(mutants, function(m) m$mutatorName, character(1))
+  statuses <- vapply(mutants, function(m) .css_status(m$status), character(1))
+  by <- split(statuses, names)
+
+  rows <- lapply(names(by), function(nm) {
+    c <- .status_counts(by[[nm]])
+    list(name = nm, counts = c, score = .score(c))
+  })
+  # worst-scoring mutators first (most actionable); unscored last
+  rows <- rows[order(vapply(rows, function(r) r$score %||% Inf, numeric(1)))]
+
+  cell <- function(n, cls) {
+    if (n == 0) {
+      htmltools::tags$td(class = "z", 0)
+    } else {
+      htmltools::tags$td(class = cls, n)
+    }
+  }
+  # Tag with the statuses actually present so the status filter never hides the
+  # plan (it summarizes mutants of every present status).
+  # ponytail: reuses details.file styling; own class only if plan needs to diverge.
+  # Collapsed by default so the chips sit directly above the file list they
+  # filter; the overview is one click away.
+  htmltools::tags$details(
+    class = paste(
+      c("file plan", paste0("has-", unique(statuses))),
+      collapse = " "
+    ),
+    htmltools::tags$summary(
+      htmltools::tags$span(class = "fname", "Mutation plan"),
+      htmltools::tags$span(
+        class = "fmeta",
+        htmltools::tags$span(
+          class = "ct",
+          htmltools::tags$b(length(by)),
+          " mutators"
+        )
       )
+    ),
+    htmltools::tags$table(
+      class = "plan-tbl",
+      htmltools::tags$thead(htmltools::tags$tr(
+        htmltools::tags$th("Mutator"),
+        htmltools::tags$th("Killed"),
+        htmltools::tags$th("Survived"),
+        htmltools::tags$th("No coverage"),
+        htmltools::tags$th("Errors"),
+        htmltools::tags$th("Total"),
+        htmltools::tags$th("Score")
+      )),
+      htmltools::tags$tbody(lapply(rows, function(r) {
+        htmltools::tags$tr(
+          htmltools::tags$td(class = "mname", r$name),
+          cell(r$counts$killed, "killed"),
+          cell(r$counts$survived, "survived"),
+          cell(r$counts$no_coverage, "no_coverage"),
+          cell(r$counts$error, "error"),
+          htmltools::tags$td(r$counts$total),
+          htmltools::tags$td(
+            if (is.null(r$score)) {
+              htmltools::HTML("&ndash;")
+            } else {
+              paste0(floor(r$score * 100), "%")
+            }
+          )
+        )
+      }))
     )
   )
 }
