@@ -113,7 +113,7 @@ withr::with_dir(system.file("examples", "boundary", package = "muttest"), {
 })
 ```
 
-The mutation score is: $\text{Mutation Score} = \frac{\text{Killed Mutants}}{\text{Total Mutants}} \times 100\%$, where a Mutant is defined as variant of the original code that is used to test the robustness of the test suite.
+The mutation score is: $\text{Mutation Score} = \frac{\text{Killed} + \text{Errors}}{\text{Killed} + \text{Survived} + \text{Errors}} \times 100\%$, where a Mutant is a variant of the original code used to test the robustness of the test suite. An erroring mutant was still detected, so it counts as killed; mutants with no test coverage are excluded.
 
 `comparison_operators()` generates mutants by swapping each comparison operator for related alternatives. For `>=` it produces two mutants:
 

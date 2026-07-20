@@ -54,11 +54,12 @@ Each column in the progress table means:
 | ------ | ----------------------------------------------- |
 | K      | Killed — mutants your tests caught              |
 | S      | Survived — mutants your tests missed            |
-| E      | Errors — mutants that caused unexpected errors  |
+| E      | Errors — mutated code errored; counted as killed |
+| N      | No coverage — no test exercised the mutant; excluded from the score |
 | T      | Total mutants for this mutator/file combination |
 | %      | Mutation score for this row                     |
 
-The **mutation score** is `Killed / Total × 100%`. A `✔` row means at least one mutant was killed; an `x` row means all mutants survived.
+The **mutation score** is `(Killed + Errors) / (Killed + Survived + Errors) × 100%` — errored mutants count as detected, no-coverage mutants are excluded. A `✔` row means at least one mutant was killed; an `x` row means all mutants survived.
 
 Here is a complete example showing a weak test, the live output, and the fix:
 

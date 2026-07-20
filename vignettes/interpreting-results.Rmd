@@ -25,9 +25,9 @@ Every `muttest::muttest()` run produces a table with one row per mutator/file pa
 | ------ | -------------------------------------------------------------------------------------------- |
 | K      | **Killed** — mutants that caused at least one test to fail. Your tests caught the change.    |
 | S      | **Survived** — mutants that passed all tests. Your tests did not notice the change.          |
-| E      | **Errors** — mutants that produced a parse or execution error (neither killed nor survived). |
+| E      | **Errors** — mutants whose mutated code errored (parse or runtime). The mutation was still detected, so it counts as killed; it is tracked separately so you can see how it was caught. |
 | T      | **Total** — mutants generated for this mutator/file pair.                                    |
-| %      | **Score** — `K / (K + S) × 100`.                                                             |
+| %      | **Score** — `(K + E) / (K + S + E) × 100`. Errors count as detected; mutants with no test coverage are excluded. |
 
 A `✔` row means at least one mutant was killed. An `x` row means every mutant survived — your tests passed unchanged.
 

@@ -114,11 +114,11 @@ withr::with_dir(system.file("examples", "boundary", package = "muttest"), {
   muttest::muttest(plan)
 })
 #> ℹ Mutation Testing
-#>   |   K |   S |   E |   T |   % | Mutator  | File 
-#> ✔ |   1 |   0 |   0 |   1 | 100 | >= → <=  | is_adult.R 
-#> x |   1 |   1 |   0 |   2 |  50 | >= → >   | is_adult.R 
+#>   |   K |   S |   N |   E |   T |   % | Mutator  | File 
+#> ✔ |   1 |   0 |   0 |   0 |   1 | 100 | >= → <=  | is_adult.R 
+#> x |   1 |   1 |   0 |   0 |   2 |  50 | >= → >   | is_adult.R 
 #> 
-#> Duration: 1.99 s
+#> Duration: 1.38 s
 #> 
 #> ── Survived Mutants ────────────────────────────────────────────────────────────
 #> is_adult.R  >= → >
@@ -126,13 +126,14 @@ withr::with_dir(system.file("examples", "boundary", package = "muttest"), {
 #>   2+   age > 18
 #> 
 #> ── Results ─────────────────────────────────────────────────────────────────────
-#> [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
+#> [ KILLED 1 | SURVIVED 1 | NO COVERAGE 0 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
 ```
 
 The mutation score is:
-$\text{Mutation Score} = \frac{\text{Killed Mutants}}{\text{Total Mutants}} \times 100\%$,
-where a Mutant is defined as variant of the original code that is used
-to test the robustness of the test suite.
+$\text{Mutation Score} = \frac{\text{Killed} + \text{Errors}}{\text{Killed} + \text{Survived} + \text{Errors}} \times 100\%$,
+where a Mutant is a variant of the original code used to test the
+robustness of the test suite. An erroring mutant was still detected, so
+it counts as killed; mutants with no test coverage are excluded.
 
 `comparison_operators()` generates mutants by swapping each comparison
 operator for related alternatives. For `>=` it produces two mutants:
