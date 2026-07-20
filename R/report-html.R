@@ -93,11 +93,12 @@ report <- function(
   )
 }
 
-# Killed as a share of scored (killed + survived + error) mutants, or NULL when
-# nothing was scored.
+# Detected (killed + errored) as a share of scored (killed + survived + error)
+# mutants, or NULL when nothing was scored. An erroring mutant was still
+# detected, so it counts as killed.
 .score <- function(counts) {
   scored <- counts$killed + counts$survived + counts$error
-  if (scored == 0) NULL else counts$killed / scored
+  if (scored == 0) NULL else (counts$killed + counts$error) / scored
 }
 
 .report_header <- function(counts, thresholds) {

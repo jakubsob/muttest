@@ -146,8 +146,10 @@ print.muttest_result <- function(x, ...) {
 #'
 #' Outcomes are mutually exclusive per mutant: `killed + survived + no_coverage
 #' + errors == 1`. A run-level crash or timeout is an error; an empty result
-#' means no test exercised the mutant (no coverage); otherwise a test failure
-#' OR a test error means the mutation was detected (killed).
+#' means no test exercised the mutant (no coverage); a test failure means the
+#' mutation was detected (killed); a test error means the mutation broke the
+#' function itself and is recorded as an error (not a kill), unless a failure
+#' also occurred.
 #'
 #' @param reporter The mutation reporter to record the result with.
 #' @param row The plan row for the current mutant.
@@ -163,13 +165,13 @@ print.muttest_result <- function(x, ...) {
     error <- NULL
   } else {
     df <- as.data.frame(test_results)
-    detected <- sum(df$failed) > 0 || sum(df$error) > 0
-    outcome <- list(
-      killed = as.numeric(detected),
-      survived = as.numeric(!detected),
-      no_coverage = 0,
-      errors = 0
-    )
+    if (sum(df$failed) > 0) {
+      outcome <- list(killed = 1, survived = 0, no_coverage = 0, errors = 0)
+    } else if (sum(df$error) > 0) {
+      outcome <- list(killed = 0, survived = 0, no_coverage = 0, errors = 1)
+    } else {
+      outcome <- list(killed = 0, survived = 1, no_coverage = 0, errors = 0)
+    }
     error <- NULL
   }
   reporter$add_result(

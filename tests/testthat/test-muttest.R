@@ -36,7 +36,8 @@ test_that("test runner errors are recorded as errors, not propagated", {
   .with_example_dir("operators/", {
     p <- muttest_plan(list(operator("+", "-")), fs::dir_ls("R"))
     result <- .muttest(p, test_strategy = error_strategy)
-    expect_equal(as.numeric(result), 0)
+    # Errors count as detected (killed), so an all-errors run scores 1.
+    expect_equal(as.numeric(result), 1)
   })
 })
 

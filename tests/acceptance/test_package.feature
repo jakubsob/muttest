@@ -144,13 +144,13 @@ Feature: Test package
       """
     Then the mutation score should be NA
 
-  Scenario: Test runs with errors don't count in the mutation score
+  Scenario: Test runs with errors count as killed in the mutation score
 
-    Mutating "+" to "-" triggers an error in the function and the assertion doesn't pass.
-    It's not a failute of a test, but a failure of the function.
-    This mutation is not counted in the mutation score.
-    Only change from "+" to "*" is counted.
-    There are 2 mutations, 1 error, 1 killed, score is 50%.
+    Mutating "+" to "-" makes calculate(1) hit stop(), so the test errors
+    rather than fails. An erroring mutant was still detected, so it counts as
+    killed (recorded separately as an error). Mutating "+" to "*" produces a
+    failing assertion, also a kill.
+    There are 2 mutations, 1 error, 1 killed. Both are detected, so the score is 100%.
 
     Given I have a "DESCRIPTION" file with
       """
@@ -185,10 +185,12 @@ Feature: Test package
         )
       )
       """
-    Then the mutation score should be 0.5
+    Then the mutation score should be 1.0
 
   Scenario: Test runs with only errors
-    There are 2 mutations, 2 errors, 0 killed, score is 0%.
+    Every mutant makes the function error, so every mutant is detected.
+    There are 2 mutations, 2 errors, 0 failing-test kills. Errors count as
+    killed, so the score is 100% (not NA).
 
     Given I have a "DESCRIPTION" file with
       """
@@ -221,4 +223,4 @@ Feature: Test package
         )
       )
       """
-    Then the mutation score should be 0.0
+    Then the mutation score should be 1.0

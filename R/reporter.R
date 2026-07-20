@@ -132,13 +132,14 @@ MutationReporter <- R6::R6Class(
         )
       }
       # No-coverage mutants are excluded from the score: an untested mutant says
-      # nothing about test quality. Denominator = killed + survived + errors.
-      killed_total <- sum(vapply(self$results, `[[`, numeric(1), "killed"))
-      scored_total <- killed_total +
-        sum(vapply(self$results, `[[`, numeric(1), "survived")) +
+      # nothing about test quality. An erroring mutant was still detected, so it
+      # counts as killed. Denominator = killed + survived + errors.
+      detected_total <- sum(vapply(self$results, `[[`, numeric(1), "killed")) +
         sum(vapply(self$results, `[[`, numeric(1), "errors"))
+      scored_total <- detected_total +
+        sum(vapply(self$results, `[[`, numeric(1), "survived"))
       self$current_score <- if (scored_total > 0) {
-        killed_total / scored_total
+        detected_total / scored_total
       } else {
         NA_real_
       }
