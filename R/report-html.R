@@ -178,7 +178,11 @@ report <- function(
           `data-tip` = "Expand all",
           `aria-label` = "Expand all",
           htmltools::HTML(
-            '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4-4 4 4"/><path d="M4 10l4 4 4-4"/></svg>'
+            paste0(
+              '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" ',
+              'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">',
+              '<path d="M4 6l4-4 4 4"/><path d="M4 10l4 4 4-4"/></svg>'
+            )
           )
         ),
         htmltools::tags$button(
@@ -187,7 +191,11 @@ report <- function(
           `data-tip` = "Collapse all",
           `aria-label` = "Collapse all",
           htmltools::HTML(
-            '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2l4 4 4-4"/><path d="M4 14l4-4 4 4"/></svg>'
+            paste0(
+              '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" ',
+              'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">',
+              '<path d="M4 2l4 4 4-4"/><path d="M4 14l4-4 4 4"/></svg>'
+            )
           )
         ),
         htmltools::tags$button(
