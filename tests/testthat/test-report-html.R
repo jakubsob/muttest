@@ -1,3 +1,6 @@
+testthat::skip_on_cran()
+testthat::skip_on_os("windows")
+
 # The report inlines its CSS/JS to be self-contained; that would bloat the
 # snapshot. Replace each inline block with a link to the real asset in
 # inst/report/, relative to the snapshot's location (tests/testthat/_snaps/report-html/)
