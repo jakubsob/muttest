@@ -1,0 +1,2248 @@
+{
+  "$schema": "https://raw.githubusercontent.com/stryker-mutator/mutation-testing-elements/master/packages/report-schema/src/mutation-testing-report-schema.json",
+  "schemaVersion": "1.0",
+  "thresholds": {
+    "high": 80,
+    "low": 50
+  },
+  "files": {
+    "R/mutator-boolean.R": {
+      "language": "r",
+      "source": "#' Mutate a boolean literal\n#'\n#' Replaces a boolean constant (`TRUE`, `FALSE`, `T`, or `F`) with another one.\n#'\n#' @param from The literal to be replaced. One of `\"TRUE\"`, `\"FALSE\"`, `\"T\"`, `\"F\"`.\n#' @param to The literal to replace with.\n#'\n#' @examples\n#' boolean_literal(\"TRUE\", \"FALSE\")\n#' boolean_literal(\"FALSE\", \"TRUE\")\n#' boolean_literal(\"T\", \"F\")\n#' boolean_literal(\"F\", \"T\")\n#'\n#' @export\nboolean_literal <- function(from, to) {\n  allowed <- c(\"TRUE\", \"FALSE\", \"T\", \"F\")\n  checkmate::assert_choice(from, allowed)\n  checkmate::assert_choice(to, allowed)\n  # TRUE/FALSE are dedicated AST nodes; T/F are plain identifiers in tree-sitter-r\n  query <- if (from %in% c(\"TRUE\", \"FALSE\")) {\n    node_type <- if (from == \"TRUE\") \"true\" else \"false\"\n    sprintf(\"(%s) @target\", node_type)\n  } else {\n    sprintf(\"(identifier) @target (#eq? @target \\\"%s\\\")\", from)\n  }\n  Mutator$new(from = from, to = to, query = query)\n}",
+      "mutants": [
+        {
+          "id": "21:27:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 21,
+              "column": 27
+            },
+            "end": {
+              "line": 21,
+              "column": 29
+            }
+          },
+          "status": "Killed"
+        }
+      ]
+    },
+    "R/mutator-condition.R": {
+      "language": "r",
+      "source": "condition_query <- function(statements) {\n  parts <- vapply(statements, function(s) {\n    node <- switch(s,\n      \"if\"    = \"if_statement\",\n      \"while\" = \"while_statement\",\n      stop(\"Unknown statement type: \", s, \". Must be 'if' or 'while'.\")\n    )\n    sprintf(\"(%s condition: (_) @target)\", node)\n  }, character(1))\n  if (length(parts) == 1) parts else paste0(\"[\", paste(parts, collapse = \" \"), \"]\")\n}\n\n#' Negate the condition of if/while statements\n#'\n#' Wraps the condition expression of each matching statement in `!(...)`.\n#' For example, `if (x > 0)` becomes `if (!(x > 0))`.\n#'\n#' @param statements Character vector of statement types to target.\n#'   Must be a subset of `c(\"if\", \"while\")`. Defaults to both.\n#' @return A [Mutator] object.\n#' @export\n#' @examples\n#' negate_condition()\n#' negate_condition(statements = \"if\")\nnegate_condition <- function(statements = c(\"if\", \"while\")) {\n  checkmate::assert_subset(statements, c(\"if\", \"while\"), empty.ok = FALSE)\n  Mutator$new(\n    from = \"<condition>\",\n    to = \"!(<condition>)\",\n    query = condition_query(statements),\n    match_fn = function(text) TRUE,\n    replacement_fn = function(text) paste0(\"!(\", text, \")\")\n  )\n}\n\n#' Remove negation from the condition of if/while statements\n#'\n#' The inverse of [negate_condition()]. Strips the leading `!` from any\n#' already-negated condition, so `if (!done)` becomes `if (done)` and\n#' `while (!ready)` becomes `while (ready)`.\n#'\n#' Unlike [remove_negation()], this mutator is scoped exclusively to\n#' conditions, leaving negations in other positions (assignments, return\n#' values, etc.) untouched.\n#'\n#' @param statements Character vector of statement types to target.\n#'   Must be a subset of `c(\"if\", \"while\")`. Defaults to both.\n#' @return A [Mutator] object.\n#' @export\n#' @examples\n#' remove_condition_negation()\n#' remove_condition_negation(statements = \"while\")\nremove_condition_negation <- function(statements = c(\"if\", \"while\")) {\n  checkmate::assert_subset(statements, c(\"if\", \"while\"), empty.ok = FALSE)\n  Mutator$new(\n    from = \"!<condition>\",\n    to = \"<condition>\",\n    query = condition_query(statements),\n    match_fn = function(text) startsWith(text, \"!\"),\n    replacement_fn = function(text) substring(text, 2)\n  )\n}",
+      "mutants": [
+        {
+          "id": "10:21:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 10,
+              "column": 21
+            },
+            "end": {
+              "line": 10,
+              "column": 23
+            }
+          },
+          "status": "Killed"
+        }
+      ]
+    },
+    "R/mutator-na.R": {
+      "language": "r",
+      "source": "#' Mutate an NA or NULL literal\n#'\n#' Replaces `NA`, `NULL`, or a typed NA constant (`NA_real_`, `NA_integer_`,\n#' `NA_complex_`, `NA_character_`) with another value.\n#'\n#' In tree-sitter-r, `NA` and all typed NA variants share the same `na` node\n#' type, while `NULL` has its own `null` node type. `match_fn` distinguishes\n#' between them by comparing the literal text.\n#'\n#' @param from The literal to replace. One of `\"NA\"`, `\"NULL\"`, `\"NA_real_\"`,\n#'   `\"NA_integer_\"`, `\"NA_complex_\"`, `\"NA_character_\"`.\n#' @param to The replacement literal.\n#' @return A [Mutator] object.\n#' @export\n#' @examples\n#' na_literal(\"NULL\", \"NA\")\n#' na_literal(\"NA\", \"NULL\")\n#' na_literal(\"NA\", \"NA_real_\")\n#' na_literal(\"NA_real_\", \"NA\")\nna_literal <- function(from, to) {\n  allowed <- c(\"NA\", \"NULL\", \"NA_real_\", \"NA_integer_\", \"NA_complex_\", \"NA_character_\")\n  checkmate::assert_choice(from, allowed)\n  checkmate::assert_string(to, min.chars = 1)\n  query <- if (from == \"NULL\") \"(null) @target\" else \"(na) @target\"\n  Mutator$new(\n    from = from,\n    to = to,\n    query = query,\n    match_fn = function(text) text == from\n  )\n}",
+      "mutants": [
+        {
+          "id": "24:21:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 24,
+              "column": 21
+            },
+            "end": {
+              "line": 24,
+              "column": 23
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "29:36:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 29,
+              "column": 36
+            },
+            "end": {
+              "line": 29,
+              "column": 38
+            }
+          },
+          "status": "Killed"
+        }
+      ]
+    },
+    "R/mutator-numeric.R": {
+      "language": "r",
+      "source": "#' Increment numeric literals\n#'\n#' Replaces every numeric literal `n` with `n + by`.\n#' Handles both integer (e.g. `5L`) and floating-point (e.g. `3.14`) literals.\n#'\n#' @param by The amount to add. Defaults to `1`.\n#' @return A [Mutator] object.\n#' @export\n#' @examples\n#' numeric_increment()\n#' numeric_increment(by = 2)\nnumeric_increment <- function(by = 1) {\n  checkmate::assert_number(by)\n  numeric_literal_mutator(\n    label = paste0(\"<n> + \", by),\n    transform = function(text) {\n      as.character(suppressWarnings(as.numeric(text)) + by)\n    }\n  )\n}\n\n#' Decrement numeric literals\n#'\n#' Replaces every numeric literal `n` with `n - by`.\n#' Handles both integer (e.g. `5L`) and floating-point (e.g. `3.14`) literals.\n#'\n#' @param by The amount to subtract. Defaults to `1`.\n#' @return A [Mutator] object.\n#' @export\n#' @examples\n#' numeric_decrement()\n#' numeric_decrement(by = 2)\nnumeric_decrement <- function(by = 1) {\n  checkmate::assert_number(by)\n  numeric_literal_mutator(\n    label = paste0(\"<n> - \", by),\n    transform = function(text) {\n      as.character(suppressWarnings(as.numeric(text)) - by)\n    }\n  )\n}\n\nnumeric_literal_mutator <- function(label, transform) {\n  Mutator$new(\n    from = label,\n    to = label,\n    # Matches both `float` (e.g. 1.5) and `integer` (e.g. 5L) nodes.\n    # The predicate (#match?) is not used here; match_fn handles filtering.\n    query = \"[(float) (integer)] @target\",\n    match_fn = function(text) {\n      !is.na(suppressWarnings(as.numeric(text)))\n    },\n    replacement_fn = transform\n  )\n}",
+      "mutants": [
+        {
+          "id": "38:55:- → +",
+          "mutatorName": "- → +",
+          "replacement": "+",
+          "location": {
+            "start": {
+              "line": 38,
+              "column": 55
+            },
+            "end": {
+              "line": 38,
+              "column": 56
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "17:55:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 17,
+              "column": 55
+            },
+            "end": {
+              "line": 17,
+              "column": 56
+            }
+          },
+          "status": "Killed"
+        }
+      ]
+    },
+    "R/mutator-operator.R": {
+      "language": "r",
+      "source": "#' Mutate a binary operator\n#'\n#' Produces one mutant per occurrence of `from` in the source file, replacing\n#' it with `to`. A surviving mutant means your tests cannot distinguish the\n#' original operator from the replacement — pointing at the missing assertion\n#' or input value.\n#'\n#' Use this when you need a specific swap not covered by the preset collections\n#' ([arithmetic_operators()], [comparison_operators()], [logical_operators()]).\n#'\n#' @param from The operator to replace (e.g. `\"+\"`, `\"==\"`, `\">\"`).\n#' @param to The replacement operator.\n#' @return A [Mutator] object.\n#' @seealso\n#'   [comparison_operators()], [arithmetic_operators()], [logical_operators()]\n#'   for ready-made preset lists.\n#'\n#'   `vignette(\"mutators\", package = \"muttest\")` for the full operator\n#'   reference with examples of what each preset catches.\n#'\n#'   `vignette(\"interpreting-results\", package = \"muttest\")` to learn how to\n#'   read surviving mutants and strengthen the tests they expose.\n#' @export\n#' @examples\n#' operator(\"+\", \"-\")\n#' operator(\"==\", \"!=\")\n#' operator(\">\", \">=\")  # probe the strict vs. non-strict boundary\noperator <- function(from, to) {\n  checkmate::assert_string(from, min.chars = 1)\n  checkmate::assert_string(to, min.chars = 1)\n  Mutator$new(\n    from = from,\n    to = to,\n    query = sprintf(\"(binary_operator\n      lhs: (_) @lhs\n      operator: _ @target\n      rhs: (_) @rhs\n      (#eq? @target \\\"%s\\\")\n    )\", from)\n  )\n}\n\ninfo_oneline <- function(m) {\n  paste(m$from, SYMBOLS$arrow, m$to)\n}\n\n# 1-based, end-exclusive location of a treesitter node (points are 0-based).\nnode_location <- function(node) {\n  s <- treesitter::node_start_point(node)\n  e <- treesitter::node_end_point(node)\n  list(\n    start = list(line = s$row + 1L, column = s$column + 1L),\n    end = list(line = e$row + 1L, column = e$column + 1L)\n  )\n}\n\nreplace_with <- function(code, node, replacement_text) {\n  start_point <- treesitter::node_start_point(node)\n  original_text <- treesitter::node_text(node)\n  code[start_point$row + 1] <- paste0(\n    substr(code[start_point$row + 1], 1, start_point$column),\n    replacement_text,\n    substr(\n      code[start_point$row + 1],\n      start_point$column + nchar(original_text) + 1,\n      nchar(code[start_point$row + 1])\n    )\n  )\n  list(code = code, location = node_location(node), replacement = replacement_text)\n}\n\nmutate_code <- function(code, mutator) {\n  language <- treesitter.r::language()\n  parser <- treesitter::parser(language)\n  treesitter_code <- paste(code, collapse = \"\\n\")\n  tree <- treesitter::parser_parse(parser, treesitter_code)\n  root_node <- treesitter::tree_root_node(tree)\n\n  query <- treesitter::query(language, mutator$query)\n\n  mutations <- list()\n\n  captures <- treesitter::query_captures(query, root_node)\n\n  if (length(captures$node) == 0) {\n    return(NULL)\n  }\n\n  for (i in seq_along(captures$node)) {\n    # By convention all queries name the node to mutate @target. Structural\n    # captures (e.g. @lhs, @rhs, @keyword) are present only for predicate\n    # filtering and must be skipped here to avoid spurious mutants.\n    if (captures$name[[i]] != \"target\") next\n    node <- captures$node[[i]]\n    node_text <- treesitter::node_text(node)\n\n    matches_node <- if (!is.null(mutator$match_fn)) {\n      mutator$match_fn(node_text)\n    } else {\n      node_text == mutator$from\n    }\n\n    if (!matches_node) next\n\n    replacement <- if (!is.null(mutator$replacement_fn)) {\n      mutator$replacement_fn(node_text)\n    } else {\n      mutator$to\n    }\n\n    mutations <- append(mutations, list(replace_with(code, node, replacement)))\n  }\n\n  if (length(mutations) == 0) return(NULL)\n  mutations\n}",
+      "mutants": [
+        {
+          "id": "93:28:!= → ==",
+          "mutatorName": "!= → ==",
+          "replacement": "==",
+          "location": {
+            "start": {
+              "line": 93,
+              "column": 28
+            },
+            "end": {
+              "line": 93,
+              "column": 30
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "52:31:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 52,
+              "column": 31
+            },
+            "end": {
+              "line": 52,
+              "column": 32
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "52:55:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 52,
+              "column": 55
+            },
+            "end": {
+              "line": 52,
+              "column": 56
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "53:29:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 53,
+              "column": 29
+            },
+            "end": {
+              "line": 53,
+              "column": 30
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "53:53:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 53,
+              "column": 53
+            },
+            "end": {
+              "line": 53,
+              "column": 54
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "60:24:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 60,
+              "column": 24
+            },
+            "end": {
+              "line": 60,
+              "column": 25
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "61:33:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 61,
+              "column": 33
+            },
+            "end": {
+              "line": 61,
+              "column": 34
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "64:28:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 64,
+              "column": 28
+            },
+            "end": {
+              "line": 64,
+              "column": 29
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "65:26:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 65,
+              "column": 26
+            },
+            "end": {
+              "line": 65,
+              "column": 27
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "65:49:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 65,
+              "column": 49
+            },
+            "end": {
+              "line": 65,
+              "column": 50
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "66:34:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 66,
+              "column": 34
+            },
+            "end": {
+              "line": 66,
+              "column": 35
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "85:29:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 85,
+              "column": 29
+            },
+            "end": {
+              "line": 85,
+              "column": 31
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "100:17:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 100,
+              "column": 17
+            },
+            "end": {
+              "line": 100,
+              "column": 19
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "114:25:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 114,
+              "column": 25
+            },
+            "end": {
+              "line": 114,
+              "column": 27
+            }
+          },
+          "status": "Killed"
+        }
+      ]
+    },
+    "R/mutator-return.R": {
+      "language": "r",
+      "source": "#' Replace the value in explicit return() calls\n#'\n#' Replaces the argument of every `return(expr)` with a fixed value (default\n#' `\"NULL\"`). Tests that only check that a function returns *something* without\n#' asserting the value will not kill these mutants.\n#'\n#' Only explicit `return()` calls are targeted. Implicit returns (the last\n#' expression of a function body) are not affected.\n#'\n#' @param replacement Raw R source text to substitute as the return value.\n#'   Defaults to `\"NULL\"`. Examples: `\"NA\"` inserts the missing value `NA`;\n#'   `'\"NULL\"'` (inner quotes) inserts the string `\"NULL\"`; `'\"NA\"'` inserts\n#'   the string `\"NA\"` rather than the missing value.\n#' @return A [Mutator] object.\n#' @export\n#' @examples\n#' replace_return_value()\n#' replace_return_value(\"NA\")\nreplace_return_value <- function(replacement = \"NULL\") {\n  checkmate::assert_string(replacement, min.chars = 1)\n  Mutator$new(\n    from = \"return(<value>)\",\n    to = paste0(\"return(\", replacement, \")\"),\n    query = \"(\n      call function: (identifier) @keyword arguments: (arguments (argument value: (_) @target))\n      (#eq? @keyword \\\"return\\\")\n    )\",\n    match_fn = function(text) text != replacement,\n    replacement_fn = function(text) replacement\n  )\n}",
+      "mutants": [
+        {
+          "id": "28:36:!= → ==",
+          "mutatorName": "!= → ==",
+          "replacement": "==",
+          "location": {
+            "start": {
+              "line": 28,
+              "column": 36
+            },
+            "end": {
+              "line": 28,
+              "column": 38
+            }
+          },
+          "status": "Killed"
+        }
+      ]
+    },
+    "R/mutator-statement.R": {
+      "language": "r",
+      "source": "delete_node <- function(code, node) {\n  start_row <- treesitter::node_start_point(node)$row + 1L\n  end_row   <- treesitter::node_end_point(node)$row + 1L\n  before    <- if (start_row > 1L) code[seq_len(start_row - 1L)] else character(0)\n  after     <- if (end_row < length(code)) code[(end_row + 1L):length(code)] else character(0)\n  list(code = c(before, after), location = node_location(node), replacement = \"\")\n}\n\ndelete_statements <- function(code, query_str, match_fn) {\n  language  <- treesitter.r::language()\n  parser    <- treesitter::parser(language)\n  ts_code   <- paste(code, collapse = \"\\n\")\n  tree      <- treesitter::parser_parse(parser, ts_code)\n  root_node <- treesitter::tree_root_node(tree)\n  query     <- treesitter::query(language, query_str)\n  captures  <- treesitter::query_captures(query, root_node)\n  if (length(captures$node) == 0) return(NULL)\n  mutations <- list()\n  for (i in seq_along(captures$node)) {\n    if (captures$name[[i]] != \"target\") next\n    node      <- captures$node[[i]]\n    node_text <- treesitter::node_text(node)\n    if (!match_fn(node_text)) next\n    mutations <- append(mutations, list(delete_node(code, node)))\n  }\n  if (length(mutations) == 0) return(NULL)\n  mutations\n}\n\n#' Delete statements one at a time\n#'\n#' Produces one mutant per deletable statement, removing each `x <- expr`\n#' assignment or standalone `f(...)` call from the source. Surviving mutants\n#' reveal untested side effects or dead assignments.\n#'\n#' Function definitions (`x <- function(...) { ... }`) are left untouched to\n#' avoid producing structurally broken mutants.\n#'\n#' @return A [Mutator] object.\n#' @export\n#' @examples\n#' delete_statement()\ndelete_statement <- function() {\n  query_str <- paste(\n    \"[(program (binary_operator operator: _ @op\",\n    \"    (#match? @op \\\"^(<-|<<-|=)$\\\")) @target)\",\n    \" (braced_expression (binary_operator operator: _ @op\",\n    \"    (#match? @op \\\"^(<-|<<-|=)$\\\")) @target)\",\n    \" (program (call) @target)\",\n    \" (braced_expression (call) @target)]\"\n  )\n  match_fn <- function(text) {\n    !grepl(\"^\\\\s*\\\\S+\\\\s*(<-|<<-|=)\\\\s*function\\\\s*\\\\(\", text, perl = TRUE)\n  }\n\n  Mutator$new(\n    from = \"<statement>\",\n    to = \"\",\n    query = query_str,\n    match_fn = match_fn,\n    mutate_fn = function(code) delete_statements(code, query_str, match_fn)\n  )\n}",
+      "mutants": [
+        {
+          "id": "4:59:- → +",
+          "mutatorName": "- → +",
+          "replacement": "+",
+          "location": {
+            "start": {
+              "line": 4,
+              "column": 59
+            },
+            "end": {
+              "line": 4,
+              "column": 60
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "20:28:!= → ==",
+          "mutatorName": "!= → ==",
+          "replacement": "==",
+          "location": {
+            "start": {
+              "line": 20,
+              "column": 28
+            },
+            "end": {
+              "line": 20,
+              "column": 30
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "2:55:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 2,
+              "column": 55
+            },
+            "end": {
+              "line": 2,
+              "column": 56
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "3:53:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 3,
+              "column": 53
+            },
+            "end": {
+              "line": 3,
+              "column": 54
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "5:58:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 5,
+              "column": 58
+            },
+            "end": {
+              "line": 5,
+              "column": 59
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "5:28:< → >",
+          "mutatorName": "< → >",
+          "replacement": ">",
+          "location": {
+            "start": {
+              "line": 5,
+              "column": 28
+            },
+            "end": {
+              "line": 5,
+              "column": 29
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "5:28:< → <=",
+          "mutatorName": "< → <=",
+          "replacement": "<=",
+          "location": {
+            "start": {
+              "line": 5,
+              "column": 28
+            },
+            "end": {
+              "line": 5,
+              "column": 29
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "17:29:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 17,
+              "column": 29
+            },
+            "end": {
+              "line": 17,
+              "column": 31
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "26:25:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 26,
+              "column": 25
+            },
+            "end": {
+              "line": 26,
+              "column": 27
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "4:30:> → <",
+          "mutatorName": "> → <",
+          "replacement": "<",
+          "location": {
+            "start": {
+              "line": 4,
+              "column": 30
+            },
+            "end": {
+              "line": 4,
+              "column": 31
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "4:30:> → >=",
+          "mutatorName": "> → >=",
+          "replacement": ">=",
+          "location": {
+            "start": {
+              "line": 4,
+              "column": 30
+            },
+            "end": {
+              "line": 4,
+              "column": 31
+            }
+          },
+          "status": "Survived"
+        }
+      ]
+    },
+    "R/mutator-string.R": {
+      "language": "r",
+      "source": "#' Mutate non-empty string literals to the empty string\n#'\n#' Replaces any non-empty string literal in the source code with `\"\"`.\n#' The empty string itself is not mutated (use [string_fill()] for that).\n#'\n#' @return A [Mutator] object.\n#' @export\n#' @examples\n#' string_empty()\nstring_empty <- function() {\n  Mutator$new(\n    from = \"<non-empty string>\",\n    to = \"\\\"\\\"\",\n    query = \"(string) @target\",\n    match_fn = function(text) nchar(text) > 2,\n    replacement_fn = function(text) \"\\\"\\\"\"\n  )\n}\n\n#' Mutate the empty string literal to a placeholder string\n#'\n#' Replaces `\"\"` with a fill string (default `\"mutant\"`) so that code paths\n#' that depend on an empty string can be detected.\n#'\n#' @param fill The replacement string. Defaults to `\"mutant\"`. Override when\n#'   the codebase already contains `\"mutant\"` as a meaningful value.\n#' @return A [Mutator] object.\n#' @export\n#' @examples\n#' string_fill()\n#' string_fill(fill = \"PLACEHOLDER\")\nstring_fill <- function(fill = \"mutant\") {\n  checkmate::assert_string(fill, min.chars = 1)\n  quoted <- paste0(\"\\\"\", fill, \"\\\"\")\n  Mutator$new(\n    from = \"\\\"\\\"\",\n    to = quoted,\n    query = \"(string) @target\",\n    match_fn = function(text) text == \"\\\"\\\"\",\n    replacement_fn = function(text) quoted\n  )\n}",
+      "mutants": [
+        {
+          "id": "39:36:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 39,
+              "column": 36
+            },
+            "end": {
+              "line": 39,
+              "column": 38
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "15:43:> → <",
+          "mutatorName": "> → <",
+          "replacement": "<",
+          "location": {
+            "start": {
+              "line": 15,
+              "column": 43
+            },
+            "end": {
+              "line": 15,
+              "column": 44
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "15:43:> → >=",
+          "mutatorName": "> → >=",
+          "replacement": ">=",
+          "location": {
+            "start": {
+              "line": 15,
+              "column": 43
+            },
+            "end": {
+              "line": 15,
+              "column": 44
+            }
+          },
+          "status": "Killed"
+        }
+      ]
+    },
+    "R/muttest.R": {
+      "language": "r",
+      "source": "#' Run a mutation test\n#'\n#' @param plan A mutation testing plan. See [muttest_plan()].\n#' @param path Path to the test directory.\n#' @param reporter Reporter to use for mutation testing results. See [MutationReporter].\n#' @param test_strategy Strategy for running tests. See [TestStrategy].\n#'   The purpose of test strategy is to control how tests are executed.\n#'   We can run all tests for each mutant, or only tests that are relevant to the mutant.\n#' @param copy_strategy Strategy for copying the project. See [CopyStrategy].\n#'   This strategy controls which files are copied to the temporary directory, where the tests are run.\n#' @param workers Number of parallel workers. When greater than 1, mutants are tested\n#'   concurrently using `mirai` daemons. Defaults to 1 (sequential).\n#' @param timeout Per-mutant timeout in milliseconds. If a mutant's test run exceeds this\n#'   limit the daemon is interrupted and the result is recorded as an error.\n#'   Use `Inf` to disable. Defaults to 600000 (10 minutes).\n#'\n#' @return An object of class `muttest_result` containing the overall mutation score.\n#'\n#' @export\n#' @md\nmuttest <- function(\n  plan,\n  path = \"tests/testthat\",\n  reporter = default_reporter(),\n  test_strategy = default_test_strategy(),\n  copy_strategy = default_copy_strategy(),\n  workers = 1,\n  timeout = 600 * 1000\n) {\n  checkmate::assert_directory_exists(path)\n  checkmate::assert(\n    checkmate::check_multi_class(plan, \"muttest_plan\"),\n    checkmate::check_data_frame(plan),\n    checkmate::check_set_equal(\n      c(\"filename\", \"original_code\", \"mutated_code\", \"mutator\", \"mutation\"),\n      names(plan)\n    ),\n    combine = \"and\"\n  )\n  checkmate::assert_class(reporter, \"MutationReporter\")\n  checkmate::assert_class(test_strategy, \"TestStrategy\", null.ok = TRUE)\n  checkmate::assert_class(copy_strategy, \"CopyStrategy\")\n  checkmate::assert_count(workers, positive = TRUE)\n  checkmate::assert_number(timeout, lower = 0)\n\n  if (nrow(plan) == 0) {\n    return(invisible(NA_real_))\n  }\n\n  reporter$start_reporter(plan)\n\n  mutator_key <- vapply(plan$mutator, function(m) m$from, character(1))\n  plan <- plan[order(plan$filename, mutator_key), ]\n  rows <- lapply(seq_len(nrow(plan)), function(i) plan[i, , drop = FALSE])\n\n  mirai::daemons(workers)\n  on.exit(mirai::daemons(0), add = TRUE)\n\n  wd <- getwd()\n  test_reporter <- reporter$test_reporter\n  timeout_ms <- if (is.finite(timeout)) as.integer(timeout) else NULL\n\n  tasks <- lapply(rows, function(row) {\n    reporter$start_file(row$filename)\n    reporter$start_mutator(row$mutator[[1]])\n    reporter$update(force = TRUE)\n\n    filename <- row$filename\n    mutated_code <- row$mutated_code[[1]]\n\n    # Pass only plain serializable data - row$mutator contains treesitter\n    # C-level objects that cannot cross process boundaries.\n    mirai::mirai(\n      {\n        # Reconstruct a minimal row so strategies can access $filename\n        minimal_row <- data.frame(\n          filename = filename,\n          mutated_code = I(list(mutated_code)),\n          stringsAsFactors = FALSE\n        )\n        dir <- copy_strategy$execute(wd, minimal_row)\n        on.exit(fs::dir_delete(dir))\n        test_results <- tryCatch(\n          withr::with_tempdir(tmpdir = dir, pattern = \"\", {\n            withr::with_dir(dir, {\n              writeLines(mutated_code, file.path(dir, filename))\n              test_strategy$execute(path, minimal_row, test_reporter)\n            })\n          }),\n          error = function(e) e\n        )\n        list(test_results = test_results)\n      },\n      copy_strategy = copy_strategy,\n      test_strategy = test_strategy,\n      wd = wd,\n      filename = filename,\n      mutated_code = mutated_code,\n      path = path,\n      test_reporter = test_reporter,\n      .timeout = timeout_ms\n    )\n  })\n\n  for (i in seq_along(tasks)) {\n    res <- tasks[[i]][] # blocks until the task resolves\n    row <- rows[[i]]\n    if (mirai::is_error_value(res) && !mirai::is_mirai_error(res)) {\n      .record_result(\n        reporter,\n        row,\n        simpleError(\"Timed out\"),\n        row$mutated_code[[1]]\n      )\n    } else if (mirai::is_error_value(res)) {\n      .record_result(\n        reporter,\n        row,\n        simpleError(format(res)),\n        row$mutated_code[[1]]\n      )\n    } else {\n      .record_result(reporter, row, res$test_results, row$mutated_code[[1]])\n    }\n  }\n\n  reporter$end_reporter()\n  invisible(muttest_result(reporter))\n}\n\nmuttest_result <- function(reporter) {\n  structure(\n    reporter$get_score(),\n    reporter = reporter,\n    class = c(\"muttest_result\", \"numeric\")\n  )\n}\n\n#' @export\nprint.muttest_result <- function(x, ...) {\n  attr(x, \"reporter\")$print()\n  invisible(x)\n}\n\n#' Record a single mutant's outcome with the reporter\n#'\n#' Outcomes are mutually exclusive per mutant: `killed + survived + no_coverage\n#' + errors == 1`. A run-level crash or timeout is an error; an empty result\n#' means no test exercised the mutant (no coverage); otherwise a test failure\n#' OR a test error means the mutation was detected (killed).\n#'\n#' @param reporter The mutation reporter to record the result with.\n#' @param row The plan row for the current mutant.\n#' @param test_results Test results, an error condition, or an empty result.\n#' @param mutated_code The mutated source lines.\n#' @noRd\n.record_result <- function(reporter, row, test_results, mutated_code) {\n  if (inherits(test_results, \"error\")) {\n    outcome <- list(killed = 0, survived = 0, no_coverage = 0, errors = 1)\n    error <- test_results\n  } else if (length(test_results) == 0) {\n    outcome <- list(killed = 0, survived = 0, no_coverage = 1, errors = 0)\n    error <- NULL\n  } else {\n    df <- as.data.frame(test_results)\n    detected <- sum(df$failed) > 0 || sum(df$error) > 0\n    outcome <- list(\n      killed = as.numeric(detected),\n      survived = as.numeric(!detected),\n      no_coverage = 0,\n      errors = 0\n    )\n    error <- NULL\n  }\n  reporter$add_result(\n    row,\n    killed = outcome$killed,\n    survived = outcome$survived,\n    no_coverage = outcome$no_coverage,\n    errors = outcome$errors,\n    error = error,\n    original_code = row$original_code[[1]],\n    mutated_code = mutated_code\n  )\n  reporter$end_mutator()\n  reporter$end_file()\n}\n\n#' Create a plan for mutation testing\n#'\n#' Each mutant requires rerunning the tests. For large project it might be not feasible to test all\n#' mutants in one go. This function allows you to create a plan for selected source files and mutators.\n#'\n#' The plan is in a data frame format, where each row represents a mutant.\n#'\n#' You can subset the plan before passing it to the [muttest()] function.\n#'\n#' @param mutators A list of mutators to use. See [operator()].\n#' @param source_files A vector of file paths to the source files.\n#' @return A data frame with the test plan.\n#'   The data frame has the following columns:\n#'   - `filename`: The name of the source file.\n#'   - `original_code`: The original code of the source file.\n#'   - `mutated_code`: The mutated code of the source file.\n#'   - `mutator`: The mutator that was applied.\n#'   - `mutation`: A list with the mutant's `location` (1-based `start`/`end`\n#'     line/column) and `replacement` text.\n#'\n#' @export\n#' @md\nmuttest_plan <- function(\n  mutators,\n  source_files = fs::dir_ls(\"R\", regexp = \".[rR]$\")\n) {\n  checkmate::assert_file_exists(source_files, extension = c(\"R\", \"r\"))\n  checkmate::assert_list(mutators)\n  rows <- list()\n  for (mutator in mutators) {\n    for (filename in source_files) {\n      code_lines <- readLines(filename)\n      mutations <- mutator$mutate(code_lines)\n      for (mutation in mutations) {\n        row <- data.frame(\n          filename = filename,\n          original_code = I(list(code_lines)),\n          mutated_code = I(list(mutation$code)),\n          mutator = I(list(mutator)),\n          mutation = I(list(mutation[c(\"location\", \"replacement\")])),\n          stringsAsFactors = FALSE\n        )\n        rows <- c(rows, list(row))\n      }\n    }\n  }\n  if (length(rows) == 0) {\n    return(.muttest_plan(data.frame(\n      filename = character(),\n      original_code = I(list()),\n      mutated_code = I(list()),\n      mutator = I(list()),\n      mutation = I(list()),\n      stringsAsFactors = FALSE\n    )))\n  }\n  .muttest_plan(do.call(rbind, rows))\n}\n\n.muttest_plan <- function(x) {\n  structure(x, class = c(\"muttest_plan\", class(x)))\n}\n\n#' @export\nprint.muttest_plan <- function(x, ..., nrows = 10) {\n  n_mutants <- nrow(x)\n  n_files <- length(unique(x$filename))\n\n  cli::cat_rule(cli::style_bold(\"Mutation Test Plan\"))\n  cli::cat_line(sprintf(\n    \"%d %s across %d %s\",\n    n_mutants,\n    ngettext(n_mutants, \"mutant\", \"mutants\"),\n    n_files,\n    ngettext(n_files, \"file\", \"files\")\n  ))\n  cli::cat_line()\n\n  shown <- x[seq_len(min(nrows, n_mutants)), ]\n  for (i in seq_len(nrow(shown))) {\n    m <- shown$mutator[[i]]\n    cli::cat_line(paste0(\n      cli::col_grey(shown$filename[[i]]),\n      \"  \",\n      cli::style_bold(m$from),\n      paste0(\" \", SYMBOLS$arrow, \" \"),\n      cli::style_bold(m$to)\n    ))\n  }\n\n  if (n_mutants > nrows) {\n    cli::cat_line()\n    cli::cat_line(cli::col_grey(sprintf(\n      \"... and %d more %s\",\n      n_mutants - nrows,\n      ngettext(n_mutants - nrows, \"mutant\", \"mutants\")\n    )))\n  }\n\n  invisible(x)\n}",
+      "mutants": [
+        {
+          "id": "283:17:- → +",
+          "mutatorName": "- → +",
+          "replacement": "+",
+          "location": {
+            "start": {
+              "line": 283,
+              "column": 17
+            },
+            "end": {
+              "line": 283,
+              "column": 18
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "284:26:- → +",
+          "mutatorName": "- → +",
+          "replacement": "+",
+          "location": {
+            "start": {
+              "line": 284,
+              "column": 26
+            },
+            "end": {
+              "line": 284,
+              "column": 27
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "28:17:* → /",
+          "mutatorName": "* → /",
+          "replacement": "/",
+          "location": {
+            "start": {
+              "line": 28,
+              "column": 17
+            },
+            "end": {
+              "line": 28,
+              "column": 18
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "108:36:&& → ||",
+          "mutatorName": "&& → ||",
+          "replacement": "||",
+          "location": {
+            "start": {
+              "line": 108,
+              "column": 36
+            },
+            "end": {
+              "line": 108,
+              "column": 38
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "46:18:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 46,
+              "column": 18
+            },
+            "end": {
+              "line": 46,
+              "column": 20
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "161:35:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 161,
+              "column": 35
+            },
+            "end": {
+              "line": 161,
+              "column": 37
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "235:20:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 235,
+              "column": 20
+            },
+            "end": {
+              "line": 235,
+              "column": 22
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "166:32:> → <",
+          "mutatorName": "> → <",
+          "replacement": "<",
+          "location": {
+            "start": {
+              "line": 166,
+              "column": 32
+            },
+            "end": {
+              "line": 166,
+              "column": 33
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "166:53:> → <",
+          "mutatorName": "> → <",
+          "replacement": "<",
+          "location": {
+            "start": {
+              "line": 166,
+              "column": 53
+            },
+            "end": {
+              "line": 166,
+              "column": 54
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "279:17:> → <",
+          "mutatorName": "> → <",
+          "replacement": "<",
+          "location": {
+            "start": {
+              "line": 279,
+              "column": 17
+            },
+            "end": {
+              "line": 279,
+              "column": 18
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "166:32:> → >=",
+          "mutatorName": "> → >=",
+          "replacement": ">=",
+          "location": {
+            "start": {
+              "line": 166,
+              "column": 32
+            },
+            "end": {
+              "line": 166,
+              "column": 33
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "166:53:> → >=",
+          "mutatorName": "> → >=",
+          "replacement": ">=",
+          "location": {
+            "start": {
+              "line": 166,
+              "column": 53
+            },
+            "end": {
+              "line": 166,
+              "column": 54
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "279:17:> → >=",
+          "mutatorName": "> → >=",
+          "replacement": ">=",
+          "location": {
+            "start": {
+              "line": 279,
+              "column": 17
+            },
+            "end": {
+              "line": 279,
+              "column": 18
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "166:36:|| → &&",
+          "mutatorName": "|| → &&",
+          "replacement": "&&",
+          "location": {
+            "start": {
+              "line": 166,
+              "column": 36
+            },
+            "end": {
+              "line": 166,
+              "column": 38
+            }
+          },
+          "status": "Survived"
+        }
+      ]
+    },
+    "R/project_copy_strategy.R": {
+      "language": "r",
+      "source": "#' @title CopyStrategy interface\n#'\n#' @description\n#' Extend this class to implement a custom copy strategy.\n#'\n#' @md\n#' @export\n#' @family CopyStrategy\nCopyStrategy <- R6::R6Class(\n  classname = \"CopyStrategy\",\n  public = list(\n    #' @description\n    #' Copy project files according to the strategy\n    #'\n    #' @param original_dir The original directory to copy from\n    #' @param plan The current test plan\n    #' @return The path to the temporary directory\n    execute = function(original_dir) {\n      rlang::abort(\"Not implemented\")\n    }\n  )\n)\n\n#' @title Package copy strategy\n#'\n#' @description\n#' It copies all files and directories from the original directory to a temporary directory.\n#'\n#' When `symlink = TRUE`, only the top-level directory holding the mutated file\n#' (e.g. `R/`) is copied; every other top-level directory and root file is\n#' symlinked to the original. For N mutants this avoids N full copies, which\n#' matters when the project carries large `inst/`/`data/` directories. Tests\n#' only read the symlinked files, so this is safe as long as the test suite\n#' does not write into the package's own directories (writes through a symlink\n#' would modify the original).\n#'\n#' @md\n#' @export\n#' @family CopyStrategy\n#' @importFrom digest digest\nPackageCopyStrategy <- R6::R6Class(\n  classname = \"PackageCopyStrategy\",\n  inherit = CopyStrategy,\n  private = list(\n    symlink = FALSE\n  ),\n  public = list(\n    #' @description\n    #' Create a package copy strategy\n    #'\n    #' @param symlink If `TRUE`, symlink unchanged files instead of copying them.\n    initialize = function(symlink = FALSE) {\n      private$symlink <- symlink\n    },\n    #' @description\n    #' Copy project files, excluding hidden and temp directories\n    #'\n    #' @param original_dir The original directory to copy from\n    #' @param plan The current test plan\n    #' @return The path to the temporary directory\n    execute = function(original_dir, plan) {\n      temp_dir <- fs::path(tempdir(), digest::digest(plan))\n      fs::dir_create(temp_dir)\n\n      # The top-level entry holding the file we overwrite must be a real copy;\n      # writing through a symlink would clobber the original source.\n      mutated_top <- if (private$symlink && length(plan$filename)) {\n        fs::path_split(plan$filename)[[1]][1]\n      }\n      place <- function(src, dst, is_dir) {\n        if (private$symlink && !identical(fs::path_file(dst), mutated_top)) {\n          fs::link_create(fs::path_abs(src), dst)\n        } else if (is_dir) {\n          fs::dir_copy(src, dst, overwrite = TRUE)\n        } else {\n          fs::file_copy(src, dst, overwrite = TRUE)\n        }\n      }\n\n      dirs_to_copy <- list.dirs(\n        original_dir,\n        recursive = FALSE,\n        full.names = FALSE\n      )\n      dirs_to_copy <- dirs_to_copy[!grepl(\"^\\\\.|tmp|temp\", dirs_to_copy)]\n      lapply(dirs_to_copy, function(dir) {\n        src_path <- fs::path(original_dir, dir)\n        if (dir.exists(src_path)) {\n          place(src_path, fs::path(temp_dir, dir), is_dir = TRUE)\n        }\n      })\n\n      files <- fs::path_file(fs::dir_ls(original_dir, type = \"file\"))\n      lapply(files, function(f) {\n        place(fs::path(original_dir, f), fs::path(temp_dir, f), is_dir = FALSE)\n      })\n\n      temp_dir\n    }\n  )\n)\n\n#' Create a default project copy strategy\n#'\n#' @param ... Arguments passed to the `?PackageCopyStrategy` constructor.\n#' @return A `?CopyStrategy` object\n#' @md\n#' @export\n#' @family CopyStrategy\ndefault_copy_strategy <- function(...) {\n  PackageCopyStrategy$new(...)\n}",
+      "mutants": [
+        {
+          "id": "67:42:&& → ||",
+          "mutatorName": "&& → ||",
+          "replacement": "||",
+          "location": {
+            "start": {
+              "line": 67,
+              "column": 42
+            },
+            "end": {
+              "line": 67,
+              "column": 44
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "71:29:&& → ||",
+          "mutatorName": "&& → ||",
+          "replacement": "||",
+          "location": {
+            "start": {
+              "line": 71,
+              "column": 29
+            },
+            "end": {
+              "line": 71,
+              "column": 31
+            }
+          },
+          "status": "Killed"
+        }
+      ]
+    },
+    "R/report-html.R": {
+      "language": "r",
+      "source": "#' Build a source-annotated HTML report from a muttest JSON file\n#'\n#' Reads a JSON file produced by [JSONMutationReporter] (the\n#' \\href{https://github.com/stryker-mutator/mutation-testing-elements}{mutation-testing-elements}\n#' schema) and renders a self-contained HTML report: overall score, per-file\n#' breakdown, and every mutant overlaid on its source line. Mutated lines\n#' expand to show each mutation as a diff. A small inline script adds status\n#' filtering (the report opens focused on survived mutants) and `n`/`p`\n#' keyboard navigation between mutated lines.\n#'\n#' The report is a single static file. Syntax highlighting is loaded from a CDN\n#' (\\href{https://shiki.style}{shiki}) when online and is skipped gracefully\n#' offline.\n#'\n#' @param json Path to the JSON file written by [JSONMutationReporter].\n#' @param output Path of the HTML file to write. Defaults to the JSON path with\n#'   an `.html` extension.\n#' @return The `output` path, invisibly.\n#' @export\n#' @md\nreport <- function(\n  json = \"muttest.json\",\n  output = sub(\"\\\\.json$\", \".html\", json)\n) {\n  checkmate::assert_file_exists(json)\n  doc <- jsonlite::read_json(json)\n\n  counts <- .status_counts(unlist(lapply(doc$files, function(f) {\n    vapply(f$mutants, function(m) .css_status(m$status), character(1))\n  })))\n  thresholds <- doc$thresholds %||% list(high = 80, low = 50)\n\n  body <- htmltools::div(\n    class = \"wrap\",\n    .report_header(counts, thresholds),\n    lapply(names(doc$files), function(path) .report_file(path, doc$files[[path]]))\n  )\n\n  # The report opens filtered to survived mutants (the actionable ones);\n  # fall back to showing everything when nothing survived.\n  init <- if (counts$survived > 0) \"survived\" else \"all\"\n\n  # htmltools strips <head> from a manually-built <html> tag (it reserves head\n  # for its dependency machinery), so assemble the document shell by hand and\n  # only render the dynamic body with htmltools.\n  writeLines(\n    c(\n      \"<!doctype html>\",\n      \"<html lang=\\\"en\\\">\",\n      \"<head>\",\n      \"<meta charset=\\\"utf-8\\\">\",\n      \"<meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1\\\">\",\n      \"<title>muttest report<\/title>\",\n      \"<style>\",\n      readLines(system.file(\"report\", \"muttest.css\", package = \"muttest\")),\n      \"<\/style>\",\n      \"<\/head>\",\n      sprintf(\"<body data-f=\\\"%s\\\">\", init),\n      as.character(body),\n      \"<script>\",\n      readLines(system.file(\"report\", \"muttest.js\", package = \"muttest\")),\n      \"<\/script>\",\n      \"<script type=\\\"module\\\">\",\n      readLines(system.file(\"report\", \"muttest-shiki.mjs\", package = \"muttest\")),\n      \"<\/script>\",\n      \"<\/body>\",\n      \"<\/html>\"\n    ),\n    output\n  )\n  invisible(output)\n}\n\n# Standard status vocabulary -> the CSS/JS class names used by the report.\n.css_status <- function(status) {\n  map <- c(Killed = \"killed\", Survived = \"survived\", NoCoverage = \"no_coverage\")\n  out <- unname(map[status])\n  out[is.na(out)] <- \"error\"\n  out\n}\n\n.status_counts <- function(css_statuses) {\n  n <- function(st) sum(css_statuses == st)\n  list(\n    killed = n(\"killed\"),\n    survived = n(\"survived\"),\n    no_coverage = n(\"no_coverage\"),\n    error = n(\"error\"),\n    total = length(css_statuses)\n  )\n}\n\n# Killed as a share of scored (killed + survived + error) mutants, or NULL when\n# nothing was scored.\n.score <- function(counts) {\n  scored <- counts$killed + counts$survived + counts$error\n  if (scored == 0) NULL else counts$killed / scored\n}\n\n.report_header <- function(counts, thresholds) {\n  score <- .score(counts)\n  pct <- if (is.null(score)) htmltools::HTML(\"&ndash;\") else paste0(floor(score * 100), \"%\")\n  score_class <- if (is.null(score)) {\n    \"no_coverage\"\n  } else if (score >= thresholds$high / 100) {\n    \"killed\"\n  } else if (score >= thresholds$low / 100) {\n    \"error\"\n  } else {\n    \"survived\"\n  }\n  chip <- function(f, label, n) {\n    htmltools::tags$button(\n      class = paste(\"chip\", f),\n      `data-f` = f,\n      `aria-pressed` = \"false\",\n      disabled = if (n == 0) NA,\n      paste0(label, \" \"),\n      htmltools::tags$b(n)\n    )\n  }\n  htmltools::tagList(\n    htmltools::div(\n      class = \"mast\",\n      htmltools::h1(\"muttest report\"),\n      htmltools::div(class = paste(\"score\", score_class), pct)\n    ),\n    htmltools::div(\n      class = \"toolbar\",\n      chip(\"all\", \"All\", counts$total),\n      chip(\"survived\", \"Survived\", counts$survived),\n      chip(\"killed\", \"Killed\", counts$killed),\n      chip(\"no_coverage\", \"No coverage\", counts$no_coverage),\n      chip(\"error\", \"Errors\", counts$error),\n      htmltools::tags$span(\n        class = \"hint\",\n        htmltools::tags$kbd(\"n\"), \" / \", htmltools::tags$kbd(\"p\"),\n        \" to jump between mutants\"\n      ),\n      htmltools::div(\n        class = \"tools\",\n        htmltools::tags$button(class = \"tbtn\", `data-open` = \"1\", \"Expand all\"),\n        htmltools::tags$button(class = \"tbtn\", `data-open` = \"0\", \"Collapse all\"),\n        htmltools::tags$button(class = \"tbtn\", id = \"theme\", \"Theme: auto\")\n      )\n    )\n  )\n}\n\n.report_file <- function(path, file) {\n  source <- strsplit(file$source, \"\\n\", fixed = TRUE)[[1]]\n  statuses <- vapply(file$mutants, function(m) .css_status(m$status), character(1))\n  counts <- .status_counts(statuses)\n  score <- .score(counts)\n  fscore <- if (is.null(score)) htmltools::HTML(\"&ndash;\") else paste0(floor(score * 100), \"%\")\n  count <- function(st, label) {\n    if (counts[[st]] == 0) {\n      return(NULL)\n    }\n    htmltools::tags$span(\n      class = \"ct\",\n      htmltools::tags$b(class = st, counts[[st]]),\n      paste0(\" \", label)\n    )\n  }\n\n  # group mutants by the line where their mutation begins\n  by_line <- list()\n  for (m in file$mutants) {\n    ln <- as.character(m$location$start$line)\n    by_line[[ln]] <- c(by_line[[ln]], list(m))\n  }\n\n  rows <- lapply(seq_along(source), function(i) {\n    .report_line(source, i, by_line[[as.character(i)]])\n  })\n\n  htmltools::tags$details(\n    class = paste(c(\"file\", paste0(\"has-\", unique(statuses))), collapse = \" \"),\n    htmltools::tags$summary(\n      htmltools::tags$span(class = \"fname\", path),\n      htmltools::tags$span(\n        class = \"fmeta\",\n        count(\"survived\", \"survived\"),\n        count(\"killed\", \"killed\"),\n        count(\"no_coverage\", \"no coverage\"),\n        count(\"error\", if (counts$error == 1) \"error\" else \"errors\"),\n        htmltools::tags$span(\n          class = \"fscore\",\n          \"score \",\n          htmltools::tags$b(fscore)\n        )\n      )\n    ),\n    htmltools::div(class = \"src\", rows)\n  )\n}\n\n.report_line <- function(source, no, hits) {\n  text <- source[[no]]\n  num <- htmltools::tags$span(class = \"no\", no)\n  txt <- if (nzchar(text)) text else htmltools::HTML(\"&nbsp;\")\n\n  if (is.null(hits)) {\n    return(htmltools::div(\n      class = \"ln\",\n      num,\n      htmltools::tags$span(class = \"txt\", txt)\n    ))\n  }\n\n  statuses <- vapply(hits, function(m) .css_status(m$status), character(1))\n  htmltools::tags$details(\n    class = paste(\n      c(\"ln hit\", paste0(\"b-\", .worst(statuses)), paste0(\"has-\", unique(statuses))),\n      collapse = \" \"\n    ),\n    htmltools::tags$summary(\n      num,\n      htmltools::tags$span(class = \"txt\", txt),\n      htmltools::tags$span(\n        class = \"badge\",\n        paste(length(hits), if (length(hits) == 1) \"mutant\" else \"mutants\")\n      )\n    ),\n    htmltools::div(class = \"muts\", lapply(hits, function(m) .report_mutant(source, m)))\n  )\n}\n\n.report_mutant <- function(source, m) {\n  st <- .css_status(m$status)\n  d <- .apply_mutation(source, m$location, m$replacement)\n  diff <- htmltools::tagList(\n    lapply(d$original, function(l) htmltools::tags$span(class = \"del\", paste0(\"- \", l))),\n    lapply(d$mutated, function(l) htmltools::tags$span(class = \"add\", paste0(\"+ \", l)))\n  )\n  htmltools::div(\n    class = paste0(\"mut m-\", st),\n    htmltools::div(\n      class = \"head\",\n      htmltools::tags$span(class = paste(\"st\", st), gsub(\"_\", \" \", st)),\n      htmltools::tags$span(class = \"rule\", m$mutatorName)\n    ),\n    htmltools::tags$code(diff),\n    if (!is.null(m$statusReason)) htmltools::tags$code(class = \"msg\", m$statusReason)\n  )\n}\n\n# Reconstruct the original and mutated line text for a mutant from the source,\n# its location (1-based, end-exclusive), and its replacement -- mirrors the\n# splice done by the mutation engine.\n.apply_mutation <- function(source, location, replacement) {\n  s <- location$start\n  e <- location$end\n  span <- source[s$line:e$line]\n  prefix <- substr(span[1], 1, s$column - 1)\n  last <- span[length(span)]\n  suffix <- substr(last, e$column, nchar(last))\n  merged <- paste0(prefix, replacement, suffix)\n  # A deletion leaves only surrounding whitespace -- show it as a removed line\n  # (no mutated side) rather than a blank \"+\" line.\n  list(\n    original = as.list(span),\n    mutated = if (grepl(\"\\\\S\", merged)) as.list(strsplit(merged, \"\\n\", fixed = TRUE)[[1]]) else list()\n  )\n}\n\n# Worst (most attention-worthy) status wins the line marker.\n.worst <- function(statuses) {\n  order <- c(survived = 0, error = 1, no_coverage = 2, killed = 3)\n  names(which.min(order[statuses]))\n}",
+      "mutants": [
+        {
+          "id": "256:41:- → +",
+          "mutatorName": "- → +",
+          "replacement": "+",
+          "location": {
+            "start": {
+              "line": 256,
+              "column": 41
+            },
+            "end": {
+              "line": 256,
+              "column": 42
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "102:81:* → /",
+          "mutatorName": "* → /",
+          "replacement": "/",
+          "location": {
+            "start": {
+              "line": 102,
+              "column": 81
+            },
+            "end": {
+              "line": 102,
+              "column": 82
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "155:84:* → /",
+          "mutatorName": "* → /",
+          "replacement": "/",
+          "location": {
+            "start": {
+              "line": 155,
+              "column": 84
+            },
+            "end": {
+              "line": 155,
+              "column": 85
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "97:44:/ → *",
+          "mutatorName": "/ → *",
+          "replacement": "*",
+          "location": {
+            "start": {
+              "line": 97,
+              "column": 44
+            },
+            "end": {
+              "line": 97,
+              "column": 45
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "105:39:/ → *",
+          "mutatorName": "/ → *",
+          "replacement": "*",
+          "location": {
+            "start": {
+              "line": 105,
+              "column": 39
+            },
+            "end": {
+              "line": 105,
+              "column": 40
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "107:38:/ → *",
+          "mutatorName": "/ → *",
+          "replacement": "*",
+          "location": {
+            "start": {
+              "line": 107,
+              "column": 38
+            },
+            "end": {
+              "line": 107,
+              "column": 39
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "96:27:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 96,
+              "column": 27
+            },
+            "end": {
+              "line": 96,
+              "column": 28
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "96:45:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 96,
+              "column": 45
+            },
+            "end": {
+              "line": 96,
+              "column": 46
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "83:38:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 83,
+              "column": 38
+            },
+            "end": {
+              "line": 83,
+              "column": 40
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "97:14:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 97,
+              "column": 14
+            },
+            "end": {
+              "line": 97,
+              "column": 16
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "117:24:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 117,
+              "column": 24
+            },
+            "end": {
+              "line": 117,
+              "column": 26
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "157:22:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 157,
+              "column": 22
+            },
+            "end": {
+              "line": 157,
+              "column": 24
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "187:41:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 187,
+              "column": 41
+            },
+            "end": {
+              "line": 187,
+              "column": 43
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "223:46:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 223,
+              "column": 46
+            },
+            "end": {
+              "line": 223,
+              "column": 48
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "41:31:> → <",
+          "mutatorName": "> → <",
+          "replacement": "<",
+          "location": {
+            "start": {
+              "line": 41,
+              "column": 31
+            },
+            "end": {
+              "line": 41,
+              "column": 32
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "41:31:> → >=",
+          "mutatorName": "> → >=",
+          "replacement": ">=",
+          "location": {
+            "start": {
+              "line": 41,
+              "column": 31
+            },
+            "end": {
+              "line": 41,
+              "column": 32
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "105:20:>= → <=",
+          "mutatorName": ">= → <=",
+          "replacement": "<=",
+          "location": {
+            "start": {
+              "line": 105,
+              "column": 20
+            },
+            "end": {
+              "line": 105,
+              "column": 22
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "107:20:>= → <=",
+          "mutatorName": ">= → <=",
+          "replacement": "<=",
+          "location": {
+            "start": {
+              "line": 107,
+              "column": 20
+            },
+            "end": {
+              "line": 107,
+              "column": 22
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "105:20:>= → >",
+          "mutatorName": ">= → >",
+          "replacement": ">",
+          "location": {
+            "start": {
+              "line": 105,
+              "column": 20
+            },
+            "end": {
+              "line": 105,
+              "column": 22
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "107:20:>= → >",
+          "mutatorName": ">= → >",
+          "replacement": ">",
+          "location": {
+            "start": {
+              "line": 107,
+              "column": 20
+            },
+            "end": {
+              "line": 107,
+              "column": 22
+            }
+          },
+          "status": "Survived"
+        }
+      ]
+    },
+    "R/reporter-progress.R": {
+      "language": "r",
+      "source": "#' @title Progress Reporter for Mutation Testing\n#'\n#' @description\n#' A reporter that displays a progress indicator for mutation tests.\n#' It provides real-time feedback on which mutants are being tested and whether they were killed by tests.\n#'\n#' @field start_time Time when testing started (for duration calculation)\n#' @field min_time Minimum test duration to display timing information\n#' @field col_config List of column configuration for report formatting\n#' @field survived_detail Controls how survived mutants are reported (summary, none)\n#' @field survived_mutants List to store details of survived mutants for summary reporting\n#'\n#' @importFrom R6 R6Class\n#' @importFrom cli col_green col_red col_yellow col_grey symbol\n#' @md\n#' @export\n#' @family MutationReporter\nProgressMutationReporter <- R6::R6Class(\n  classname = \"ProgressMutationReporter\",\n  inherit = MutationReporter,\n  public = list(\n    start_time = NULL,\n    min_time = 1,\n    survived_detail = \"summary\",\n    survived_mutants = list(),\n    col_config = list(\n      \"status\" = list(\n        padding_left = 0,\n        padding_right = 1,\n        width = 2\n      ),\n      \"k\" = list(\n        padding_left = 1,\n        padding_right = 1,\n        width = 5,\n        type = \"number\"\n      ),\n      \"s\" = list(\n        padding_left = 1,\n        padding_right = 1,\n        width = 5,\n        type = \"number\"\n      ),\n      \"n\" = list(\n        padding_left = 1,\n        padding_right = 1,\n        width = 5,\n        type = \"number\"\n      ),\n      \"e\" = list(\n        padding_left = 1,\n        padding_right = 1,\n        width = 5,\n        type = \"number\"\n      ),\n      \"t\" = list(\n        padding_left = 1,\n        padding_right = 1,\n        width = 5,\n        type = \"number\"\n      ),\n      \"score\" = list(\n        padding_left = 1,\n        padding_right = 1,\n        width = 5,\n        type = \"number\"\n      ),\n      \"mutator\" = list(\n        padding_left = 1,\n        padding_right = 1,\n        width = 10\n      ),\n      \"file\" = list(\n        padding_left = 1,\n        padding_right = 1\n      )\n    ),\n\n    #' @description Format a column with specified padding and width\n    #' @param text Text to format\n    #' @param col_name Column name to use configuration from\n    #' @param colorize Optional function to color the text\n    format_column = function(text, col_name, colorize = NULL) {\n      config <- self$col_config[[col_name]]\n\n      # Get actual visible length of text\n      text_len <- nchar(text)\n\n      # If width is specified, calculate available text space after padding\n      if (!is.null(config$width) && config$width > 0) {\n        padding_size <- (config$padding_left %||% 0) +\n          (config$padding_right %||% 0)\n        text_max_width <- config$width - padding_size\n        if (text_len > text_max_width && text_max_width > 0) {\n          # Truncate if text is too long for the available space\n          text <- substring(text, 1, text_max_width)\n          text_len <- text_max_width\n        }\n      } else if (!is.null(config$max_width) && config$max_width > 0) {\n        # Otherwise, use the existing max_width logic if provided\n        text <- substring(text, 1, config$max_width)\n        text_len <- min(text_len, config$max_width)\n      }\n\n      # Calculate left padding\n      left_pad <- \"\"\n      if (!is.null(config$padding_left) && config$padding_left > 0) {\n        left_pad <- strrep(\" \", config$padding_left)\n      }\n\n      # Calculate right padding\n      right_pad <- \"\"\n      if (!is.null(config$padding_right) && config$padding_right > 0) {\n        right_pad <- strrep(\" \", config$padding_right)\n      }\n\n      # Handle fixed width columns\n      if (!is.null(config$width) && config$width > 0) {\n        # Calculate current total width\n        total_width <- text_len + nchar(left_pad) + nchar(right_pad)\n        if (total_width < config$width) {\n          # For number columns, add extra spaces to left padding for right alignment\n          if (!is.null(config$type) && config$type == \"number\") {\n            left_pad <- paste0(\n              left_pad,\n              strrep(\" \", config$width - total_width)\n            )\n          } else {\n            # Otherwise add to right padding (left alignment)\n            right_pad <- paste0(\n              right_pad,\n              strrep(\" \", config$width - total_width)\n            )\n          }\n        }\n      } else if (!is.null(config$max_width) && config$max_width > 0) {\n        # Handle max_width padding (existing behavior)\n        total_current_width <- text_len + nchar(left_pad) + nchar(right_pad)\n        if (total_current_width < config$max_width) {\n          # Add extra spaces to reach max width\n          right_pad <- paste0(\n            right_pad,\n            strrep(\" \", config$max_width - total_current_width)\n          )\n        }\n      }\n\n      # Apply color formatting after padding calculation but before concatenation\n      if (!is.null(colorize) && is.function(colorize)) {\n        text <- colorize(text)\n      }\n\n      paste0(left_pad, text, right_pad)\n    },\n\n    #' @description Format the header of the report\n    fmt_h = function() {\n      paste0(\n        \" \",\n        \" |\",\n        self$format_column(\"K\", \"k\", cli::col_green),\n        \"|\",\n        self$format_column(\"S\", \"s\", cli::col_red),\n        \"|\",\n        self$format_column(\"N\", \"n\", cli::col_grey),\n        \"|\",\n        self$format_column(\"E\", \"e\", cli::col_yellow),\n        \"|\",\n        self$format_column(\"T\", \"t\"),\n        \"|\",\n        self$format_column(\"  %\", \"score\"),\n        \"|\",\n        self$format_column(\"Mutator\", \"mutator\"),\n        \"|\",\n        self$format_column(\"File\", \"file\")\n      )\n    },\n\n    #' @description Format a row of the report\n    #' @param status Status symbol (e.g., tick or cross)\n    #' @param k Number of killed mutations\n    #' @param s Number of survived mutations\n    #' @param n Number of mutations with no test coverage\n    #' @param e Number of errors\n    #' @param t Total number of mutations\n    #' @param score Score percentage\n    #' @param mutator The mutator used\n    #' @param file The file being tested\n    #' @return Formatted row string\n    fmt_r = function(status, k, s, n, e, t, score, mutator, file) {\n      paste0(\n        status,\n        \" |\",\n        self$format_column(as.character(k), \"k\"),\n        \"|\",\n        self$format_column(as.character(s), \"s\"),\n        \"|\",\n        self$format_column(as.character(n), \"n\"),\n        \"|\",\n        self$format_column(as.character(e), \"e\"),\n        \"|\",\n        self$format_column(as.character(t), \"t\"),\n        \"|\",\n        self$format_column(score, \"score\"),\n        \"|\",\n        self$format_column(as.character(mutator), \"mutator\"),\n        \"|\",\n        self$format_column(file, \"file\")\n      )\n    },\n\n    #' @description Initialize a new progress reporter\n    #' @param test_reporter Reporter to use for testthat::test_dir\n    #' @param min_time Minimum time to show elapsed time (default: 1s)\n    #' @param file Output destination (default: stdout)\n    #' @param survived_detail Controls how survived mutants are reported.\n    #'   One of `\"summary\"` (default) or `\"none\"`.\n    initialize = function(\n      test_reporter = \"silent\",\n      min_time = 1,\n      file = stdout(),\n      survived_detail = c(\"summary\", \"none\")\n    ) {\n      super$initialize(test_reporter, file)\n\n      self$min_time <- min_time\n      self$survived_detail <- match.arg(survived_detail)\n      self$results <- list()\n    },\n\n    #' @description Start reporter\n    #' @param plan The complete mutation plan\n    start_reporter = function(plan = NULL) {\n      super$start_reporter(plan)\n      self$start_time <- proc.time()\n      self$results <- list()\n      self$survived_mutants <- list()\n      self$cat_line(paste(cli::symbol$info, \"Mutation Testing\"))\n      self$cat_line(self$fmt_h())\n    },\n\n    #' @description Add a mutation test result\n    #' @param plan Current testing plan. See `muttest_plan()`.\n    #' @param killed Whether the mutation was killed by tests\n    #' @param survived Number of survived mutations\n    #' @param no_coverage Number of mutants with no test coverage\n    #' @param errors Number of errors encountered\n    #' @param error Optional error condition from a failed run\n    #' @param original_code Original source lines before mutation\n    #' @param mutated_code Mutated source lines\n    add_result = function(\n      plan,\n      killed,\n      survived,\n      no_coverage,\n      errors,\n      error = NULL,\n      original_code = NULL,\n      mutated_code = NULL\n    ) {\n      super$add_result(plan, killed, survived, no_coverage, errors, error)\n\n      status_symbol <- if (killed) {\n        cli::col_green(cli::symbol$tick)\n      } else if (no_coverage) {\n        cli::col_grey(\"-\")\n      } else {\n        cli::col_red(\"x\")\n      }\n\n      filename <- plan$filename\n      mutator <- plan$mutator[[1]]\n      k <- self$results[[filename]]$killed\n      s <- self$results[[filename]]$survived\n      n <- self$results[[filename]]$no_coverage\n      t <- self$results[[filename]]$total\n      e <- self$results[[filename]]$errors\n      file_name <- basename(filename)\n      score <- if (is.na(self$current_score)) {\n        \"-\"\n      } else {\n        floor(self$current_score * 100)\n      }\n\n      self$cat_line(self$fmt_r(\n        status_symbol,\n        k,\n        s,\n        n,\n        e,\n        t,\n        score,\n        info_oneline(mutator),\n        file_name\n      ))\n\n      if (survived == 1 && !is.null(original_code) && !is.null(mutated_code)) {\n        if (self$survived_detail == \"summary\") {\n          self$survived_mutants <- c(\n            self$survived_mutants,\n            list(list(\n              file_path = filename,\n              mutator = mutator,\n              original_code = original_code,\n              mutated_code = mutated_code\n            ))\n          )\n        }\n      }\n    },\n\n    #' @description Update status spinner (for long-running operations)\n    #' @param force Force update even if interval hasn't elapsed\n    update = function(force = FALSE) {},\n\n    #' @description End testing current file\n    end_file = function() {\n      super$end_file()\n    },\n\n    #' @description End reporter with detailed summary\n    end_reporter = function() {\n      self$cat_line()\n\n      time <- proc.time() - self$start_time\n      if (time[[3]] > self$min_time) {\n        self$cat_line(cli::col_cyan(paste0(\n          \"Duration: \",\n          sprintf(\"%.2f s\", time[[3]])\n        )))\n      }\n\n      private$cat_survived_mutants()\n\n      private$cat_stats()\n      self$cat_line()\n\n      super$end_reporter()\n    },\n\n    #' @description Print the mutation test result with survived diffs\n    print = function() {\n      private$cat_stats()\n      private$cat_survived_mutants()\n      invisible(self)\n    }\n  ),\n  private = list(\n    cat_survived_mutants = function() {\n      if (length(self$survived_mutants) == 0) {\n        return(invisible(NULL))\n      }\n      self$cat_line()\n      self$rule(cli::style_bold(\"Survived Mutants\"))\n      for (entry in self$survived_mutants) {\n        private$print_survived_diff(\n          entry$original_code,\n          entry$mutated_code,\n          entry$file_path,\n          entry$mutator\n        )\n      }\n    },\n\n    print_survived_diff = function(\n      original_code,\n      mutated_code,\n      file_path,\n      mutator\n    ) {\n      changed <- which(original_code != mutated_code)\n      if (length(changed) == 0) {\n        return(invisible(NULL))\n      }\n\n      self$cat_line(cli::col_grey(paste0(\n        basename(file_path),\n        \"  \",\n        mutator$from,\n        \" \\u2192 \",\n        mutator$to\n      )))\n      for (i in changed) {\n        self$cat_line(cli::col_red(paste0(\n          \"  \",\n          i,\n          \"- \",\n          trimws(original_code[[i]], \"right\")\n        )))\n        self$cat_line(cli::col_green(paste0(\n          \"  \",\n          i,\n          \"+ \",\n          trimws(mutated_code[[i]], \"right\")\n        )))\n      }\n    },\n\n    cat_stats = function() {\n      results <- do.call(rbind, lapply(self$results, as.data.frame))\n      k <- sum(results$killed)\n      s <- sum(results$survived)\n      n <- sum(results$no_coverage)\n      t <- sum(results$total)\n      e <- sum(results$errors)\n      score <- self$current_score\n      self$cat_line()\n      self$rule(cli::style_bold(\"Results\"))\n      self$cat_line(\n        \"[ \",\n        cli::col_green(\"KILLED \"),\n        k,\n        \" | \",\n        cli::col_red(\"SURVIVED \"),\n        s,\n        \" | \",\n        cli::col_grey(\"NO COVERAGE \"),\n        n,\n        \" | \",\n        cli::col_yellow(\"ERRORS \"),\n        e,\n        \" | \",\n        \"TOTAL \",\n        t,\n        \" | \",\n        cli::style_bold(cli::col_green(sprintf(\"SCORE %.1f%%\", score * 100))),\n        \" ]\"\n      )\n    }\n  )\n)",
+      "mutants": [
+        {
+          "id": "93:40:- → +",
+          "mutatorName": "- → +",
+          "replacement": "+",
+          "location": {
+            "start": {
+              "line": 93,
+              "column": 40
+            },
+            "end": {
+              "line": 93,
+              "column": 41
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "126:40:- → +",
+          "mutatorName": "- → +",
+          "replacement": "+",
+          "location": {
+            "start": {
+              "line": 126,
+              "column": 40
+            },
+            "end": {
+              "line": 126,
+              "column": 41
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "132:40:- → +",
+          "mutatorName": "- → +",
+          "replacement": "+",
+          "location": {
+            "start": {
+              "line": 132,
+              "column": 40
+            },
+            "end": {
+              "line": 132,
+              "column": 41
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "143:42:- → +",
+          "mutatorName": "- → +",
+          "replacement": "+",
+          "location": {
+            "start": {
+              "line": 143,
+              "column": 42
+            },
+            "end": {
+              "line": 143,
+              "column": 43
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "325:27:- → +",
+          "mutatorName": "- → +",
+          "replacement": "+",
+          "location": {
+            "start": {
+              "line": 325,
+              "column": 27
+            },
+            "end": {
+              "line": 325,
+              "column": 28
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "371:38:!= → ==",
+          "mutatorName": "!= → ==",
+          "replacement": "==",
+          "location": {
+            "start": {
+              "line": 371,
+              "column": 38
+            },
+            "end": {
+              "line": 371,
+              "column": 40
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "282:34:* → /",
+          "mutatorName": "* → /",
+          "replacement": "/",
+          "location": {
+            "start": {
+              "line": 282,
+              "column": 34
+            },
+            "end": {
+              "line": 282,
+              "column": 35
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "426:70:* → /",
+          "mutatorName": "* → /",
+          "replacement": "/",
+          "location": {
+            "start": {
+              "line": 426,
+              "column": 70
+            },
+            "end": {
+              "line": 426,
+              "column": 71
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "90:34:&& → ||",
+          "mutatorName": "&& → ||",
+          "replacement": "||",
+          "location": {
+            "start": {
+              "line": 90,
+              "column": 34
+            },
+            "end": {
+              "line": 90,
+              "column": 36
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "94:39:&& → ||",
+          "mutatorName": "&& → ||",
+          "replacement": "||",
+          "location": {
+            "start": {
+              "line": 94,
+              "column": 39
+            },
+            "end": {
+              "line": 94,
+              "column": 41
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "99:45:&& → ||",
+          "mutatorName": "&& → ||",
+          "replacement": "||",
+          "location": {
+            "start": {
+              "line": 99,
+              "column": 45
+            },
+            "end": {
+              "line": 99,
+              "column": 47
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "107:41:&& → ||",
+          "mutatorName": "&& → ||",
+          "replacement": "||",
+          "location": {
+            "start": {
+              "line": 107,
+              "column": 41
+            },
+            "end": {
+              "line": 107,
+              "column": 43
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "113:42:&& → ||",
+          "mutatorName": "&& → ||",
+          "replacement": "||",
+          "location": {
+            "start": {
+              "line": 113,
+              "column": 42
+            },
+            "end": {
+              "line": 113,
+              "column": 44
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "118:34:&& → ||",
+          "mutatorName": "&& → ||",
+          "replacement": "||",
+          "location": {
+            "start": {
+              "line": 118,
+              "column": 34
+            },
+            "end": {
+              "line": 118,
+              "column": 36
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "123:37:&& → ||",
+          "mutatorName": "&& → ||",
+          "replacement": "||",
+          "location": {
+            "start": {
+              "line": 123,
+              "column": 37
+            },
+            "end": {
+              "line": 123,
+              "column": 39
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "136:45:&& → ||",
+          "mutatorName": "&& → ||",
+          "replacement": "||",
+          "location": {
+            "start": {
+              "line": 136,
+              "column": 45
+            },
+            "end": {
+              "line": 136,
+              "column": 47
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "149:30:&& → ||",
+          "mutatorName": "&& → ||",
+          "replacement": "||",
+          "location": {
+            "start": {
+              "line": 149,
+              "column": 30
+            },
+            "end": {
+              "line": 149,
+              "column": 32
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "297:25:&& → ||",
+          "mutatorName": "&& → ||",
+          "replacement": "||",
+          "location": {
+            "start": {
+              "line": 297,
+              "column": 25
+            },
+            "end": {
+              "line": 297,
+              "column": 27
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "297:52:&& → ||",
+          "mutatorName": "&& → ||",
+          "replacement": "||",
+          "location": {
+            "start": {
+              "line": 297,
+              "column": 52
+            },
+            "end": {
+              "line": 297,
+              "column": 54
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "91:54:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 91,
+              "column": 54
+            },
+            "end": {
+              "line": 91,
+              "column": 55
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "120:33:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 120,
+              "column": 33
+            },
+            "end": {
+              "line": 120,
+              "column": 34
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "120:51:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 120,
+              "column": 51
+            },
+            "end": {
+              "line": 120,
+              "column": 52
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "138:41:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 138,
+              "column": 41
+            },
+            "end": {
+              "line": 138,
+              "column": 42
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "138:59:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 138,
+              "column": 59
+            },
+            "end": {
+              "line": 138,
+              "column": 60
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "121:25:< → >",
+          "mutatorName": "< → >",
+          "replacement": ">",
+          "location": {
+            "start": {
+              "line": 121,
+              "column": 25
+            },
+            "end": {
+              "line": 121,
+              "column": 26
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "139:33:< → >",
+          "mutatorName": "< → >",
+          "replacement": ">",
+          "location": {
+            "start": {
+              "line": 139,
+              "column": 33
+            },
+            "end": {
+              "line": 139,
+              "column": 34
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "121:25:< → <=",
+          "mutatorName": "< → <=",
+          "replacement": "<=",
+          "location": {
+            "start": {
+              "line": 121,
+              "column": 25
+            },
+            "end": {
+              "line": 121,
+              "column": 26
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "139:33:< → <=",
+          "mutatorName": "< → <=",
+          "replacement": "<=",
+          "location": {
+            "start": {
+              "line": 139,
+              "column": 33
+            },
+            "end": {
+              "line": 139,
+              "column": 34
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "123:52:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 123,
+              "column": 52
+            },
+            "end": {
+              "line": 123,
+              "column": 54
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "297:20:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 297,
+              "column": 20
+            },
+            "end": {
+              "line": 297,
+              "column": 22
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "298:34:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 298,
+              "column": 34
+            },
+            "end": {
+              "line": 298,
+              "column": 36
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "350:41:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 350,
+              "column": 41
+            },
+            "end": {
+              "line": 350,
+              "column": 43
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "372:27:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 372,
+              "column": 27
+            },
+            "end": {
+              "line": 372,
+              "column": 29
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "90:50:> → <",
+          "mutatorName": "> → <",
+          "replacement": "<",
+          "location": {
+            "start": {
+              "line": 90,
+              "column": 50
+            },
+            "end": {
+              "line": 90,
+              "column": 51
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "94:22:> → <",
+          "mutatorName": "> → <",
+          "replacement": "<",
+          "location": {
+            "start": {
+              "line": 94,
+              "column": 22
+            },
+            "end": {
+              "line": 94,
+              "column": 23
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "94:57:> → <",
+          "mutatorName": "> → <",
+          "replacement": "<",
+          "location": {
+            "start": {
+              "line": 94,
+              "column": 57
+            },
+            "end": {
+              "line": 94,
+              "column": 58
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "99:65:> → <",
+          "mutatorName": "> → <",
+          "replacement": "<",
+          "location": {
+            "start": {
+              "line": 99,
+              "column": 65
+            },
+            "end": {
+              "line": 99,
+              "column": 66
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "107:64:> → <",
+          "mutatorName": "> → <",
+          "replacement": "<",
+          "location": {
+            "start": {
+              "line": 107,
+              "column": 64
+            },
+            "end": {
+              "line": 107,
+              "column": 65
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "113:66:> → <",
+          "mutatorName": "> → <",
+          "replacement": "<",
+          "location": {
+            "start": {
+              "line": 113,
+              "column": 66
+            },
+            "end": {
+              "line": 113,
+              "column": 67
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "118:50:> → <",
+          "mutatorName": "> → <",
+          "replacement": "<",
+          "location": {
+            "start": {
+              "line": 118,
+              "column": 50
+            },
+            "end": {
+              "line": 118,
+              "column": 51
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "136:65:> → <",
+          "mutatorName": "> → <",
+          "replacement": "<",
+          "location": {
+            "start": {
+              "line": 136,
+              "column": 65
+            },
+            "end": {
+              "line": 136,
+              "column": 66
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "326:21:> → <",
+          "mutatorName": "> → <",
+          "replacement": "<",
+          "location": {
+            "start": {
+              "line": 326,
+              "column": 21
+            },
+            "end": {
+              "line": 326,
+              "column": 22
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "90:50:> → >=",
+          "mutatorName": "> → >=",
+          "replacement": ">=",
+          "location": {
+            "start": {
+              "line": 90,
+              "column": 50
+            },
+            "end": {
+              "line": 90,
+              "column": 51
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "94:22:> → >=",
+          "mutatorName": "> → >=",
+          "replacement": ">=",
+          "location": {
+            "start": {
+              "line": 94,
+              "column": 22
+            },
+            "end": {
+              "line": 94,
+              "column": 23
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "94:57:> → >=",
+          "mutatorName": "> → >=",
+          "replacement": ">=",
+          "location": {
+            "start": {
+              "line": 94,
+              "column": 57
+            },
+            "end": {
+              "line": 94,
+              "column": 58
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "99:65:> → >=",
+          "mutatorName": "> → >=",
+          "replacement": ">=",
+          "location": {
+            "start": {
+              "line": 99,
+              "column": 65
+            },
+            "end": {
+              "line": 99,
+              "column": 66
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "107:64:> → >=",
+          "mutatorName": "> → >=",
+          "replacement": ">=",
+          "location": {
+            "start": {
+              "line": 107,
+              "column": 64
+            },
+            "end": {
+              "line": 107,
+              "column": 65
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "113:66:> → >=",
+          "mutatorName": "> → >=",
+          "replacement": ">=",
+          "location": {
+            "start": {
+              "line": 113,
+              "column": 66
+            },
+            "end": {
+              "line": 113,
+              "column": 67
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "118:50:> → >=",
+          "mutatorName": "> → >=",
+          "replacement": ">=",
+          "location": {
+            "start": {
+              "line": 118,
+              "column": 50
+            },
+            "end": {
+              "line": 118,
+              "column": 51
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "136:65:> → >=",
+          "mutatorName": "> → >=",
+          "replacement": ">=",
+          "location": {
+            "start": {
+              "line": 136,
+              "column": 65
+            },
+            "end": {
+              "line": 136,
+              "column": 66
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "326:21:> → >=",
+          "mutatorName": "> → >=",
+          "replacement": ">=",
+          "location": {
+            "start": {
+              "line": 326,
+              "column": 21
+            },
+            "end": {
+              "line": 326,
+              "column": 22
+            }
+          },
+          "status": "Survived"
+        }
+      ]
+    },
+    "R/reporter.R": {
+      "language": "r",
+      "source": "#' @title Reporter for Mutation Testing\n#'\n#' @description\n#' The job of a mutation reporter is to aggregate and display the results of mutation tests.\n#' It tracks each mutation attempt, reporting on whether the tests killed the mutation or the mutation survived.\n#'\n#' @field test_reporter Reporter to use for the testthat::test_dir function\n#' @field out Output destination for reporter messages\n#' @field width Width of the console in characters\n#' @field unicode Whether Unicode output is supported\n#' @field crayon Whether colored output is supported\n#' @field rstudio Whether running in RStudio\n#' @field hyperlinks Whether terminal hyperlinks are supported\n#' @field current_file Path of the file currently being mutated\n#' @field current_mutator Mutator currently being applied\n#' @field plan Complete mutation plan for the test run\n#' @field results List of mutation test results, indexed by file path\n#' @field current_score Current score of the mutation tests\n#' @field error_messages List of error messages from failed mutant runs\n#'\n#' @md\n#' @export\n#' @importFrom rlang `%||%`\n#' @family MutationReporter\nMutationReporter <- R6::R6Class(\n  classname = \"MutationReporter\",\n  public = list(\n    # Define test reporter that will be used for running tests\n    test_reporter = NULL,\n\n    # Output destination\n    out = NULL,\n\n    # Display settings\n    width = 80,\n    unicode = TRUE,\n    crayon = TRUE,\n    rstudio = TRUE,\n    hyperlinks = TRUE,\n\n    # Current state\n    current_file = NULL,\n    current_mutator = NULL,\n\n    plan = NULL,\n\n    # Track mutations by file\n    results = NULL,\n    current_score = NA_real_,\n    error_messages = list(),\n\n    #' @description Initialize a new reporter\n    #' @param test_reporter Reporter to use for the testthat::test_dir function\n    #' @param file Output destination (default: stdout)\n    initialize = function(test_reporter = \"silent\", file = stdout()) {\n      self$test_reporter <- test_reporter\n      self$out <- file\n\n      # Capture display settings\n      self$width <- cli::console_width()\n      self$unicode <- cli::is_utf8_output()\n      self$crayon <- cli::num_ansi_colors() > 1\n      self$rstudio <- Sys.getenv(\"RSTUDIO\") == \"1\"\n      self$hyperlinks <- cli::ansi_hyperlink_types()[[\"run\"]]\n    },\n\n    #' @description Start reporter\n    #' @param plan The complete mutation plan\n    #' @param temp_dir Path to the temporary directory for testing\n    start_reporter = function(plan = NULL) {\n      self$plan <- plan\n      self$results <- list()\n      self$current_score <- NA_real_\n      self$error_messages <- list()\n    },\n\n    #' @description Start testing a file\n    #' @param filename Path to the file being mutated\n    start_file = function(filename) {\n      self$current_file <- filename\n      self$results[[filename]] <- self$results[[filename]] %||%\n        list(\n          total = 0,\n          killed = 0,\n          survived = 0,\n          no_coverage = 0,\n          errors = 0\n        )\n    },\n\n    #' @description Start testing with a specific mutator\n    #' @param mutator The mutator being applied\n    start_mutator = function(mutator) {\n      self$current_mutator <- mutator\n    },\n\n    #' @description Add a mutation test result\n    #' @param plan Current testing plan. See `muttest_plan()`.\n    #' @param killed Whether the mutation was killed by tests\n    #' @param survived Number of survived mutations\n    #' @param no_coverage Number of mutants with no test coverage\n    #' @param errors Number of errors encountered\n    #' @param error Optional error condition from a failed run\n    #' @param original_code Original source lines before mutation\n    #' @param mutated_code Mutated source lines\n    add_result = function(\n      plan,\n      killed,\n      survived,\n      no_coverage,\n      errors,\n      error = NULL,\n      original_code = NULL,\n      mutated_code = NULL\n    ) {\n      filename <- plan$filename\n      self$results[[filename]]$total <- self$results[[filename]]$total + 1\n      self$results[[filename]]$killed <- self$results[[filename]]$killed +\n        killed\n      self$results[[filename]]$survived <- self$results[[filename]]$survived +\n        survived\n      self$results[[filename]]$no_coverage <- self$results[[\n        filename\n      ]]$no_coverage +\n        no_coverage\n      self$results[[filename]]$errors <- self$results[[filename]]$errors +\n        errors\n      if (!is.null(error)) {\n        self$error_messages <- c(\n          self$error_messages,\n          list(conditionMessage(error))\n        )\n      }\n      # No-coverage mutants are excluded from the score: an untested mutant says\n      # nothing about test quality. Denominator = killed + survived + errors.\n      killed_total <- sum(vapply(self$results, `[[`, numeric(1), \"killed\"))\n      scored_total <- killed_total +\n        sum(vapply(self$results, `[[`, numeric(1), \"survived\")) +\n        sum(vapply(self$results, `[[`, numeric(1), \"errors\"))\n      self$current_score <- if (scored_total > 0) {\n        killed_total / scored_total\n      } else {\n        NA_real_\n      }\n    },\n\n    #' @description Update status (no-op in base class)\n    #' @param force Ignored\n    update = function(force = FALSE) {},\n\n    #' @description End testing with current mutator\n    end_mutator = function() {\n      self$current_mutator <- NULL\n    },\n\n    #' @description End testing current file\n    end_file = function() {\n      self$current_file <- NULL\n    },\n\n    #' @description End reporter and show summary\n    end_reporter = function() {},\n\n    #' @description Get the current score\n    get_score = function() {\n      self$current_score\n    },\n\n    #' @description Print a message to the output\n    #' @param ... Message to print\n    cat_line = function(...) {\n      cli::cat_line(..., file = self$out)\n    },\n\n    #' @description Print a message to the output with a rule\n    #' @param ... Message to print\n    rule = function(...) {\n      cli::cat_rule(..., file = self$out)\n    }\n  )\n)\n\n#' Create a default reporter\n#'\n#' @param ... Arguments passed to the `?ProgressMutationReporter` constructor.\n#' @md\n#' @export\n#' @family MutationReporter\ndefault_reporter <- function(...) {\n  ProgressMutationReporter$new(...)\n}",
+      "mutants": [
+        {
+          "id": "141:22:/ → *",
+          "mutatorName": "/ → *",
+          "replacement": "*",
+          "location": {
+            "start": {
+              "line": 141,
+              "column": 22
+            },
+            "end": {
+              "line": 141,
+              "column": 23
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "117:72:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 117,
+              "column": 72
+            },
+            "end": {
+              "line": 117,
+              "column": 73
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "118:74:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 118,
+              "column": 74
+            },
+            "end": {
+              "line": 118,
+              "column": 75
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "120:78:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 120,
+              "column": 78
+            },
+            "end": {
+              "line": 120,
+              "column": 79
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "124:22:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 124,
+              "column": 22
+            },
+            "end": {
+              "line": 124,
+              "column": 23
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "126:74:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 126,
+              "column": 74
+            },
+            "end": {
+              "line": 126,
+              "column": 75
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "137:36:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 137,
+              "column": 36
+            },
+            "end": {
+              "line": 137,
+              "column": 37
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "138:65:+ → -",
+          "mutatorName": "+ → -",
+          "replacement": "-",
+          "location": {
+            "start": {
+              "line": 138,
+              "column": 65
+            },
+            "end": {
+              "line": 138,
+              "column": 66
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "63:45:== → !=",
+          "mutatorName": "== → !=",
+          "replacement": "!=",
+          "location": {
+            "start": {
+              "line": 63,
+              "column": 45
+            },
+            "end": {
+              "line": 63,
+              "column": 47
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "62:45:> → <",
+          "mutatorName": "> → <",
+          "replacement": "<",
+          "location": {
+            "start": {
+              "line": 62,
+              "column": 45
+            },
+            "end": {
+              "line": 62,
+              "column": 46
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "140:46:> → <",
+          "mutatorName": "> → <",
+          "replacement": "<",
+          "location": {
+            "start": {
+              "line": 140,
+              "column": 46
+            },
+            "end": {
+              "line": 140,
+              "column": 47
+            }
+          },
+          "status": "Killed"
+        },
+        {
+          "id": "62:45:> → >=",
+          "mutatorName": "> → >=",
+          "replacement": ">=",
+          "location": {
+            "start": {
+              "line": 62,
+              "column": 45
+            },
+            "end": {
+              "line": 62,
+              "column": 46
+            }
+          },
+          "status": "Survived"
+        },
+        {
+          "id": "140:46:> → >=",
+          "mutatorName": "> → >=",
+          "replacement": ">=",
+          "location": {
+            "start": {
+              "line": 140,
+              "column": 46
+            },
+            "end": {
+              "line": 140,
+              "column": 47
+            }
+          },
+          "status": "Survived"
+        }
+      ]
+    }
+  }
+}

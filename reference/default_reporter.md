@@ -19,5 +19,7 @@ default_reporter(...)
 ## See also
 
 Other MutationReporter:
+[`JSONMutationReporter`](https://jakubsob.github.io/muttest/reference/JSONMutationReporter.md),
+[`MultiReporter`](https://jakubsob.github.io/muttest/reference/MultiReporter.md),
 [`MutationReporter`](https://jakubsob.github.io/muttest/reference/MutationReporter.md),
 [`ProgressMutationReporter`](https://jakubsob.github.io/muttest/reference/ProgressMutationReporter.md)

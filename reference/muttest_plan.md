@@ -34,6 +34,9 @@ columns:
 
 - `mutator`: The mutator that was applied.
 
+- `mutation`: A list with the mutant's `location` (1-based `start`/`end`
+  line/column) and `replacement` text.
+
 ## Details
 
 The plan is in a data frame format, where each row represents a mutant.

@@ -2,6 +2,37 @@
 
 ## muttest 0.3.0
 
+- ✨ New `JSONMutationReporter` writes a report conforming to the
+  [mutation-testing-elements](https://stryker-mutator.io) schema, a
+  cross-language standard shared by StrykerJS/.NET/Scala — so muttest
+  output can be fed to any schema-compatible tooling.
+- ✨ New
+  [`report()`](https://jakubsob.github.io/muttest/reference/report.md)
+  renders a self-contained, source-annotated HTML report (overall score,
+  per-file breakdown, per-line mutant diffs, status filtering, keyboard
+  navigation) from a `JSONMutationReporter` file.
+- ✨ New `MultiReporter` fans reporter events out to several reporters
+  at once, e.g. a live `ProgressMutationReporter` alongside a
+  `JSONMutationReporter`.
+- ❗️ A mutant that makes tests *error* (rather than fail an expectation)
+  is now scored as killed, matching PIT/Stryker/mutmut. Previously it
+  was counted as survived.
+- ❗️ Mutants with no test coverage (no matching test file under
+  `FileTestStrategy`) are now reported as a separate `no coverage`
+  category and excluded from the score, so untested code no longer looks
+  like escaped mutants. The score is now
+  `killed / (killed + survived + errors)`. `FullTestStrategy` scores are
+  unaffected.
+- ✨ `PackageCopyStrategy` gained a `symlink` argument. When `TRUE`,
+  only the mutated file’s top-level directory is copied and everything
+  else is symlinked to the original, avoiding a full project copy per
+  mutant (helpful for packages with large `inst/`/`data/`). Defaults to
+  `FALSE`; unsafe if the test suite writes into the package’s own
+  directories.
+- 🐛 `FileTestStrategy` now matches test files by exact name instead of
+  an unanchored regex, so a source file like `mod.R` no longer runs
+  `test-model.R` and filenames with regex metacharacters are handled
+  correctly.
 - 🐛 Added missing `digest` and `tools` to Imports.
 
 ## muttest 0.2.1

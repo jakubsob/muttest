@@ -62,6 +62,8 @@ It provides real-time feedback on which mutants are being tested and whether the
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other MutationReporter:
+<code><a href="JSONMutationReporter.html">JSONMutationReporter</a></code>,
+<code><a href="MultiReporter.html">MultiReporter</a></code>,
 <code><a href="MutationReporter.html">MutationReporter</a></code>,
 <code><a href="default_reporter.html">default_reporter()</a></code></p></div>
     </div>
@@ -107,12 +109,10 @@ It provides real-time feedback on which mutants are being tested and whether the
 <li><p><a href="#method-ProgressMutationReporter-add_result"><code>ProgressMutationReporter$add_result()</code></a></p></li>
 <li><p><a href="#method-ProgressMutationReporter-update"><code>ProgressMutationReporter$update()</code></a></p></li>
 <li><p><a href="#method-ProgressMutationReporter-end_file"><code>ProgressMutationReporter$end_file()</code></a></p></li>
-<li><p><a href="#method-ProgressMutationReporter-cr"><code>ProgressMutationReporter$cr()</code></a></p></li>
 <li><p><a href="#method-ProgressMutationReporter-end_reporter"><code>ProgressMutationReporter$end_reporter()</code></a></p></li>
 <li><p><a href="#method-ProgressMutationReporter-print"><code>ProgressMutationReporter$print()</code></a></p></li>
 <li><p><a href="#method-ProgressMutationReporter-clone"><code>ProgressMutationReporter$clone()</code></a></p></li>
 </ul></div><p><details><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="muttest" data-topic="MutationReporter" data-id="cat_line"><a href="MutationReporter.html#method-cat_line"><code>muttest::MutationReporter$cat_line()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="muttest" data-topic="MutationReporter" data-id="cat_tight"><a href="MutationReporter.html#method-cat_tight"><code>muttest::MutationReporter$cat_tight()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="muttest" data-topic="MutationReporter" data-id="end_mutator"><a href="MutationReporter.html#method-end_mutator"><code>muttest::MutationReporter$end_mutator()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="muttest" data-topic="MutationReporter" data-id="get_score"><a href="MutationReporter.html#method-get_score"><code>muttest::MutationReporter$get_score()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="muttest" data-topic="MutationReporter" data-id="rule"><a href="MutationReporter.html#method-rule"><code>muttest::MutationReporter$rule()</code></a></span></li>
@@ -154,7 +154,7 @@ It provides real-time feedback on which mutants are being tested and whether the
 <h3 id="method-fmt-r-">Method <code>fmt_r()</code><a class="anchor" aria-label="anchor" href="#method-fmt-r-"></a></h3>
 <p>Format a row of the report</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ProgressMutationReporter</span><span class="op">$</span><span class="fu">fmt_r</span><span class="op">(</span><span class="va">status</span>, <span class="va">k</span>, <span class="va">s</span>, <span class="va">e</span>, <span class="va">t</span>, <span class="va">score</span>, <span class="va">mutator</span>, <span class="va">file</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ProgressMutationReporter</span><span class="op">$</span><span class="fu">fmt_r</span><span class="op">(</span><span class="va">status</span>, <span class="va">k</span>, <span class="va">s</span>, <span class="va">n</span>, <span class="va">e</span>, <span class="va">t</span>, <span class="va">score</span>, <span class="va">mutator</span>, <span class="va">file</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -169,6 +169,10 @@ It provides real-time feedback on which mutants are being tested and whether the
 
 <dt><code>s</code></dt>
 <dd><p>Number of survived mutations</p></dd>
+
+
+<dt><code>n</code></dt>
+<dd><p>Number of mutations with no test coverage</p></dd>
 
 
 <dt><code>e</code></dt>
@@ -256,6 +260,7 @@ One of <code>"summary"</code> (default) or <code>"none"</code>.</p></dd>
 <span>  <span class="va">plan</span>,</span>
 <span>  <span class="va">killed</span>,</span>
 <span>  <span class="va">survived</span>,</span>
+<span>  <span class="va">no_coverage</span>,</span>
 <span>  <span class="va">errors</span>,</span>
 <span>  error <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  original_code <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -275,6 +280,10 @@ One of <code>"summary"</code> (default) or <code>"none"</code>.</p></dd>
 
 <dt><code>survived</code></dt>
 <dd><p>Number of survived mutations</p></dd>
+
+
+<dt><code>no_coverage</code></dt>
+<dd><p>Number of mutants with no test coverage</p></dd>
 
 
 <dt><code>errors</code></dt>
@@ -320,18 +329,10 @@ One of <code>"summary"</code> (default) or <code>"none"</code>.</p></dd>
 </div>
 
 
-</div><p></p><hr><a id="method-ProgressMutationReporter-cr"></a><div class="section">
-<h3 id="method-cr-">Method <code>cr()</code><a class="anchor" aria-label="anchor" href="#method-cr-"></a></h3>
-<p>Carriage return if dynamic, newline otherwise</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ProgressMutationReporter</span><span class="op">$</span><span class="fu">cr</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-
 </div><p></p><hr><a id="method-ProgressMutationReporter-end_reporter"></a><div class="section">
 <h3 id="method-end-reporter-">Method <code>end_reporter()</code><a class="anchor" aria-label="anchor" href="#method-end-reporter-"></a></h3>
 <p>End reporter with detailed summary</p><div class="section">
-<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ProgressMutationReporter</span><span class="op">$</span><span class="fu">end_reporter</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -339,7 +340,7 @@ One of <code>"summary"</code> (default) or <code>"none"</code>.</p></dd>
 </div><p></p><hr><a id="method-ProgressMutationReporter-print"></a><div class="section">
 <h3 id="method-print-">Method <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code><a class="anchor" aria-label="anchor" href="#method-print-"></a></h3>
 <p>Print the mutation test result with survived diffs</p><div class="section">
-<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ProgressMutationReporter</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -347,7 +348,7 @@ One of <code>"summary"</code> (default) or <code>"none"</code>.</p></dd>
 </div><p></p><hr><a id="method-ProgressMutationReporter-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
+<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ProgressMutationReporter</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -373,7 +374,7 @@ One of <code>"summary"</code> (default) or <code>"none"</code>.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

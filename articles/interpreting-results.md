@@ -34,6 +34,25 @@ A 100% score does not mean there are no bugs — it means there are no
 untested bugs *of the kinds the mutators probe*. Start with the
 survivors; they are the actionable signal.
 
+## [The HTML report](https://jakubsob.github.io/muttest/report/muttest.md)
+
+For anything bigger than a couple of files, review survivors in the HTML
+report instead of the terminal. Run muttest with `JSONMutationReporter`,
+then render the report:
+
+``` r
+
+muttest(plan, reporter = JSONMutationReporter$new())
+report()
+```
+
+The report opens filtered to survived mutants, overlays each mutant on
+its source line, and shows the exact diff that your tests failed to
+notice.
+
+[See a live example
+report](https://jakubsob.github.io/muttest/report/muttest.md).
+
 ------------------------------------------------------------------------
 
 ### Example: Mean Absolute Deviation — Direction-Insensitive Assertion
@@ -72,12 +91,12 @@ This checks a property of the output rather than its value.
 **Mutation testing output:**
 
     ℹ Mutation Testing
-      |   K |   S |   E |   T |   % | Mutator  | File 
-    x |   0 |   1 |   0 |   1 |   0 | - → +    | mad.R 
+      |   K |   S |   N |   E |   T |   % | Mutator  | File 
+    x |   0 |   1 |   0 |   0 |   1 |   0 | - → +    | mad.R 
 
 
     ── Results ─────────────────────────────────────────────────────────────────────
-    [ KILLED 0 | SURVIVED 1 | ERRORS 0 | TOTAL 1 | SCORE 0.0% ]
+    [ KILLED 0 | SURVIVED 1 | NO COVERAGE 0 | ERRORS 0 | TOTAL 1 | SCORE 0.0% ]
 
 `- → +` survives. Changing `x - center` to `x + center` gives a
 different number, but `abs(x + center)` is also non-negative for all
@@ -108,12 +127,12 @@ test fails.
 **After the fix:**
 
     ℹ Mutation Testing
-      |   K |   S |   E |   T |   % | Mutator  | File 
-    ✔ |   1 |   0 |   0 |   1 | 100 | - → +    | mad.R 
+      |   K |   S |   N |   E |   T |   % | Mutator  | File 
+    ✔ |   1 |   0 |   0 |   0 |   1 | 100 | - → +    | mad.R 
 
 
     ── Results ─────────────────────────────────────────────────────────────────────
-    [ KILLED 1 | SURVIVED 0 | ERRORS 0 | TOTAL 1 | SCORE 100.0% ]
+    [ KILLED 1 | SURVIVED 0 | NO COVERAGE 0 | ERRORS 0 | TOTAL 1 | SCORE 100.0% ]
 
 > When an arithmetic mutant survives, replace directional assertions
 > (`expect_gt`, `expect_gte`) with exact-value assertions
@@ -132,6 +151,9 @@ precise boundary value kills it.
 
 ``` r
 
+apply_discount <- function(price) {
+  price - 1
+}
 shipping_cost <- function(weight_kg) {
   if (weight_kg > 5) 15.00 else 5.00
 }
@@ -157,13 +179,13 @@ boundary — so it never exercises the value 5 itself.
 **Mutation testing output:**
 
     ℹ Mutation Testing
-      |   K |   S |   E |   T |   % | Mutator  | File 
-    ✔ |   1 |   0 |   0 |   1 | 100 | > → <    | shipping.R 
-    x |   1 |   1 |   0 |   2 |  50 | > → >=   | shipping.R 
+      |   K |   S |   N |   E |   T |   % | Mutator  | File 
+    ✔ |   1 |   0 |   0 |   0 |   1 | 100 | > → <    | shipping.R 
+    x |   1 |   1 |   0 |   0 |   2 |  50 | > → >=   | shipping.R 
 
 
     ── Results ─────────────────────────────────────────────────────────────────────
-    [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
+    [ KILLED 1 | SURVIVED 1 | NO COVERAGE 0 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
 
 `> → >=` survives. Changing `weight_kg > 5` to `weight_kg >= 5` only
 affects input `weight_kg = 5` exactly. For inputs 10 and 2, the function
@@ -193,13 +215,13 @@ condition is `FALSE` and the function returns `5.00`. With `>= 5`, it is
 **After the fix:**
 
     ℹ Mutation Testing
-      |   K |   S |   E |   T |   % | Mutator  | File 
-    ✔ |   1 |   0 |   0 |   1 | 100 | > → <    | shipping.R 
-    ✔ |   2 |   0 |   0 |   2 | 100 | > → >=   | shipping.R 
+      |   K |   S |   N |   E |   T |   % | Mutator  | File 
+    ✔ |   1 |   0 |   0 |   0 |   1 | 100 | > → <    | shipping.R 
+    ✔ |   2 |   0 |   0 |   0 |   2 | 100 | > → >=   | shipping.R 
 
 
     ── Results ─────────────────────────────────────────────────────────────────────
-    [ KILLED 2 | SURVIVED 0 | ERRORS 0 | TOTAL 2 | SCORE 100.0% ]
+    [ KILLED 2 | SURVIVED 0 | NO COVERAGE 0 | ERRORS 0 | TOTAL 2 | SCORE 100.0% ]
 
 > When a comparison mutant survives, find the boundary value implied by
 > the operator and add a test that passes exactly that value.

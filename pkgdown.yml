@@ -1,5 +1,5 @@
 pandoc: 3.8.3
-pkgdown: 2.2.0
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   ci-integration: ci-integration.html
@@ -7,7 +7,7 @@ articles:
   interpreting-results: interpreting-results.html
   mutation-testing-101: mutation-testing-101.html
   mutators: mutators.html
-last_built: 2026-07-05T08:57Z
+last_built: 2026-07-20T11:15Z
 urls:
   reference: https://jakubsob.github.io/muttest/reference
   article: https://jakubsob.github.io/muttest/articles

@@ -189,12 +189,12 @@ target.</p>
 rather than its value.</p>
 <p><strong>Mutation testing output:</strong></p>
 <pre><code>ℹ Mutation Testing
-  |   K |   S |   E |   T |   % | Mutator  | File 
-x |   0 |   1 |   0 |   1 |   0 | - → +    | mad.R 
+  |   K |   S |   N |   E |   T |   % | Mutator  | File 
+x |   0 |   1 |   0 |   0 |   1 |   0 | - → +    | mad.R 
 
 
 ── Results ─────────────────────────────────────────────────────────────────────
-[ KILLED 0 | SURVIVED 1 | ERRORS 0 | TOTAL 1 | SCORE 0.0% ]
+[ KILLED 0 | SURVIVED 1 | NO COVERAGE 0 | ERRORS 0 | TOTAL 1 | SCORE 0.0% ]
 </code></pre>
 <p><code>- → +</code> survives. Changing <code>x - center</code> to
 <code>x + center</code> gives a different number, but
@@ -221,12 +221,12 @@ a value computed by hand. Now the mutant returns 6, which is not 4/3,
 and the test fails.</p>
 <p><strong>After the fix:</strong></p>
 <pre><code>ℹ Mutation Testing
-  |   K |   S |   E |   T |   % | Mutator  | File 
-✔ |   1 |   0 |   0 |   1 | 100 | - → +    | mad.R 
+  |   K |   S |   N |   E |   T |   % | Mutator  | File 
+✔ |   1 |   0 |   0 |   0 |   1 | 100 | - → +    | mad.R 
 
 
 ── Results ─────────────────────────────────────────────────────────────────────
-[ KILLED 1 | SURVIVED 0 | ERRORS 0 | TOTAL 1 | SCORE 100.0% ]
+[ KILLED 1 | SURVIVED 0 | NO COVERAGE 0 | ERRORS 0 | TOTAL 1 | SCORE 100.0% ]
 </code></pre>
 <blockquote>
 <p>When an arithmetic mutant survives, replace directional assertions
@@ -296,7 +296,10 @@ that precise boundary value kills it.</p>
 <h4 id="the-function-1">The function<a class="anchor" aria-label="anchor" href="#the-function-1"></a>
 </h4>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">shipping_cost</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">weight_kg</span><span class="op">)</span> <span class="op">{</span></span>
+<code class="sourceCode R"><span><span class="va">apply_discount</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">price</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">price</span> <span class="op">-</span> <span class="fl">1</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">shipping_cost</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">weight_kg</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="va">weight_kg</span> <span class="op">&gt;</span> <span class="fl">5</span><span class="op">)</span> <span class="fl">15.00</span> <span class="kw">else</span> <span class="fl">5.00</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p><code>shipping_cost</code> returns a flat rate based on whether the
@@ -316,13 +319,13 @@ It passes inputs of 10 and 2 kg — both clearly on opposite sides of the
 boundary — so it never exercises the value 5 itself.</p>
 <p><strong>Mutation testing output:</strong></p>
 <pre><code>ℹ Mutation Testing
-  |   K |   S |   E |   T |   % | Mutator  | File 
-✔ |   1 |   0 |   0 |   1 | 100 | &gt; → &lt;    | shipping.R 
-x |   1 |   1 |   0 |   2 |  50 | &gt; → &gt;=   | shipping.R 
+  |   K |   S |   N |   E |   T |   % | Mutator  | File 
+✔ |   1 |   0 |   0 |   0 |   1 | 100 | &gt; → &lt;    | shipping.R 
+x |   1 |   1 |   0 |   0 |   2 |  50 | &gt; → &gt;=   | shipping.R 
 
 
 ── Results ─────────────────────────────────────────────────────────────────────
-[ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
+[ KILLED 1 | SURVIVED 1 | NO COVERAGE 0 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
 </code></pre>
 <p><code>&gt; → &gt;=</code> survives. Changing
 <code>weight_kg &gt; 5</code> to <code>weight_kg &gt;= 5</code> only
@@ -351,13 +354,13 @@ function returns <code>5.00</code>. With <code>&gt;= 5</code>, it is
 the mutant.</p>
 <p><strong>After the fix:</strong></p>
 <pre><code>ℹ Mutation Testing
-  |   K |   S |   E |   T |   % | Mutator  | File 
-✔ |   1 |   0 |   0 |   1 | 100 | &gt; → &lt;    | shipping.R 
-✔ |   2 |   0 |   0 |   2 | 100 | &gt; → &gt;=   | shipping.R 
+  |   K |   S |   N |   E |   T |   % | Mutator  | File 
+✔ |   1 |   0 |   0 |   0 |   1 | 100 | &gt; → &lt;    | shipping.R 
+✔ |   2 |   0 |   0 |   0 |   2 | 100 | &gt; → &gt;=   | shipping.R 
 
 
 ── Results ─────────────────────────────────────────────────────────────────────
-[ KILLED 2 | SURVIVED 0 | ERRORS 0 | TOTAL 2 | SCORE 100.0% ]
+[ KILLED 2 | SURVIVED 0 | NO COVERAGE 0 | ERRORS 0 | TOTAL 2 | SCORE 100.0% ]
 </code></pre>
 <blockquote>
 <p>When a comparison mutant survives, find the boundary value implied by
@@ -434,12 +437,12 @@ access) and both <code>FALSE</code> (should deny access). These are the
 simple scenarios without thinking about individual flag variation.</p>
 <p><strong>Mutation testing output:</strong></p>
 <pre><code>ℹ Mutation Testing
-  |   K |   S |   E |   T |   % | Mutator  | File 
-x |   0 |   1 |   0 |   1 |   0 | || → &amp;&amp;  | access.R 
+  |   K |   S |   N |   E |   T |   % | Mutator  | File 
+x |   0 |   1 |   0 |   0 |   1 |   0 | || → &amp;&amp;  | access.R 
 
 
 ── Results ─────────────────────────────────────────────────────────────────────
-[ KILLED 0 | SURVIVED 1 | ERRORS 0 | TOTAL 1 | SCORE 0.0% ]
+[ KILLED 0 | SURVIVED 1 | NO COVERAGE 0 | ERRORS 0 | TOTAL 1 | SCORE 0.0% ]
 </code></pre>
 <p><code>|| → &amp;&amp;</code> survives for both test cases:</p>
 <ul>
@@ -482,12 +485,12 @@ operators across the entire test suite.</p>
 This difference kills the mutant.</p>
 <p><strong>After the fix:</strong></p>
 <pre><code>ℹ Mutation Testing
-  |   K |   S |   E |   T |   % | Mutator  | File 
-✔ |   1 |   0 |   0 |   1 | 100 | || → &amp;&amp;  | access.R 
+  |   K |   S |   N |   E |   T |   % | Mutator  | File 
+✔ |   1 |   0 |   0 |   0 |   1 | 100 | || → &amp;&amp;  | access.R 
 
 
 ── Results ─────────────────────────────────────────────────────────────────────
-[ KILLED 1 | SURVIVED 0 | ERRORS 0 | TOTAL 1 | SCORE 100.0% ]
+[ KILLED 1 | SURVIVED 0 | NO COVERAGE 0 | ERRORS 0 | TOTAL 1 | SCORE 100.0% ]
 </code></pre>
 <blockquote>
 <p>When a logical operator mutant survives, add tests with asymmetric
@@ -880,7 +883,7 @@ ones.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

@@ -30,12 +30,12 @@ muttest(
 - reporter:
 
   Reporter to use for mutation testing results. See
-  [`?MutationReporter`](https://jakubsob.github.io/muttest/reference/MutationReporter.md).
+  [MutationReporter](https://jakubsob.github.io/muttest/reference/MutationReporter.md).
 
 - test_strategy:
 
   Strategy for running tests. See
-  [`?TestStrategy`](https://jakubsob.github.io/muttest/reference/TestStrategy.md).
+  [TestStrategy](https://jakubsob.github.io/muttest/reference/TestStrategy.md).
   The purpose of test strategy is to control how tests are executed. We
   can run all tests for each mutant, or only tests that are relevant to
   the mutant.
@@ -43,7 +43,7 @@ muttest(
 - copy_strategy:
 
   Strategy for copying the project. See
-  [`?CopyStrategy`](https://jakubsob.github.io/muttest/reference/CopyStrategy.md).
+  [CopyStrategy](https://jakubsob.github.io/muttest/reference/CopyStrategy.md).
   This strategy controls which files are copied to the temporary
   directory, where the tests are run.
 

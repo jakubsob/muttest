@@ -174,6 +174,21 @@ these specific changes.</td>
 <p>A 100% score does not mean there are no bugs — it means there are no
 untested bugs <em>of the kinds the mutators probe</em>. Start with the
 survivors; they are the actionable signal.</p>
+</div>
+<div class="section level2">
+<h2 id="the-html-report">
+<a href="../report/muttest.html">The HTML report</a><a class="anchor" aria-label="anchor" href="#the-html-report"></a>
+</h2>
+<p>For anything bigger than a couple of files, review survivors in the
+HTML report instead of the terminal. Run muttest with
+<code>JSONMutationReporter</code>, then render the report:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/muttest.html">muttest</a></span><span class="op">(</span><span class="va">plan</span>, reporter <span class="op">=</span> <span class="va"><a href="../reference/JSONMutationReporter.html">JSONMutationReporter</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/report.html">report</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>The report opens filtered to survived mutants, overlays each mutant
+on its source line, and shows the exact diff that your tests failed to
+notice.</p>
+<p><a href="../report/muttest.html">See a live example report</a>.</p>
 <hr>
 <div class="section level3">
 <h3 id="example-mean-absolute-deviation-direction-insensitive-assertion">Example: Mean Absolute Deviation — Direction-Insensitive
@@ -187,7 +202,7 @@ directional assertion with an exact-value assertion kills it.</p>
 <div class="section level4">
 <h4 id="the-function">The function<a class="anchor" aria-label="anchor" href="#the-function"></a>
 </h4>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mean_absolute_deviation</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">center</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="va">center</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
@@ -199,7 +214,7 @@ target.</p>
 <div class="section level4">
 <h4 id="weak-test">Weak test<a class="anchor" aria-label="anchor" href="#weak-test"></a>
 </h4>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">test_that</span><span class="op">(</span><span class="st">"mean absolute deviation is non-negative"</span>, <span class="op">{</span></span>
 <span>  <span class="fu">expect_gte</span><span class="op">(</span><span class="fu">mean_absolute_deviation</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">5</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
@@ -208,12 +223,12 @@ target.</p>
 rather than its value.</p>
 <p><strong>Mutation testing output:</strong></p>
 <pre><code>ℹ Mutation Testing
-  |   K |   S |   E |   T |   % | Mutator  | File 
-x |   0 |   1 |   0 |   1 |   0 | - → +    | mad.R 
+  |   K |   S |   N |   E |   T |   % | Mutator  | File 
+x |   0 |   1 |   0 |   0 |   1 |   0 | - → +    | mad.R 
 
 
 ── Results ─────────────────────────────────────────────────────────────────────
-[ KILLED 0 | SURVIVED 1 | ERRORS 0 | TOTAL 1 | SCORE 0.0% ]
+[ KILLED 0 | SURVIVED 1 | NO COVERAGE 0 | ERRORS 0 | TOTAL 1 | SCORE 0.0% ]
 </code></pre>
 <p><code>- → +</code> survives. Changing <code>x - center</code> to
 <code>x + center</code> gives a different number, but
@@ -231,7 +246,7 @@ rather than what is <em>specifically correct</em>.</p>
 <div class="section level4">
 <h4 id="the-fix">The fix<a class="anchor" aria-label="anchor" href="#the-fix"></a>
 </h4>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">test_that</span><span class="op">(</span><span class="st">"mean absolute deviation equals average distance from center"</span>, <span class="op">{</span></span>
 <span>  <span class="fu">expect_equal</span><span class="op">(</span><span class="fu">mean_absolute_deviation</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">5</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fl">4</span> <span class="op">/</span> <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
@@ -240,12 +255,12 @@ a value computed by hand. Now the mutant returns 6, which is not 4/3,
 and the test fails.</p>
 <p><strong>After the fix:</strong></p>
 <pre><code>ℹ Mutation Testing
-  |   K |   S |   E |   T |   % | Mutator  | File 
-✔ |   1 |   0 |   0 |   1 | 100 | - → +    | mad.R 
+  |   K |   S |   N |   E |   T |   % | Mutator  | File 
+✔ |   1 |   0 |   0 |   0 |   1 | 100 | - → +    | mad.R 
 
 
 ── Results ─────────────────────────────────────────────────────────────────────
-[ KILLED 1 | SURVIVED 0 | ERRORS 0 | TOTAL 1 | SCORE 100.0% ]
+[ KILLED 1 | SURVIVED 0 | NO COVERAGE 0 | ERRORS 0 | TOTAL 1 | SCORE 100.0% ]
 </code></pre>
 <blockquote>
 <p>When an arithmetic mutant survives, replace directional assertions
@@ -266,8 +281,11 @@ that precise boundary value kills it.</p>
 <div class="section level4">
 <h4 id="the-function-1">The function<a class="anchor" aria-label="anchor" href="#the-function-1"></a>
 </h4>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">shipping_cost</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">weight_kg</span><span class="op">)</span> <span class="op">{</span></span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">apply_discount</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">price</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">price</span> <span class="op">-</span> <span class="fl">1</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">shipping_cost</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">weight_kg</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="va">weight_kg</span> <span class="op">&gt;</span> <span class="fl">5</span><span class="op">)</span> <span class="fl">15.00</span> <span class="kw">else</span> <span class="fl">5.00</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p><code>shipping_cost</code> returns a flat rate based on whether the
@@ -278,7 +296,7 @@ charge it the higher rate.</p>
 <div class="section level4">
 <h4 id="weak-test-1">Weak test<a class="anchor" aria-label="anchor" href="#weak-test-1"></a>
 </h4>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">test_that</span><span class="op">(</span><span class="st">"heavy packages cost more than light ones"</span>, <span class="op">{</span></span>
 <span>  <span class="fu">expect_gt</span><span class="op">(</span><span class="fu">shipping_cost</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>, <span class="fu">shipping_cost</span><span class="op">(</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
@@ -287,13 +305,13 @@ It passes inputs of 10 and 2 kg — both clearly on opposite sides of the
 boundary — so it never exercises the value 5 itself.</p>
 <p><strong>Mutation testing output:</strong></p>
 <pre><code>ℹ Mutation Testing
-  |   K |   S |   E |   T |   % | Mutator  | File 
-✔ |   1 |   0 |   0 |   1 | 100 | &gt; → &lt;    | shipping.R 
-x |   1 |   1 |   0 |   2 |  50 | &gt; → &gt;=   | shipping.R 
+  |   K |   S |   N |   E |   T |   % | Mutator  | File 
+✔ |   1 |   0 |   0 |   0 |   1 | 100 | &gt; → &lt;    | shipping.R 
+x |   1 |   1 |   0 |   0 |   2 |  50 | &gt; → &gt;=   | shipping.R 
 
 
 ── Results ─────────────────────────────────────────────────────────────────────
-[ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
+[ KILLED 1 | SURVIVED 1 | NO COVERAGE 0 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
 </code></pre>
 <p><code>&gt; → &gt;=</code> survives. Changing
 <code>weight_kg &gt; 5</code> to <code>weight_kg &gt;= 5</code> only
@@ -307,7 +325,7 @@ the regression.</p>
 <div class="section level4">
 <h4 id="the-fix-1">The fix<a class="anchor" aria-label="anchor" href="#the-fix-1"></a>
 </h4>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">test_that</span><span class="op">(</span><span class="st">"heavy packages cost more than light ones"</span>, <span class="op">{</span></span>
 <span>  <span class="fu">expect_gt</span><span class="op">(</span><span class="fu">shipping_cost</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>, <span class="fu">shipping_cost</span><span class="op">(</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
@@ -322,13 +340,13 @@ function returns <code>5.00</code>. With <code>&gt;= 5</code>, it is
 the mutant.</p>
 <p><strong>After the fix:</strong></p>
 <pre><code>ℹ Mutation Testing
-  |   K |   S |   E |   T |   % | Mutator  | File 
-✔ |   1 |   0 |   0 |   1 | 100 | &gt; → &lt;    | shipping.R 
-✔ |   2 |   0 |   0 |   2 | 100 | &gt; → &gt;=   | shipping.R 
+  |   K |   S |   N |   E |   T |   % | Mutator  | File 
+✔ |   1 |   0 |   0 |   0 |   1 | 100 | &gt; → &lt;    | shipping.R 
+✔ |   2 |   0 |   0 |   0 |   2 | 100 | &gt; → &gt;=   | shipping.R 
 
 
 ── Results ─────────────────────────────────────────────────────────────────────
-[ KILLED 2 | SURVIVED 0 | ERRORS 0 | TOTAL 2 | SCORE 100.0% ]
+[ KILLED 2 | SURVIVED 0 | NO COVERAGE 0 | ERRORS 0 | TOTAL 2 | SCORE 100.0% ]
 </code></pre>
 <blockquote>
 <p>When a comparison mutant survives, find the boundary value implied by
@@ -393,7 +411,7 @@ that is your actionable signal.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

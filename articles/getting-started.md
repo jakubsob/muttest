@@ -99,13 +99,13 @@ the tests cannot tell the operators apart.
 **Mutation testing output:**
 
     ℹ Mutation Testing
-      |   K |   S |   E |   T |   % | Mutator  | File 
-    ✔ |   1 |   0 |   0 |   1 | 100 | >= → <=  | is_adult.R 
-    x |   1 |   1 |   0 |   2 |  50 | >= → >   | is_adult.R 
+      |   K |   S |   N |   E |   T |   % | Mutator  | File 
+    ✔ |   1 |   0 |   0 |   0 |   1 | 100 | >= → <=  | is_adult.R 
+    x |   1 |   1 |   0 |   0 |   2 |  50 | >= → >   | is_adult.R 
 
 
     ── Results ─────────────────────────────────────────────────────────────────────
-    [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
+    [ KILLED 1 | SURVIVED 1 | NO COVERAGE 0 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
 
 `>= → >` survives. Changing `age >= 18` to `age > 18` only affects one
 input — `age = 18` exactly. The tests never pass 18, so the function
@@ -135,13 +135,13 @@ returns `FALSE`. This difference kills the mutant.
 **After the fix:**
 
     ℹ Mutation Testing
-      |   K |   S |   E |   T |   % | Mutator  | File 
-    ✔ |   1 |   0 |   0 |   1 | 100 | >= → <=  | is_adult.R 
-    ✔ |   2 |   0 |   0 |   2 | 100 | >= → >   | is_adult.R 
+      |   K |   S |   N |   E |   T |   % | Mutator  | File 
+    ✔ |   1 |   0 |   0 |   0 |   1 | 100 | >= → <=  | is_adult.R 
+    ✔ |   2 |   0 |   0 |   0 |   2 | 100 | >= → >   | is_adult.R 
 
 
     ── Results ─────────────────────────────────────────────────────────────────────
-    [ KILLED 2 | SURVIVED 0 | ERRORS 0 | TOTAL 2 | SCORE 100.0% ]
+    [ KILLED 2 | SURVIVED 0 | NO COVERAGE 0 | ERRORS 0 | TOTAL 2 | SCORE 100.0% ]
 
 > When a comparison mutant survives, find the boundary value implied by
 > the operator and add a test that passes exactly that value.

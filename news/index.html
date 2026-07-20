@@ -52,7 +52,14 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0" id="muttest-030">muttest 0.3.0<a class="anchor" aria-label="anchor" href="#muttest-030"></a></h2>
-<ul><li>🐛 Added missing <code>digest</code> and <code>tools</code> to Imports.</li>
+<ul><li>✨ New <code>JSONMutationReporter</code> writes a report conforming to the <a href="https://stryker-mutator.io" class="external-link">mutation-testing-elements</a> schema, a cross-language standard shared by StrykerJS/.NET/Scala — so muttest output can be fed to any schema-compatible tooling.</li>
+<li>✨ New <code><a href="../reference/report.html">report()</a></code> renders a self-contained, source-annotated HTML report (overall score, per-file breakdown, per-line mutant diffs, status filtering, keyboard navigation) from a <code>JSONMutationReporter</code> file.</li>
+<li>✨ New <code>MultiReporter</code> fans reporter events out to several reporters at once, e.g. a live <code>ProgressMutationReporter</code> alongside a <code>JSONMutationReporter</code>.</li>
+<li>❗️ A mutant that makes tests <em>error</em> (rather than fail an expectation) is now scored as killed, matching PIT/Stryker/mutmut. Previously it was counted as survived.</li>
+<li>❗️ Mutants with no test coverage (no matching test file under <code>FileTestStrategy</code>) are now reported as a separate <code>no coverage</code> category and excluded from the score, so untested code no longer looks like escaped mutants. The score is now <code>killed / (killed + survived + errors)</code>. <code>FullTestStrategy</code> scores are unaffected.</li>
+<li>✨ <code>PackageCopyStrategy</code> gained a <code>symlink</code> argument. When <code>TRUE</code>, only the mutated file’s top-level directory is copied and everything else is symlinked to the original, avoiding a full project copy per mutant (helpful for packages with large <code>inst/</code>/<code>data/</code>). Defaults to <code>FALSE</code>; unsafe if the test suite writes into the package’s own directories.</li>
+<li>🐛 <code>FileTestStrategy</code> now matches test files by exact name instead of an unanchored regex, so a source file like <code>mod.R</code> no longer runs <code>test-model.R</code> and filenames with regex metacharacters are handled correctly.</li>
+<li>🐛 Added missing <code>digest</code> and <code>tools</code> to Imports.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.1" id="muttest-021">muttest 0.2.1<a class="anchor" aria-label="anchor" href="#muttest-021"></a></h2><p class="text-muted">CRAN release: 2026-06-24</p>
@@ -135,7 +142,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

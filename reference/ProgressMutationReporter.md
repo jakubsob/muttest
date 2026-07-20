@@ -7,6 +7,8 @@ whether they were killed by tests.
 ## See also
 
 Other MutationReporter:
+[`JSONMutationReporter`](https://jakubsob.github.io/muttest/reference/JSONMutationReporter.md),
+[`MultiReporter`](https://jakubsob.github.io/muttest/reference/MultiReporter.md),
 [`MutationReporter`](https://jakubsob.github.io/muttest/reference/MutationReporter.md),
 [`default_reporter()`](https://jakubsob.github.io/muttest/reference/default_reporter.md)
 
@@ -57,8 +59,6 @@ Other MutationReporter:
 
 - [`ProgressMutationReporter$end_file()`](#method-ProgressMutationReporter-end_file)
 
-- [`ProgressMutationReporter$cr()`](#method-ProgressMutationReporter-cr)
-
 - [`ProgressMutationReporter$end_reporter()`](#method-ProgressMutationReporter-end_reporter)
 
 - [`ProgressMutationReporter$print()`](#method-ProgressMutationReporter-print)
@@ -68,7 +68,6 @@ Other MutationReporter:
 Inherited methods
 
 - [`muttest::MutationReporter$cat_line()`](https://jakubsob.github.io/muttest/reference/MutationReporter.html#method-cat_line)
-- [`muttest::MutationReporter$cat_tight()`](https://jakubsob.github.io/muttest/reference/MutationReporter.html#method-cat_tight)
 - [`muttest::MutationReporter$end_mutator()`](https://jakubsob.github.io/muttest/reference/MutationReporter.html#method-end_mutator)
 - [`muttest::MutationReporter$get_score()`](https://jakubsob.github.io/muttest/reference/MutationReporter.html#method-get_score)
 - [`muttest::MutationReporter$rule()`](https://jakubsob.github.io/muttest/reference/MutationReporter.html#method-rule)
@@ -117,7 +116,7 @@ Format a row of the report
 
 #### Usage
 
-    ProgressMutationReporter$fmt_r(status, k, s, e, t, score, mutator, file)
+    ProgressMutationReporter$fmt_r(status, k, s, n, e, t, score, mutator, file)
 
 #### Arguments
 
@@ -132,6 +131,10 @@ Format a row of the report
 - `s`:
 
   Number of survived mutations
+
+- `n`:
+
+  Number of mutations with no test coverage
 
 - `e`:
 
@@ -219,6 +222,7 @@ Add a mutation test result
       plan,
       killed,
       survived,
+      no_coverage,
       errors,
       error = NULL,
       original_code = NULL,
@@ -239,6 +243,10 @@ Add a mutation test result
 - `survived`:
 
   Number of survived mutations
+
+- `no_coverage`:
+
+  Number of mutants with no test coverage
 
 - `errors`:
 
@@ -281,16 +289,6 @@ End testing current file
 #### Usage
 
     ProgressMutationReporter$end_file()
-
-------------------------------------------------------------------------
-
-### Method `cr()`
-
-Carriage return if dynamic, newline otherwise
-
-#### Usage
-
-    ProgressMutationReporter$cr()
 
 ------------------------------------------------------------------------
 

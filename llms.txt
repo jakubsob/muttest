@@ -313,8 +313,14 @@ Control how results are displayed.
   : Reporter for Mutation Testing
 - [`ProgressMutationReporter`](https://jakubsob.github.io/muttest/reference/ProgressMutationReporter.md)
   : Progress Reporter for Mutation Testing
+- [`JSONMutationReporter`](https://jakubsob.github.io/muttest/reference/JSONMutationReporter.md)
+  : JSON Reporter for Mutation Testing
+- [`MultiReporter`](https://jakubsob.github.io/muttest/reference/MultiReporter.md)
+  : Combine Several Mutation Reporters
 - [`default_reporter()`](https://jakubsob.github.io/muttest/reference/default_reporter.md)
   : Create a default reporter
+- [`report()`](https://jakubsob.github.io/muttest/reference/report.md) :
+  Build a source-annotated HTML report from a muttest JSON file
 
 ## Strategies
 

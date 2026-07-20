@@ -110,7 +110,7 @@ are mostly glue code or just call other functions.</p>
 <p>A test plan describes <em>what</em> to mutate and <em>which</em>
 mutations to apply:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jakubsobolewski.com/muttest/" class="external-link">muttest</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jakubsob.github.io/muttest/">muttest</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/muttest_plan.html">muttest_plan</a></span><span class="op">(</span></span>
 <span>  source_files <span class="op">=</span> <span class="st">"R/is_adult.R"</span>,</span>
@@ -200,13 +200,13 @@ Both inputs return the same result whether the operator is
 operators apart.</p>
 <p><strong>Mutation testing output:</strong></p>
 <pre><code>ℹ Mutation Testing
-  |   K |   S |   E |   T |   % | Mutator  | File 
-✔ |   1 |   0 |   0 |   1 | 100 | &gt;= → &lt;=  | is_adult.R 
-x |   1 |   1 |   0 |   2 |  50 | &gt;= → &gt;   | is_adult.R 
+  |   K |   S |   N |   E |   T |   % | Mutator  | File 
+✔ |   1 |   0 |   0 |   0 |   1 | 100 | &gt;= → &lt;=  | is_adult.R 
+x |   1 |   1 |   0 |   0 |   2 |  50 | &gt;= → &gt;   | is_adult.R 
 
 
 ── Results ─────────────────────────────────────────────────────────────────────
-[ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
+[ KILLED 1 | SURVIVED 1 | NO COVERAGE 0 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]
 </code></pre>
 <p><code>&gt;= → &gt;</code> survives. Changing
 <code>age &gt;= 18</code> to <code>age &gt; 18</code> only affects one
@@ -234,13 +234,13 @@ condition is <code>TRUE</code> and the function returns
 and returns <code>FALSE</code>. This difference kills the mutant.</p>
 <p><strong>After the fix:</strong></p>
 <pre><code>ℹ Mutation Testing
-  |   K |   S |   E |   T |   % | Mutator  | File 
-✔ |   1 |   0 |   0 |   1 | 100 | &gt;= → &lt;=  | is_adult.R 
-✔ |   2 |   0 |   0 |   2 | 100 | &gt;= → &gt;   | is_adult.R 
+  |   K |   S |   N |   E |   T |   % | Mutator  | File 
+✔ |   1 |   0 |   0 |   0 |   1 | 100 | &gt;= → &lt;=  | is_adult.R 
+✔ |   2 |   0 |   0 |   0 |   2 | 100 | &gt;= → &gt;   | is_adult.R 
 
 
 ── Results ─────────────────────────────────────────────────────────────────────
-[ KILLED 2 | SURVIVED 0 | ERRORS 0 | TOTAL 2 | SCORE 100.0% ]
+[ KILLED 2 | SURVIVED 0 | NO COVERAGE 0 | ERRORS 0 | TOTAL 2 | SCORE 100.0% ]
 </code></pre>
 <blockquote>
 <p>When a comparison mutant survives, find the boundary value implied by
@@ -289,7 +289,7 @@ tests automatically on every push</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

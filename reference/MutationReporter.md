@@ -7,6 +7,8 @@ the tests killed the mutation or the mutation survived.
 ## See also
 
 Other MutationReporter:
+[`JSONMutationReporter`](https://jakubsob.github.io/muttest/reference/JSONMutationReporter.md),
+[`MultiReporter`](https://jakubsob.github.io/muttest/reference/MultiReporter.md),
 [`ProgressMutationReporter`](https://jakubsob.github.io/muttest/reference/ProgressMutationReporter.md),
 [`default_reporter()`](https://jakubsob.github.io/muttest/reference/default_reporter.md)
 
@@ -87,8 +89,6 @@ Other MutationReporter:
 - [`MutationReporter$end_reporter()`](#method-MutationReporter-end_reporter)
 
 - [`MutationReporter$get_score()`](#method-MutationReporter-get_score)
-
-- [`MutationReporter$cat_tight()`](#method-MutationReporter-cat_tight)
 
 - [`MutationReporter$cat_line()`](#method-MutationReporter-cat_line)
 
@@ -180,6 +180,7 @@ Add a mutation test result
       plan,
       killed,
       survived,
+      no_coverage,
       errors,
       error = NULL,
       original_code = NULL,
@@ -200,6 +201,10 @@ Add a mutation test result
 - `survived`:
 
   Number of survived mutations
+
+- `no_coverage`:
+
+  Number of mutants with no test coverage
 
 - `errors`:
 
@@ -272,22 +277,6 @@ Get the current score
 #### Usage
 
     MutationReporter$get_score()
-
-------------------------------------------------------------------------
-
-### Method `cat_tight()`
-
-Print a message to the output
-
-#### Usage
-
-    MutationReporter$cat_tight(...)
-
-#### Arguments
-
-- `...`:
-
-  Message to print
 
 ------------------------------------------------------------------------
 

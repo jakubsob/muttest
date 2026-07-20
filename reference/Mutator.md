@@ -115,8 +115,10 @@ Apply this mutator to a character vector of source lines.
 
 #### Returns
 
-A list of mutated code variants (one per match), or `NULL` if the
-pattern was not found.
+A list of mutation records (one per match), each a list with `code`
+(mutated source lines), `location` (1-based `start`/`end` line/column),
+and `replacement` (the inserted text), or `NULL` if the pattern was not
+found.
 
 ------------------------------------------------------------------------
 

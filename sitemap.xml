@@ -15,6 +15,8 @@
 <url><loc>https://jakubsob.github.io/muttest/reference/CopyStrategy.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/reference/FileTestStrategy.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/reference/FullTestStrategy.html</loc></url>
+<url><loc>https://jakubsob.github.io/muttest/reference/JSONMutationReporter.html</loc></url>
+<url><loc>https://jakubsob.github.io/muttest/reference/MultiReporter.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/reference/MutationReporter.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/reference/Mutator.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/reference/PackageCopyStrategy.html</loc></url>
@@ -47,8 +49,10 @@
 <url><loc>https://jakubsob.github.io/muttest/reference/remove_condition_negation.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/reference/remove_negation.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/reference/replace_return_value.html</loc></url>
+<url><loc>https://jakubsob.github.io/muttest/reference/report.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/reference/string_empty.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/reference/string_fill.html</loc></url>
 <url><loc>https://jakubsob.github.io/muttest/reference/string_literals.html</loc></url>
+<url><loc>https://jakubsob.github.io/muttest/report/muttest.html</loc></url>
 </urlset>
 
