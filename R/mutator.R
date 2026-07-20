@@ -71,3 +71,79 @@ Mutator <- R6::R6Class(
     # nocov end
   )
 )
+
+
+info_oneline <- function(m) {
+  paste(m$from, SYMBOLS$arrow, m$to)
+}
+
+# 1-based, end-exclusive location of a treesitter node (points are 0-based).
+node_location <- function(node) {
+  s <- treesitter::node_start_point(node)
+  e <- treesitter::node_end_point(node)
+  list(
+    start = list(line = s$row + 1L, column = s$column + 1L),
+    end = list(line = e$row + 1L, column = e$column + 1L)
+  )
+}
+
+replace_with <- function(code, node, replacement_text) {
+  start_point <- treesitter::node_start_point(node)
+  original_text <- treesitter::node_text(node)
+  code[start_point$row + 1] <- paste0(
+    substr(code[start_point$row + 1], 1, start_point$column),
+    replacement_text,
+    substr(
+      code[start_point$row + 1],
+      start_point$column + nchar(original_text) + 1,
+      nchar(code[start_point$row + 1])
+    )
+  )
+  list(code = code, location = node_location(node), replacement = replacement_text)
+}
+
+mutate_code <- function(code, mutator) {
+  language <- treesitter.r::language()
+  parser <- treesitter::parser(language)
+  treesitter_code <- paste(code, collapse = "\n")
+  tree <- treesitter::parser_parse(parser, treesitter_code)
+  root_node <- treesitter::tree_root_node(tree)
+
+  query <- treesitter::query(language, mutator$query)
+
+  mutations <- list()
+
+  captures <- treesitter::query_captures(query, root_node)
+
+  if (length(captures$node) == 0) {
+    return(NULL)
+  }
+
+  for (i in seq_along(captures$node)) {
+    # By convention all queries name the node to mutate @target. Structural
+    # captures (e.g. @lhs, @rhs, @keyword) are present only for predicate
+    # filtering and must be skipped here to avoid spurious mutants.
+    if (captures$name[[i]] != "target") next
+    node <- captures$node[[i]]
+    node_text <- treesitter::node_text(node)
+
+    matches_node <- if (!is.null(mutator$match_fn)) {
+      mutator$match_fn(node_text)
+    } else {
+      node_text == mutator$from
+    }
+
+    if (!matches_node) next
+
+    replacement <- if (!is.null(mutator$replacement_fn)) {
+      mutator$replacement_fn(node_text)
+    } else {
+      mutator$to
+    }
+
+    mutations <- append(mutations, list(replace_with(code, node, replacement)))
+  }
+
+  if (length(mutations) == 0) return(NULL)
+  mutations
+}
