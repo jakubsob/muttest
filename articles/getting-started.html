@@ -132,6 +132,10 @@ For <code>&gt;=</code> it produces two mutants: <code>&gt;=</code> →
 </h2>
 <p>Each column in the progress table means:</p>
 <table class="table">
+<colgroup>
+<col width="11%">
+<col width="88%">
+</colgroup>
 <thead><tr class="header">
 <th>Column</th>
 <th>Meaning</th>
@@ -147,22 +151,28 @@ For <code>&gt;=</code> it produces two mutants: <code>&gt;=</code> →
 </tr>
 <tr class="odd">
 <td>E</td>
-<td>Errors — mutants that caused unexpected errors</td>
+<td>Errors — mutated code errored; counted as killed</td>
 </tr>
 <tr class="even">
+<td>N</td>
+<td>No coverage — no test exercised the mutant; excluded from the
+score</td>
+</tr>
+<tr class="odd">
 <td>T</td>
 <td>Total mutants for this mutator/file combination</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>%</td>
 <td>Mutation score for this row</td>
 </tr>
 </tbody>
 </table>
 <p>The <strong>mutation score</strong> is
-<code>Killed / Total × 100%</code>. A <code>✔</code> row means at least
-one mutant was killed; an <code>x</code> row means all mutants
-survived.</p>
+<code>(Killed + Errors) / (Killed + Survived + Errors) × 100%</code> —
+errored mutants count as detected, no-coverage mutants are excluded. A
+<code>✔</code> row means at least one mutant was killed; an
+<code>x</code> row means all mutants survived.</p>
 <p>Here is a complete example showing a weak test, the live output, and
 the fix:</p>
 <div class="section level3">

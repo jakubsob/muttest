@@ -154,11 +154,11 @@
 <span>  <span class="fu">muttest</span><span class="fu">::</span><span class="fu"><a href="reference/muttest.html">muttest</a></span><span class="op">(</span><span class="va">plan</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ℹ Mutation Testing</span></span>
-<span><span class="co">#&gt;   |   K |   S |   E |   T |   % | Mutator  | File </span></span>
-<span><span class="co">#&gt; ✔ |   1 |   0 |   0 |   1 | 100 | &gt;= → &lt;=  | is_adult.R </span></span>
-<span><span class="co">#&gt; x |   1 |   1 |   0 |   2 |  50 | &gt;= → &gt;   | is_adult.R </span></span>
+<span><span class="co">#&gt;   |   K |   S |   N |   E |   T |   % | Mutator  | File </span></span>
+<span><span class="co">#&gt; ✔ |   1 |   0 |   0 |   0 |   1 | 100 | &gt;= → &lt;=  | is_adult.R </span></span>
+<span><span class="co">#&gt; x |   1 |   1 |   0 |   0 |   2 |  50 | &gt;= → &gt;   | is_adult.R </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Duration: 1.99 s</span></span>
+<span><span class="co">#&gt; Duration: 1.38 s</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── Survived Mutants ────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; is_adult.R  &gt;= → &gt;</span></span>
@@ -166,8 +166,8 @@
 <span><span class="co">#&gt;   2+   age &gt; 18</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── Results ─────────────────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; [ KILLED 1 | SURVIVED 1 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]</span></span></code></pre></div>
-<p>The mutation score is: <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Mutation Score</mtext><mo>=</mo><mfrac><mtext mathvariant="normal">Killed Mutants</mtext><mtext mathvariant="normal">Total Mutants</mtext></mfrac><mo>×</mo><mn>100</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">\text{Mutation Score} = \frac{\text{Killed Mutants}}{\text{Total Mutants}} \times 100\%</annotation></semantics></math>, where a Mutant is defined as variant of the original code that is used to test the robustness of the test suite.</p>
+<span><span class="co">#&gt; [ KILLED 1 | SURVIVED 1 | NO COVERAGE 0 | ERRORS 0 | TOTAL 2 | SCORE 50.0% ]</span></span></code></pre></div>
+<p>The mutation score is: <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Mutation Score</mtext><mo>=</mo><mfrac><mrow><mtext mathvariant="normal">Killed</mtext><mo>+</mo><mtext mathvariant="normal">Errors</mtext></mrow><mrow><mtext mathvariant="normal">Killed</mtext><mo>+</mo><mtext mathvariant="normal">Survived</mtext><mo>+</mo><mtext mathvariant="normal">Errors</mtext></mrow></mfrac><mo>×</mo><mn>100</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">\text{Mutation Score} = \frac{\text{Killed} + \text{Errors}}{\text{Killed} + \text{Survived} + \text{Errors}} \times 100\%</annotation></semantics></math>, where a Mutant is a variant of the original code used to test the robustness of the test suite. An erroring mutant was still detected, so it counts as killed; mutants with no test coverage are excluded.</p>
 <p><code><a href="reference/comparison_operators.html">comparison_operators()</a></code> generates mutants by swapping each comparison operator for related alternatives. For <code>&gt;=</code> it produces two mutants:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#' R/is_adult.R — mutant 1: "&gt;=" -&gt; "&gt;"</span></span>

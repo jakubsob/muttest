@@ -21,8 +21,10 @@
   `FileTestStrategy`) are now reported as a separate `no coverage`
   category and excluded from the score, so untested code no longer looks
   like escaped mutants. The score is now
-  `killed / (killed + survived + errors)`. `FullTestStrategy` scores are
-  unaffected.
+  `(killed + errors) / (killed + survived + errors)` — an erroring
+  mutant was still detected, so it counts toward the score while
+  remaining a separate `errors` category in the report.
+  `FullTestStrategy` scores are unaffected.
 - ✨ `PackageCopyStrategy` gained a `symlink` argument. When `TRUE`,
   only the mutated file’s top-level directory is copied and everything
   else is symlinked to the original, avoiding a full project copy per

@@ -60,11 +60,12 @@ mutant **survived** — your tests are blind to that kind of bug.
 
 ## Kill vs survive
 
-| Outcome  | Meaning                                                    |
-|----------|------------------------------------------------------------|
-| Killed   | At least one test failed. Your tests caught this mutation. |
-| Survived | All tests passed. Your tests did not detect this change.   |
-| Error    | The mutated code caused an unexpected runtime error.       |
+| Outcome | Meaning |
+|----|----|
+| Killed | At least one test failed. Your tests caught this mutation. |
+| Survived | All tests passed. Your tests did not detect this change. |
+| Error | The mutated code errored. The change was still detected, so it counts as killed. |
+| No coverage | No test exercised the mutant. Excluded from the score. |
 
 Survivors are the interesting ones. Each surviving mutant points to a
 specific gap: a mutation your tests cannot distinguish from the original
@@ -72,7 +73,11 @@ code. That is a candidate for a stronger test.
 
 ## The mutation score
 
-    Mutation Score = (Killed Mutants / Total Mutants) × 100%
+    Mutation Score = (Killed + Errors) / (Killed + Survived + Errors) × 100%
+
+Errored mutants count as detected (killed); mutants with no test
+coverage are excluded — an untested mutant says nothing about test
+quality.
 
 - **0%** — Your tests pass regardless of what the code does. Assertions
   are missing or trivial.

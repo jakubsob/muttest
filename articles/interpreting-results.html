@@ -121,8 +121,9 @@ tests did not notice the change.</td>
 <tr class="odd">
 <td>E</td>
 <td>
-<strong>Errors</strong> — mutants that produced a parse or execution
-error (neither killed nor survived).</td>
+<strong>Errors</strong> — mutants whose mutated code errored (parse
+or runtime). The mutation was still detected, so it counts as killed; it
+is tracked separately so you can see how it was caught.</td>
 </tr>
 <tr class="even">
 <td>T</td>
@@ -133,7 +134,9 @@ pair.</td>
 <tr class="odd">
 <td>%</td>
 <td>
-<strong>Score</strong> — <code>K / (K + S) × 100</code>.</td>
+<strong>Score</strong> — <code>(K + E) / (K + S + E) × 100</code>.
+Errors count as detected; mutants with no test coverage are
+excluded.</td>
 </tr>
 </tbody>
 </table>

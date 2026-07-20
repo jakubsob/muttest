@@ -143,8 +143,8 @@ blind to that kind of bug.</p>
 </h2>
 <table class="table">
 <colgroup>
-<col width="12%">
-<col width="87%">
+<col width="11%">
+<col width="88%">
 </colgroup>
 <thead><tr class="header">
 <th>Outcome</th>
@@ -161,7 +161,12 @@ blind to that kind of bug.</p>
 </tr>
 <tr class="odd">
 <td>Error</td>
-<td>The mutated code caused an unexpected runtime error.</td>
+<td>The mutated code errored. The change was still detected, so it
+counts as killed.</td>
+</tr>
+<tr class="even">
+<td>No coverage</td>
+<td>No test exercised the mutant. Excluded from the score.</td>
 </tr>
 </tbody>
 </table>
@@ -172,7 +177,10 @@ code. That is a candidate for a stronger test.</p>
 <div class="section level2">
 <h2 id="the-mutation-score">The mutation score<a class="anchor" aria-label="anchor" href="#the-mutation-score"></a>
 </h2>
-<pre><code>Mutation Score = (Killed Mutants / Total Mutants) × 100%</code></pre>
+<pre><code>Mutation Score = (Killed + Errors) / (Killed + Survived + Errors) × 100%</code></pre>
+<p>Errored mutants count as detected (killed); mutants with no test
+coverage are excluded — an untested mutant says nothing about test
+quality.</p>
 <ul>
 <li>
 <strong>0%</strong> — Your tests pass regardless of what the code
