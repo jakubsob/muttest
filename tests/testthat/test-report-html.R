@@ -1,4 +1,3 @@
-testthat::skip_on_cran()
 testthat::skip_on_os("windows")
 
 # The report inlines its CSS/JS to be self-contained; that would bloat the
