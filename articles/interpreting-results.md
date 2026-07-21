@@ -34,7 +34,7 @@ A 100% score does not mean there are no bugs — it means there are no
 untested bugs *of the kinds the mutators probe*. Start with the
 survivors; they are the actionable signal.
 
-## [The HTML report](https://jakubsob.github.io/muttest/report/muttest.md)
+## [The HTML report](https://jakubsob.github.io/muttest/report/muttest.html)
 
 For anything bigger than a couple of files, review survivors in the HTML
 report instead of the terminal. Run muttest with `JSONMutationReporter`,
@@ -51,7 +51,7 @@ its source line, and shows the exact diff that your tests failed to
 notice.
 
 [See a live example
-report](https://jakubsob.github.io/muttest/report/muttest.md).
+report](https://jakubsob.github.io/muttest/report/muttest.html).
 
 ------------------------------------------------------------------------
 
