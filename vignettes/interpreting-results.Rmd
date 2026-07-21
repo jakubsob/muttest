@@ -41,7 +41,7 @@ A `✔` row means at least one mutant was killed. An `x` row means every mutant 
 
 A 100% score does not mean there are no bugs — it means there are no untested bugs *of the kinds the mutators probe*. Start with the survivors; they are the actionable signal.
 
-## [The HTML report](../report/muttest.html)
+## [The HTML report](https://jakubsob.github.io/muttest/report/muttest.html)
 
 For anything bigger than a couple of files, review survivors in the HTML report instead of the terminal. Run muttest with `JSONMutationReporter`, then render the report:
 
@@ -52,7 +52,7 @@ report()
 
 The report opens filtered to survived mutants, overlays each mutant on its source line, and shows the exact diff that your tests failed to notice.
 
-[See a live example report](../report/muttest.html).
+[See a live example report](https://jakubsob.github.io/muttest/report/muttest.html).
 
 ---
 
