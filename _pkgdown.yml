@@ -76,6 +76,25 @@ reference:
       - remove_negation
       - replace_return_value
       - delete_statement
+      - remove_unary_minus
+      - integer_to_double
+      - double_to_integer
+      - numeric_replace
+      - condition_constant
+      - keep_operand
+      - remove_else_branch
+      - empty_if_body
+      - remove_null_guard
+      - replace_implicit_return
+      - replace_call_result
+      - drop_argument
+      - reverse_arguments
+      - remove_validation
+      - flip_named_flag
+      - remove_pipe_stage
+      - seq_len_decrement
+      - seq_along_drop_first
+      - colon_start_increment
   - title: Mutator presets
     desc: Ready-made collections of related mutators for common bug categories.
     contents:
@@ -88,6 +107,14 @@ reference:
       - index_mutations
       - string_literals
       - condition_mutations
+      - function_swaps
+      - membership_operators
+      - operand_elision
+      - branch_mutations
+      - numeric_boundaries
+      - numeric_type_swaps
+      - sequence_mutations
+      - all_mutators
   - title: Reporters
     desc: Control how results are displayed.
     contents:

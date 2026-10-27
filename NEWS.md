@@ -1,3 +1,12 @@
+# muttest (development version)
+
+- ✨ New mutators:
+  - Calls and arguments: `drop_argument()`, `reverse_arguments()`, `remove_validation()`, `flip_named_flag()`, `replace_call_result()`, `remove_pipe_stage()`.
+  - Control flow: `condition_constant()`, `remove_else_branch()`, `empty_if_body()`, `remove_null_guard()`, `keep_operand()`, `replace_implicit_return()`.
+  - Literals and sequences: `remove_unary_minus()`, `integer_to_double()`, `double_to_integer()`, `numeric_replace()`, `seq_len_decrement()`, `seq_along_drop_first()`, `colon_start_increment()`, `colon_end_decrement()`.
+- ✨ New presets: `function_swaps()` (`any`/`all`, `min`/`max`, `nrow`/`ncol`, ...), `membership_operators()`, `operand_elision()`, `branch_mutations()`, `numeric_boundaries()`, `numeric_type_swaps()` and `sequence_mutations()`.
+- ✨ New `all_mutators()` returns a flat list of every mutator with default arguments.
+
 # muttest 0.3.0
 
 - ✨ New `JSONMutationReporter` writes a report conforming to the [mutation-testing-elements](https://stryker-mutator.io) schema, a cross-language standard shared by StrykerJS/.NET/Scala — so muttest output can be fed to any schema-compatible tooling.
