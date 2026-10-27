@@ -60,7 +60,9 @@ muttest <- function(
   test_reporter <- reporter$test_reporter
   timeout_ms <- if (is.finite(timeout)) as.integer(timeout) else NULL
 
-  tasks <- lapply(rows, function(row) {
+  # Submit at most `workers` mutants at a time: mirai's timeout clock starts at
+  # submission, so a mutant queued behind others would otherwise time out.
+  submit <- function(row) {
     reporter$start_file(row$filename)
     reporter$start_mutator(row$mutator[[1]])
     reporter$update(force = TRUE)
@@ -100,16 +102,37 @@ muttest <- function(
       test_reporter = test_reporter,
       .timeout = timeout_ms
     )
-  })
+  }
 
-  for (i in seq_along(tasks)) {
+  tasks <- lapply(rows[seq_len(min(workers, length(rows)))], submit)
+
+  for (i in seq_along(rows)) {
     res <- tasks[[i]][] # blocks until the task resolves
+    if (mirai::is_error_value(res) && !mirai::is_mirai_error(res)) {
+      # The mutant crashed its daemon, or timed out in code that ignores
+      # interrupts (e.g. compiled loops) and still holds it. Either way later
+      # mutants would wait out the timeout, so restart the daemons and
+      # resubmit the mutants that were in flight on them.
+      mirai::daemons(0)
+      mirai::daemons(workers)
+      in_flight <- seq_len(min(i + workers - 1, length(rows)))[-seq_len(i)]
+      for (j in in_flight) {
+        tasks[[j]] <- submit(rows[[j]])
+      }
+    }
+    if (i + workers <= length(rows)) {
+      tasks[[i + workers]] <- submit(rows[[i + workers]])
+    }
     row <- rows[[i]]
     if (mirai::is_error_value(res) && !mirai::is_mirai_error(res)) {
       .record_result(
         reporter,
         row,
-        simpleError("Timed out"),
+        simpleError(if (unclass(res) == 5L) {
+          "Timed out"
+        } else {
+          paste0("Test process crashed (mirai error ", unclass(res), ")")
+        }),
         row$mutated_code[[1]]
       )
     } else if (mirai::is_error_value(res)) {

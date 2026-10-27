@@ -368,8 +368,18 @@ ProgressMutationReporter <- R6::R6Class(
       file_path,
       mutator
     ) {
-      changed <- which(original_code != mutated_code)
-      if (length(changed) == 0) {
+      if (length(original_code) == length(mutated_code)) {
+        changed <- which(original_code != mutated_code)
+        removed <- changed
+        added <- changed
+      } else {
+        # Mutant added or removed lines (e.g. a deleted statement), so a
+        # positional comparison would misalign: diff via longest common subsequence
+        keep <- private$common_lines(original_code, mutated_code)
+        removed <- setdiff(seq_along(original_code), keep$original)
+        added <- setdiff(seq_along(mutated_code), keep$mutated)
+      }
+      if (length(removed) == 0 && length(added) == 0) {
         return(invisible(NULL))
       }
 
@@ -380,13 +390,15 @@ ProgressMutationReporter <- R6::R6Class(
         " \u2192 ",
         mutator$to
       )))
-      for (i in changed) {
+      for (i in removed) {
         self$cat_line(cli::col_red(paste0(
           "  ",
           i,
           "- ",
           trimws(original_code[[i]], "right")
         )))
+      }
+      for (i in added) {
         self$cat_line(cli::col_green(paste0(
           "  ",
           i,
@@ -394,6 +406,39 @@ ProgressMutationReporter <- R6::R6Class(
           trimws(mutated_code[[i]], "right")
         )))
       }
+    },
+
+    # Indices of lines in each vector that belong to their longest common subsequence
+    common_lines = function(a, b) {
+      n <- length(a)
+      m <- length(b)
+      len <- matrix(0L, n + 1L, m + 1L)
+      for (i in seq_len(n)) {
+        for (j in seq_len(m)) {
+          len[i + 1L, j + 1L] <- if (a[[i]] == b[[j]]) {
+            len[i, j] + 1L
+          } else {
+            max(len[i, j + 1L], len[i + 1L, j])
+          }
+        }
+      }
+      i <- n
+      j <- m
+      keep_a <- integer()
+      keep_b <- integer()
+      while (i > 0 && j > 0) {
+        if (a[[i]] == b[[j]]) {
+          keep_a <- c(i, keep_a)
+          keep_b <- c(j, keep_b)
+          i <- i - 1L
+          j <- j - 1L
+        } else if (len[i, j + 1L] >= len[i + 1L, j]) {
+          i <- i - 1L
+        } else {
+          j <- j - 1L
+        }
+      }
+      list(original = keep_a, mutated = keep_b)
     },
 
     cat_stats = function() {

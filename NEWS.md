@@ -1,3 +1,8 @@
+# muttest (development version)
+
+- 🐛 `muttest()`'s `timeout` now applies to each mutant's own run. Previously every mutant was queued up front and the timeout clock started at submission, so once total run time exceeded `timeout` all remaining mutants were reported as "Timed out" errors.
+- 🐛 A mutant that crashes its test process (e.g. a segfault in compiled code), or times out in code that ignores interrupts, no longer makes every later mutant wait out the timeout: `muttest()` restarts its workers after such a failure. Crashes are now reported as "Test process crashed" instead of "Timed out".
+
 # muttest 0.3.0
 
 - ✨ New `JSONMutationReporter` writes a report conforming to the [mutation-testing-elements](https://stryker-mutator.io) schema, a cross-language standard shared by StrykerJS/.NET/Scala — so muttest output can be fed to any schema-compatible tooling.
